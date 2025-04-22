@@ -1,0 +1,20 @@
+---
+deployment:
+  tasks:
+    # Set your deployment path
+    - export DEPLOY_PATH=/home/mvpmyriam/repositories/ecoReport-itos-packed 
+    
+    # Move to the deployment directory
+    - cd $DEPLOY_PATH
+
+    # Pull latest changes from Git (optional but good to have)
+    - git pull
+
+    # Install PHP dependencies
+    - composer install --no-interaction --prefer-dist --optimize-autoloader
+
+    # Install Node.js dependencies
+    - npm install
+
+    # Run DB migrations (auto-confirm "yes")
+    - yes | php yii migrate --interactive=0
