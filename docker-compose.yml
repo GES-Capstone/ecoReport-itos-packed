@@ -1,0 +1,103 @@
+version: "3.7"
+
+services:
+  frontend:
+    build: frontend
+    volumes:
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - db
+
+  backend:
+    build: backend
+    volumes:
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - db
+  console:
+    build: console
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    working_dir: /app
+    depends_on:
+      - db
+
+  storage:
+    build: storage
+    volumes:
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - db
+
+  api:
+    build: api
+    volumes:
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./:/app
+      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+    depends_on:
+      - api
+      - frontend
+      - backend
+      - console
+      - storage
+
+  node:
+    image: node:16-alpine
+    volumes:
+      - ./:/app
+    working_dir: /app
+
+  mailcatcher:
+    image: schickling/mailcatcher:latest
+    ports:
+      - 1080:1080
+
+  db:
+    image: mariadb:10.6
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/config.cnf:/etc/mysql/conf.d/config.cnf
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yii2-starter-kit
+      MYSQL_USER: ysk_dbu
+      MYSQL_PASSWORD: ysk_pass
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ysk_dbu
+      PMA_PASSWORD: ysk_pass
+    depends_on:
+      - db
+networks:
+  default:
+    name: yii2-starter-kit_default
+volumes:
+  db_data:
