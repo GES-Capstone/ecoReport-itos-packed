@@ -1,20 +1,29 @@
 ---
 deployment:
   tasks:
-    # Set your deployment path
-    - export DEPLOY_PATH=/home/mvpmyriam/repositories/ecoReport-itos-packed 
-    
-    # Move to the deployment directory
+    # 1. Define deployment path
+    - export DEPLOY_PATH=/home/mvpmyriam/repositories/ecoReport-itos-packed
+
+    # 2. Move to the deployment directory
     - cd $DEPLOY_PATH
 
-    # Pull latest changes from Git (optional but good to have)
-    - git pull
-
-    # Install PHP dependencies
+    # 3. Install Composer dependencies
     - composer install --no-interaction --prefer-dist --optimize-autoloader
 
-    # Install Node.js dependencies
+    # 4. Install Node.js dependencies (if your backend uses assets managed by npm/yarn)
+    - cd backend
     - npm install
+    - cd ..
 
-    # Run DB migrations (auto-confirm "yes")
-    - yes | php yii migrate --interactive=0
+    # 5. Run Yii migrations
+    - php yii migrate --interactive=0
+
+    # 6. Clear application cache
+    - php yii cache/flush-all
+
+    # 7. Set file permissions
+    - chmod -R 755 runtime backend/web/assets console yii
+
+    # 8. Create symlinks for web access (assuming 'backend/web' is your web root)
+    - rm -rf public_html
+    - ln -s backend/web public_html
