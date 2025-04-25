@@ -14,29 +14,14 @@ class m250424_163928_create_fleet_table extends Migration
     {
         $this->createTable('{{%fleet}}', [
             'id' => $this->primaryKey(),
+            'mining_group_id' => $this->integer(),
             'company_id' => $this->integer(),
             'location_id' => $this->integer(),
-            'name' => $this-> string(100),
+            'name' => $this->string(),
             'description' => $this->text(),
-
-
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
         ]);
-        $this->addForeignKey(
-            'fk-fleet-company_id',
-            '{{%fleet}}',
-            'company_id',
-            '{{%company}}',
-            'id',
-            'SET NULL',
-        );
-        $this->addForeignKey(
-            'fk-fleet-location',
-            '{{%fleet}}',
-            'location_id',
-            '{{%location}}',
-            'id',
-            'SET NULL',
-        );
     }
 
     /**
