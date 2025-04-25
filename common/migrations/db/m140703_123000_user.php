@@ -12,6 +12,7 @@ class m140703_123000_user extends Migration
     {
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
+            'mining_group_id' => $this->integer(),
             'username' => $this->string(32),
             'auth_key' => $this->string(32)->notNull(),
             'access_token' => $this->string(40)->notNull(),
@@ -37,6 +38,7 @@ class m140703_123000_user extends Migration
         ]);
 
         $this->addForeignKey('fk_user', '{{%user_profile}}', 'user_id', '{{%user}}', 'id', 'cascade', 'cascade');
+        $this->addForeignKey('fk_user_mining_group', '{{%user}}', 'mining_group_id', '{{%mining_group}}', 'id', 'SET NULL', 'SET NULL');
 
     }
 
