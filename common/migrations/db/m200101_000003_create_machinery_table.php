@@ -5,13 +5,11 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%machinery}}`.
  */
-class m250425_211707_create_machinery_table extends Migration
+class m200101_000003_create_machinery_table extends Migration
 {
     public function safeUp()
     {
-        // Crear la enumeración para inspection_type
-        $this->execute("CREATE TYPE inspection_type AS ENUM ('PER COMPONENT', 'COMPLETE')");
-        
+        // En MariaDB, los ENUM se definen directamente en la columna
         $this->createTable('{{%machinery}}', [
             'id' => $this->primaryKey(),
             'mining_group_id' => $this->integer(),
@@ -31,7 +29,8 @@ class m250425_211707_create_machinery_table extends Migration
             'description' => $this->text(),
             'photo_base_url' => $this->string(),
             'photo_path' => $this->string(),
-            'inspection_type' => "inspection_type", // Usando el ENUM creado
+            // Definir el ENUM directamente en la columna para MariaDB
+            'inspection_type' => "ENUM('PER COMPONENT', 'COMPLETE')",
         ]);
 
         // Añadir claves foráneas
@@ -103,7 +102,6 @@ class m250425_211707_create_machinery_table extends Migration
         // Eliminar tabla
         $this->dropTable('{{%machinery}}');
         
-        // Eliminar la enumeración
-        $this->execute("DROP TYPE inspection_type");
+        // Ya no es necesario eliminar el tipo porque no se crea como un tipo separado
     }
 }

@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%functional_status}}`.
  */
-class m250425_211452_create_functional_status_table extends Migration
+class m140701_000004_create_functional_status_table extends Migration
 {
     /**
      * {@inheritdoc}

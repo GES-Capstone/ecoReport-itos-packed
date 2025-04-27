@@ -10,7 +10,7 @@ use yii\db\Migration;
  * - `{{%fleet}}`
  * - `{{%location}}`
  */
-class m250425_145438_create_area_table extends Migration
+class m140703_122004_create_area_table extends Migration
 {
     /**
      * {@inheritdoc}

@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%mining_group}}`.
  */
-class m250423_213912_create_mining_group_table extends Migration
+class m140701_000003_create_mining_group_table extends Migration
 {
     /**
      * {@inheritdoc}

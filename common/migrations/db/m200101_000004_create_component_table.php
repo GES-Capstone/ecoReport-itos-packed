@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%component}}`.
  */
-class m250425_224748_create_component_table extends Migration
+class m200101_000004_create_component_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -55,7 +55,7 @@ class m250425_224748_create_component_table extends Migration
             'mining_group_id',
             '{{%mining_group}}',
             'id',
-            'CASCADE'
+            'SET NULL'
         );
 
         $this->addForeignKey(
@@ -64,7 +64,7 @@ class m250425_224748_create_component_table extends Migration
             'company_id',
             '{{%company}}',
             'id',
-            'CASCADE'
+            'SET NULL'
         );
 
         $this->addForeignKey(
@@ -73,7 +73,7 @@ class m250425_224748_create_component_table extends Migration
             'fleet_id',
             '{{%fleet}}',
             'id',
-            'CASCADE'
+            'SET NULL'
         );
 
         $this->addForeignKey(
@@ -82,7 +82,7 @@ class m250425_224748_create_component_table extends Migration
             'area_id',
             '{{%area}}',
             'id',
-            'CASCADE'
+           'SET NULL'
         );
 
         $this->addForeignKey(
@@ -91,7 +91,7 @@ class m250425_224748_create_component_table extends Migration
             'machinery_id',
             '{{%machinery}}',
             'id',
-            'CASCADE'
+           'SET NULL'
         );
 
         $this->addForeignKey(
@@ -100,7 +100,7 @@ class m250425_224748_create_component_table extends Migration
             'component_id',
             '{{%component}}',
             'id',
-            'CASCADE'
+           'SET NULL'
         );
 
         $this->addForeignKey(
@@ -109,7 +109,7 @@ class m250425_224748_create_component_table extends Migration
             'status_id',
             '{{%status}}',
             'id',
-            'CASCADE'
+           'SET NULL'
         );
 
         $this->addForeignKey(
@@ -118,7 +118,7 @@ class m250425_224748_create_component_table extends Migration
             'location_id',
             '{{%location}}',
             'id',
-            'CASCADE'
+            'SET NULL'
         );
     }
 
