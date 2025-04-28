@@ -1,0 +1,15 @@
+.alerts-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 300px;
+    pointer-events: none;
+}
+
+.alerts-container .alert {
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    pointer-events: all;
+}

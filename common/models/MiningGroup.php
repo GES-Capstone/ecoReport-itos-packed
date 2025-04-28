@@ -61,8 +61,8 @@ class MiningGroup extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'location_id' => 'Location ID',
-            'name' => 'Name',
-            'ges_name' => 'Ges Name',
+            'name' => 'Nombre del Grupo Minero',
+            'ges_name' => 'Nombre del Grupo Minero',
             'description' => 'Description',
             'commercial_address' => 'Commercial Address',
             'operational_address' => 'Operational Address',
