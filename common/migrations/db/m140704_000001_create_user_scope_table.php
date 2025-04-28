@@ -19,7 +19,6 @@ class m140704_000001_create_user_scope_table extends Migration
 
         ]);
 
-        // Añadir índices para mejorar el rendimiento
         $this->createIndex(
             'idx-user_scope-user_id',
             '{{%user_scope}}',
@@ -32,7 +31,6 @@ class m140704_000001_create_user_scope_table extends Migration
             'company_id'
         );
 
-        // Crear índice único para evitar duplicados
         $this->createIndex(
             'idx-user_scope-user_company-unique',
             '{{%user_scope}}',
@@ -40,7 +38,6 @@ class m140704_000001_create_user_scope_table extends Migration
             true
         );
 
-        // Añadir claves foráneas
         $this->addForeignKey(
             'fk-user_scope-user_id',
             '{{%user_scope}}',
@@ -48,7 +45,7 @@ class m140704_000001_create_user_scope_table extends Migration
             '{{%user}}',
             'id',
             'SET NULL',
-            
+
         );
 
         $this->addForeignKey(
@@ -66,16 +63,13 @@ class m140704_000001_create_user_scope_table extends Migration
      */
     public function safeDown()
     {
-        // Eliminar primero las claves foráneas
         $this->dropForeignKey('fk-user_scope-user_id', '{{%user_scope}}');
         $this->dropForeignKey('fk-user_scope-company_id', '{{%user_scope}}');
-        
-        // Eliminar los índices
+
         $this->dropIndex('idx-user_scope-user_id', '{{%user_scope}}');
         $this->dropIndex('idx-user_scope-company_id', '{{%user_scope}}');
         $this->dropIndex('idx-user_scope-user_company-unique', '{{%user_scope}}');
-        
-        // Finalmente eliminar la tabla
+
         $this->dropTable('{{%user_scope}}');
     }
 }

@@ -28,8 +28,10 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property integer $logged_at
  * @property string $password write-only password
+ * @property integer $mining_group_id
  *
  * @property \common\models\UserProfile $userProfile
+ * @property \common\models\MiningGroup $miningGroup
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -155,7 +157,11 @@ class User extends ActiveRecord implements IdentityInterface
             parent::scenarios(),
             [
                 'oauth_create' => [
-                    'oauth_client', 'oauth_client_user_id', 'email', 'username', '!status'
+                    'oauth_client',
+                    'oauth_client_user_id',
+                    'email',
+                    'username',
+                    '!status'
                 ]
             ]
         );
@@ -170,7 +176,8 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'email'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_NOT_ACTIVE],
             ['status', 'in', 'range' => array_keys(self::statuses())],
-            [['username'], 'filter', 'filter' => '\yii\helpers\Html::encode']
+            [['username'], 'filter', 'filter' => '\yii\helpers\Html::encode'],
+            [['mining_group_id'], 'integer']
         ];
     }
 
@@ -200,6 +207,7 @@ class User extends ActiveRecord implements IdentityInterface
             'created_at' => Yii::t('common', 'Created at'),
             'updated_at' => Yii::t('common', 'Updated at'),
             'logged_at' => Yii::t('common', 'Last login'),
+            'mining_group_id' => Yii::t('common', 'Mining Group'),
         ];
     }
 
@@ -209,6 +217,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function getUserProfile()
     {
         return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMiningGroup()
+    {
+        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
     }
 
     /**

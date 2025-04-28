@@ -17,7 +17,6 @@ class m140701_000002_create_initial_configuration_table extends Migration
         ]);
 
 
-        // Create FK to mining_group table
         if ($this->db->schema->getTableSchema('{{%mining_group}}', true) !== null) {
             $this->addForeignKey(
                 'fk-initial_configuration-mining_group_id',

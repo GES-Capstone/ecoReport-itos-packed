@@ -39,7 +39,6 @@ class m140703_123000_user extends Migration
 
         $this->addForeignKey('fk_user', '{{%user_profile}}', 'user_id', '{{%user}}', 'id', 'cascade', 'cascade');
         $this->addForeignKey('fk_user_mining_group', '{{%user}}', 'mining_group_id', '{{%mining_group}}', 'id', 'SET NULL', 'SET NULL');
-
     }
 
     /**
@@ -50,6 +49,5 @@ class m140703_123000_user extends Migration
         $this->dropForeignKey('fk_user', '{{%user_profile}}');
         $this->dropTable('{{%user_profile}}');
         $this->dropTable('{{%user}}');
-
     }
 }
