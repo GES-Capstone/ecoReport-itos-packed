@@ -26,21 +26,18 @@ class m140703_000003_create_company_table extends Migration
             'logo_base_url' => $this->string(255)->comment('Base URL for logo image'),
         ]);
 
-        // Añadir índice para mining_group_id
         $this->createIndex(
             'idx-company-mining_group_id',
             '{{%company}}',
             'mining_group_id'
         );
 
-        // Añadir índice para location_id
         $this->createIndex(
             'idx-company-location-id',
             '{{%company}}',
             'location_id'
         );
 
-        // Añadir clave foránea para mining_group_id (FK)
         $this->addForeignKey(
             'fk-company-mining_group_id',
             '{{%company}}',
@@ -50,7 +47,6 @@ class m140703_000003_create_company_table extends Migration
             'SET NULL', 
         );
 
-        // Añadir clave foránea para location_id (FK)
         $this->addForeignKey(
             'fk-company-location-id',
             '{{%company}}',
@@ -66,15 +62,12 @@ class m140703_000003_create_company_table extends Migration
      */
     public function safeDown()
     {
-        // Eliminar primero las claves foráneas
         $this->dropForeignKey('fk-company-mining_group_id', '{{%company}}');
         $this->dropForeignKey('fk-company-location-id', '{{%company}}');
         
-        // Eliminar los índices
         $this->dropIndex('idx-company-mining_group_id', '{{%company}}');
         $this->dropIndex('idx-company-location-id', '{{%company}}');
         
-        // Finalmente eliminar la tabla
         $this->dropTable('{{%company}}');
     }
 }
