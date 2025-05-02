@@ -70,6 +70,13 @@ $config = [
                 'actions' => ['logout'],
             ],
             [
+                'controllers' => ['import/import-data'],
+                'allow' => true,
+                'roles' => ['@'],
+                'actions' => ['index','process'],
+            ],
+           
+            [
                 'controllers' => ['site'],
                 'allow' => true,
                 'roles' => ['?', '@'],

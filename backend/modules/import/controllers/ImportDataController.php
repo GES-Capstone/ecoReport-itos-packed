@@ -39,6 +39,7 @@ class ImportDataController extends Controller
 
         // Obtener el ID del grupo minero asociado al usuario actual
         $userId = Yii::$app->user->id;
+
         $userMiningGroup = $this->getUserMiningGroup($userId);
 
         if (!$userMiningGroup) {
@@ -190,10 +191,10 @@ class ImportDataController extends Controller
     {
 
         $user = User::findOne($userId);
-        $miningGroup = $user->getMiningGroup();
         if (!$user) {
             return null;
         }
-        return $user->getMiningGroup();
+        $miningGroup = $user->getMiningGroup();
+        return $miningGroup();
     }
 }

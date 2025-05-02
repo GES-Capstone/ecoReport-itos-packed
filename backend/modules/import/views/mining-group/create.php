@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model common\models\MiningGroup */
 /* @var $location common\models\Location */
 
-$this->title = 'Crear Grupo Minero';
+$this->title = 'Create Mining Group';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="mining-group-create">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Información del Grupo Minero</h3>
+                <h3 class="panel-title">Mining Group Information</h3>
             </div>
             <div class="panel-body">
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
@@ -47,8 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="form-group">
-            <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
-            <?= Html::a('Cancelar', ['/site/index'], ['class' => 'btn btn-default']) ?>
+            <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Cancel', ['/site/index'], ['class' => 'btn btn-default']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>

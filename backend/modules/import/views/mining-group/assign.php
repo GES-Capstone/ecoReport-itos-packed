@@ -9,46 +9,42 @@ use yii\widgets\ActiveForm;
 /* @var $userId int|null */
 /* @var $groupId int|null */
 
-$this->title = 'Asignar Grupo Minero a Usuario';
+$this->title = 'Assign Mining Group to User';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="mining-group-assign">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Asignar Grupo Minero</h3>
-        </div>
+
         <div class="panel-body">
             <?php $form = ActiveForm::begin(); ?>
 
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label">Usuario</label>
+                        <label class="control-label">User</label>
                         <?= Html::dropDownList('user_id', $userId, $users, [
                             'class' => 'form-control',
-                            'prompt' => 'Seleccionar Usuario',
+                            'prompt' => 'Select User',
                         ]) ?>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label">Grupo Minero</label>
+                        <label class="control-label">Mining Group</label>
                         <?= Html::dropDownList('group_id', $groupId, $groups, [
                             'class' => 'form-control',
-                            'prompt' => 'Seleccionar Grupo Minero',
+                            'prompt' => 'Select Mining Group',
                         ]) ?>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <?= Html::submitButton('Asignar', ['class' => 'btn btn-success']) ?>
-                <?= Html::a('Crear Nuevo Grupo Minero', ['create'], ['class' => 'btn btn-primary']) ?>
-                <?= Html::a('Cancelar', ['/site/index'], ['class' => 'btn btn-default']) ?>
+                <?= Html::submitButton('Assign', ['class' => 'btn btn-success']) ?>
+                <?= Html::a('Create New Mining Group', ['create'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Cancel', ['/site/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>
