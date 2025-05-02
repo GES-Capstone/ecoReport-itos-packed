@@ -39,7 +39,7 @@ class Maintenance extends Component implements BootstrapInterface
     /**
      * @var string
      */
-    public $maintenanceView = '@common/components/maintenance/views/maintenance/index.php';
+    public $maintenanceView = '@common/components/maintenance/views/maintenance/create.php';
     /**
      * @var string
      */

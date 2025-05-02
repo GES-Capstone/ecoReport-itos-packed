@@ -57,7 +57,8 @@
     "yii-starter-kit/sitemaped": "^2.0",
     "yii2mod/yii2-swagger": "^1.1",
     "rmrevin/yii2-fontawesome": "^3.4",
-    "kartik-v/yii2-widgets": "^3.4"
+    "kartik-v/yii2-widgets": "^3.4",
+    "phpoffice/phpspreadsheet": "^4.2"
   },
   "require-dev": {
     "yiisoft/yii2-gii": "^2.0.0",

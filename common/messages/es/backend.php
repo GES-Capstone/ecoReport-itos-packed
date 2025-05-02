@@ -206,4 +206,8 @@ return [
     'The logs have been cleared' => 'Los registros han sido eliminados',
     'Uploads' => 'Cargas de archivos',
     '{identity} has been deleted' => '{identity} ha sido eliminado',
+    'Please select an Excel file' => 'Por favor seleccione un archivo Excel',
+    'Please upload a valid Excel file (.xlsx, .xls or .csv)' => 'Por favor suba un archivo Excel válido (.xlsx, .xls o .csv)',
+    'The file is too large. Maximum size is 10MB' => 'El archivo es demasiado grande. Tamaño máximo 10MB',
+    'Excel File' => 'Archivo Excel',
 ];

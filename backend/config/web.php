@@ -18,6 +18,17 @@ $config = [
             'enableAutoLogin' => true,
             'as afterLogin' => common\behaviors\LoginTimestampBehavior::class,
         ],
+        'log' => [
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning', 'info'],
+                    'categories' => ['import'],
+                    'logFile' => '@runtime/logs/import.log',
+                    'logVars' => [],
+                ],
+            ],
+        ],
     ],
     'modules' => [
         'content' => [
@@ -38,6 +49,9 @@ $config = [
         'rbac' => [
             'class' => backend\modules\rbac\Module::class,
             'defaultRoute' => 'rbac-auth-item/index',
+        ],
+        'import' => [
+            'class' => 'backend\modules\import\Module',
         ],
     ],
     'as globalAccess' => [

@@ -10,7 +10,7 @@ class ExcelUploadForm extends Model
     /**
      * @var UploadedFile
      */
-    public UploadedFile $excelFile;
+    public $excelFile;
 
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class ExcelUploadForm extends Model
     public function rules()
     {
         return [
-            [['excelFile'], 'required', 'message' => 'Por favor seleccione un archivo Excel'],
+            [['excelFile'], 'required', 'message' => 'Please select an Excel file'],
             [['excelFile'], 'file', 'skipOnEmpty' => false,
                 'extensions' => 'xlsx, xls, csv',
                 'mimeTypes' => [
@@ -29,8 +29,8 @@ class ExcelUploadForm extends Model
                     'text/plain'
                 ],
                 'maxSize' => 1024 * 1024 * 10, // 10 MB
-                'message' => 'Por favor suba un archivo Excel válido (.xlsx, .xls o .csv)',
-                'tooBig' => 'El archivo es demasiado grande. Tamaño máximo 10MB',
+                'message' => 'Please upload a valid Excel file (.xlsx, .xls or .csv)',
+                'tooBig' => 'The file is too large. Maximum size 10MB',
             ],
         ];
     }
@@ -41,7 +41,7 @@ class ExcelUploadForm extends Model
     public function attributeLabels()
     {
         return [
-            'excelFile' => 'Archivo Excel',
+            'excelFile' => 'Excel File',
         ];
     }
 
@@ -52,20 +52,20 @@ class ExcelUploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
-            // Crear directorio uploads si no existe
+            // creo que esto ya esta implemntado en el sistema ver si se puede reutilizar
             $path = Yii::getAlias('@webroot/uploads');
 
             if (!is_dir($path)) {
                 mkdir($path, 0775, true);
             }
 
-            // Guardar el archivo con nombre único para evitar colisiones
+            // Save the file with a unique name to avoid collisions
             $timestamp = time();
             $fileName = "{$timestamp}_{$this->excelFile->baseName}.{$this->excelFile->extension}";
             $filePath = $path . '/' . $fileName;
 
             if ($this->excelFile->saveAs($filePath)) {
-                // Puedes guardar el nombre original y el nombre de archivo en una propiedad
+                // You can save the original name and file name in a property
                 $this->excelFile->name = $fileName;
                 return true;
             }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace backend\controllers;
+namespace backend\modules\import\controllers;
 
 use Yii;
 use common\models\MiningGroup;
@@ -35,18 +35,18 @@ class MiningGroupController extends Controller
                 // Guardar primero la ubicación si hay coordenadas
                 if (!empty($location->latitude) && !empty($location->longitude)) {
                     if (!$location->save()) {
-                        throw new \Exception('Error al guardar la ubicación');
+                        throw new \Exception('Error saving location');
                     }
-                    $model->location_id = $location->id;
                 }
-
+              
+                $model->location_id = $location->id;
                 // Fechas de creación y actualización
                 $model->created_at = date('Y-m-d H:i:s');
                 $model->updated_at = date('Y-m-d H:i:s');
 
                 // Guardar el grupo minero
                 if (!$model->save()) {
-                    throw new \Exception('Error al guardar el grupo minero');
+                    throw new \Exception('Error saving the mining group');
                 }
 
                 $transaction->commit();
@@ -86,7 +86,7 @@ class MiningGroupController extends Controller
                 $user = User::findOne($userId);
 
                 if ($user) {
-                    // Asignar el grupo minero al usuario
+                    // Asignar el grupo miner al usuario
                     $user->mining_group_id = $groupId;
 
                     if ($user->save()) {
