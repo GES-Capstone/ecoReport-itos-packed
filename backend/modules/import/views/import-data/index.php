@@ -5,28 +5,34 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\modules\import\models\ExcelUploadForm */
 
-$this->title = 'Import Mining Groups and Companies';
+$this->title = 'Importar Datos';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="importacion-minera-form">
+<div class="import-data-index">
     <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>The Excel file must contain the following columns:</p>
-    <ul>
-        <li>Column A: Name of the mining group</li>
-        <li>Column B: Name of the company</li>
-    </ul>
+    
+    <div class="alert alert-info">
+        <p><strong>Instrucciones:</strong></p>
+        <ul>
+            <li>El archivo debe estar en formato Excel (.xlsx o .xls)</li>
+            <li>La primera fila debe contener los encabezados</li>
+            <li>Columna A: Nombre de la Compañía</li>
+            <li>Columna B: Ubicación (formato: latitud,longitud)</li>
+        </ul>
+    </div>
 
     <div class="panel panel-default">
-        <div class="panel-heading">Select file</div>
+        <div class="panel-heading">
+            <h3 class="panel-title">Subir archivo Excel</h3>
+        </div>
         <div class="panel-body">
             <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-            <?= $form->field($model, 'excelFile')->fileInput(['accept' => '.xlsx, .xls'])->label('Excel File') ?>
+            <?= $form->field($model, 'excelFile')->fileInput(['accept' => '.xlsx, .xls']) ?>
 
             <div class="form-group">
-                <?= Html::submitButton('Import', ['class' => 'btn btn-primary']) ?>
+                <?= Html::submitButton('Subir y Procesar', ['class' => 'btn btn-primary']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>

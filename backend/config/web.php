@@ -70,13 +70,6 @@ $config = [
                 'actions' => ['logout'],
             ],
             [
-                'controllers' => ['import/import-data'],
-                'allow' => true,
-                'roles' => ['@'],
-                'actions' => ['index','process'],
-            ],
-           
-            [
                 'controllers' => ['site'],
                 'allow' => true,
                 'roles' => ['?', '@'],
@@ -95,6 +88,18 @@ $config = [
             [
                 'controllers' => ['user'],
                 'allow' => false,
+            ],
+            [
+                'controllers' => ['import/mining-group'],
+                'allow' => true,
+                'roles'=> ['webmaster'],
+                'actions'=>['create','assign'],
+            ],
+            [
+                'controllers' => ['import/import-data'],
+                'allow' => true,
+                'roles' => ['@'],
+                'actions' => ['index','process'],
             ],
             [
                 'allow' => true,
