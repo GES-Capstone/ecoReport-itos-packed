@@ -92,8 +92,13 @@ $config = [
             [
                 'controllers' => ['import/mining-group'],
                 'allow' => true,
-                'roles'=> ['webmaster'],
+                'roles'=> ['webmaster','manager'],
                 'actions'=>['create','assign'],
+            ],    [
+                'controllers' => ['import/mining-group'],
+                'allow' => false,
+                'roles' => ['user'],
+                'actions' => ['create', 'assign'],
             ],
             [
                 'controllers' => ['import/import-data'],
@@ -103,7 +108,7 @@ $config = [
             ],
             [
                 'allow' => true,
-                'roles' => ['manager', 'administrator'],
+                'roles' => ['manager', 'administrator','user'],
             ],
         ],
     ],

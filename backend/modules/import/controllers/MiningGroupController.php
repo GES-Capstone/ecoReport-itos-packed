@@ -72,36 +72,83 @@ class MiningGroupController extends Controller
     {
         $userId = null;
         $groupId = null;
-
-        // Lista de usuarios y grupos mineros para los dropdowns
+    
         $users = ArrayHelper::map(User::find()->all(), 'id', 'username');
         $groups = ArrayHelper::map(MiningGroup::find()->all(), 'id', 'name');
-
+    
         if (Yii::$app->request->isPost) {
             $userId = Yii::$app->request->post('user_id');
             $groupId = Yii::$app->request->post('group_id');
-
-            if ($userId && $groupId) {
-                // Obtener el usuario
-                $user = User::findOne($userId);
-
-                if ($user) {
-                    // Asignar el grupo miner al usuario
-                    $user->mining_group_id = $groupId;
-
-                    if ($user->save()) {
-                        Yii::$app->session->setFlash('success', 'Grupo minero asignado correctamente al usuario');
-                    } else {
-                        Yii::$app->session->setFlash('error', 'Error al asignar el grupo minero al usuario');
-                    }
-                } else {
-                    Yii::$app->session->setFlash('error', 'Usuario no encontrado');
+    
+            if (!is_numeric($userId) || !is_numeric($groupId)) {
+                Yii::$app->session->setFlash('error', 'User and group IDs must be numeric values');
+                return $this->render('assign', [
+                    'users' => $users,
+                    'groups' => $groups,
+                    'userId' => $userId,
+                    'groupId' => $groupId,
+                ]);
+            }
+    
+            $user = User::findOne($userId);
+            if (!$user) {
+                Yii::$app->session->setFlash('error', 'Selected user does not exist');
+                return $this->render('assign', [
+                    'users' => $users,
+                    'groups' => $groups,
+                    'userId' => $userId,
+                    'groupId' => $groupId,
+                ]);
+            }
+    
+            $group = MiningGroup::findOne($groupId);
+            if (!$group) {
+                Yii::$app->session->setFlash('error', 'Selected mining group does not exist');
+                return $this->render('assign', [
+                    'users' => $users,
+                    'groups' => $groups,
+                    'userId' => $userId,
+                    'groupId' => $groupId,
+                ]);
+            }
+    
+            if ($user->mining_group_id) {
+                $currentGroup = MiningGroup::findOne($user->mining_group_id);
+                $currentGroupName = $currentGroup ? $currentGroup->name : 'unknown';
+                
+                Yii::$app->session->setFlash('error', 
+                    "User already belongs to group '$currentGroupName'. " .
+                    "Cannot reassign a user who already has a mining group."
+                );
+                
+                return $this->render('assign', [
+                    'users' => $users,
+                    'groups' => $groups,
+                    'userId' => $userId,
+                    'groupId' => $groupId,
+                ]);
+            }
+    
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $user->mining_group_id = $groupId;
+                $user->updated_at = date('Y-m-d H:i:s');
+    
+                if (!$user->save()) {
+                    throw new \Exception('Error saving changes: ' . implode(', ', $user->getErrorSummary(true)));
                 }
-            } else {
-                Yii::$app->session->setFlash('error', 'Debes seleccionar un usuario y un grupo minero');
+    
+                Yii::info("User {$user->username} (ID: {$user->id}) assigned to mining group {$group->name} (ID: {$group->id}) by " . Yii::$app->user->identity->username, 'mining');
+    
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', "User successfully assigned to group '{$group->name}'");
+                
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
-
+    
         return $this->render('assign', [
             'users' => $users,
             'groups' => $groups,
@@ -109,4 +156,5 @@ class MiningGroupController extends Controller
             'groupId' => $groupId,
         ]);
     }
+
 }

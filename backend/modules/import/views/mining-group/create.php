@@ -10,7 +10,6 @@ $this->title = 'Create Mining Group';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="mining-group-create">
-    <h1><?= Html::encode($this->title) ?></h1>
     
     <?php if (Yii::$app->session->hasFlash('success') || Yii::$app->session->hasFlash('error')): ?>
         <div class="alert alert-<?= Yii::$app->session->hasFlash('error') ? 'danger' : 'success' ?>">
