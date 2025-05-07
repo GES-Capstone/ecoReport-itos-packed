@@ -21,7 +21,7 @@ class Location extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'location';
+        return '{{%location}}';
     }
 
     /**

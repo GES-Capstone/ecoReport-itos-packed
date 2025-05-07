@@ -11,8 +11,25 @@ class m150725_192740_seed_data extends Migration
      */
     public function safeUp()
     {
+        $this->insert('{{%location}}', [
+            'id' => 1,
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
+        ]);
+
+        $this->insert('{{%mining_group}}', [
+            'id' => 1,
+            'location_id' => 1,
+            'name' => 'Alpha Group inc.',
+            'ges_name' => 'Alpha Group',
+            'description' => 'Webmaster group',
+            'commercial_address' => '1234 Main St, Suite 100, Cityville, ST 12345',
+            'operational_address' => '5678 Industrial Rd, Cityville, ST 12345',
+        ]);
+
         $this->insert('{{%user}}', [
             'id' => 1,
+            'mining_group_id' => 1,
             'username' => 'webmaster',
             'email' => 'webmaster@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('webmaster'),
@@ -173,7 +190,6 @@ class m150725_192740_seed_data extends Migration
             'value' => 'disabled',
             'comment' => 'Set it to "enabled" to turn on maintenance mode'
         ]);
-
     }
 
     /**

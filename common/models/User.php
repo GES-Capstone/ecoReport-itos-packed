@@ -46,6 +46,7 @@ class User extends ActiveRecord implements IdentityInterface
     const EVENT_AFTER_SIGNUP = 'afterSignup';
     const EVENT_AFTER_LOGIN = 'afterLogin';
 
+
     /**
      * @inheritdoc
      */
@@ -227,6 +228,7 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
     }
 
+
     /**
      * @inheritdoc
      */
@@ -329,9 +331,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return $this->getPrimaryKey();
     }
-    
+
     public function getAuthAssignments()
     {
-    return $this->hasMany(AuthAssignment::class, ['user_id' => 'id']);
+        return $this->hasMany(AuthAssignment::class, ['user_id' => 'id']);
     }
 }

@@ -19,7 +19,7 @@ class InitialConfiguration extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'initial_configuration';
+        return '{{%initial_configuration}}';
     }
 
     /**

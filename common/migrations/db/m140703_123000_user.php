@@ -12,7 +12,7 @@ class m140703_123000_user extends Migration
     {
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id' => $this->integer(),
+            'mining_group_id' => $this->integer()->null(),
             'username' => $this->string(32),
             'auth_key' => $this->string(32)->notNull(),
             'access_token' => $this->string(40)->notNull(),
@@ -47,6 +47,7 @@ class m140703_123000_user extends Migration
     public function safeDown()
     {
         $this->dropForeignKey('fk_user', '{{%user_profile}}');
+        $this->dropForeignKey('fk_user_mining_group', '{{%user}}');
         $this->dropTable('{{%user_profile}}');
         $this->dropTable('{{%user}}');
     }
