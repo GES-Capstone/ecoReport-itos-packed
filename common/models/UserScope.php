@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "user_scope".
  *
- * @property int $id
+ * @property int $id 
  * @property int|null $user_id
  * @property int|null $company_id
  *

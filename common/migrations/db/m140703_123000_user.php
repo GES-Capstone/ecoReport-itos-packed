@@ -5,7 +5,7 @@ use yii\db\Migration;
 
 class m140703_123000_user extends Migration
 {
-    /**
+    /** 
      * @return bool|void
      */
     public function safeUp()

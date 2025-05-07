@@ -6,7 +6,7 @@ use Yii;
 use trntv\filekit\behaviors\UploadBehavior;
 
 /**
- * This is the model class for table "company".
+ * This is the model class for table "company" .
  *
  * @property int $id
  * @property int|null $mining_group_id

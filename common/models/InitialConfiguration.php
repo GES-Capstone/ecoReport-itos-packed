@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "initial_configuration".
+ * This is the model class for table "initial_configuration" .
  *
  * @property int $id
  * @property int $step
