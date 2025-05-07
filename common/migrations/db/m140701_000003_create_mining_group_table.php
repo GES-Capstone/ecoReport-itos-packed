@@ -3,7 +3,7 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%mining_group}}` .
+ * Handles the creation of table `{{%mining_group}}`.
  */
 class m140701_000003_create_mining_group_table extends Migration
 {

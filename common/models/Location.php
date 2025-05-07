@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "location" .
+ * This is the model class for table "location".
  *
  * @property int $id
  * @property float $latitude Latitude coordinate
