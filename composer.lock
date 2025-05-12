@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b80553ee5abc1dacd5d5b70c2efb7425",
+    "content-hash": "38e6215a3ddf8fe7a874380dd48933de",
     "packages": [
         {
             "name": "alexantr/yii2-elfinder",
