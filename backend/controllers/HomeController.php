@@ -2,12 +2,16 @@
 
 namespace backend\controllers;
 
+use common\models\UserProfile;
 use common\models\User;
 use Yii;
 use yii\web\Controller;
 use backend\models\UserForm;
+use backend\models\AccountForm;
+use backend\models\UserCreateForm;
 use yii\web\NotFoundHttpException;
 use backend\models\GroupMiningCreateForm;
+use trntv\filekit\actions\UploadAction;
 use common\models\MiningGroup;
 use common\models\InitialConfiguration;
 
@@ -22,7 +26,7 @@ class HomeController extends Controller
 
     public function actionCreate()
 {
-    $model = new UserForm();
+    $model = new UserCreateForm();
     $modelGM = new GroupMiningCreateForm();
 
     if (Yii::$app->request->post()) {
@@ -105,18 +109,17 @@ class HomeController extends Controller
 
 public function actionEdit()
 {
+    if (!Yii::$app->user->can('administrator')) {
+        throw new \yii\web\NotFoundHttpException('No tienes permiso para acceder a esta página.');
+    }
 
     $group_user_mining = Yii::$app->request->get('group_user_mining');
     $role_filter = Yii::$app->request->get('role_filter');
 
-
     $query = User::find();
-
-
-    $isAdmin = Yii::$app->user->can('administrator'); 
+    $isAdmin = Yii::$app->user->can('administrator');
 
     if (!$isAdmin) {
-
         $userGroupId = Yii::$app->user->identity->mining_group_id;
         $query->andWhere(['mining_group_id' => $userGroupId]);
     }
@@ -129,30 +132,36 @@ public function actionEdit()
         }
     }
 
-
     if ($role_filter) {
-        $query->joinWith('authAssignments as auth_assignment') 
+        $query->joinWith('authAssignments as auth_assignment')
               ->andWhere(['auth_assignment.item_name' => $role_filter]);
     }
 
-
     $query->andWhere(['status' => 2]);
-
-
     $users = $query->all();
 
 
+    $groups = MiningGroup::find()->all();
+    $groupOptions = \yii\helpers\ArrayHelper::map($groups, 'id', 'name');
+    $groupOptions = ['no_group' => 'Sin grupo'] + $groupOptions;
+
+    $auth = Yii::$app->authManager;
+    $rolesList = \yii\helpers\ArrayHelper::map($auth->getRoles(), 'name', 'name');
+
     return $this->render('edit', [
         'users' => $users,
+        'groupOptions' => $groupOptions,
+        'rolesList' => $rolesList,
+        'isAdmin' => $isAdmin,
     ]);
 }
 
 
 public function actionUpdate($id)
 {
-    //if (!Yii::$app->user->can('administrator')) {
-    //    throw new \yii\web\ForbiddenHttpException('No tienes permiso para acceder a esta página.');
-    //}
+    if (!Yii::$app->user->can('administrator')) {
+    throw new \yii\web\NotFoundHttpException('No tienes permiso para acceder a esta página.');
+    }
 
     $user = User::findOne($id);
     if (!$user) {
@@ -161,20 +170,18 @@ public function actionUpdate($id)
 
     $model = new UserForm();
     $model->setModel($user);
-
+    $modelProfile = $user->userProfile;
     $gm = MiningGroup::findOne($user->mining_group_id);
 
-    if ($model->load(Yii::$app->request->post())) {
-        if (empty($model->roles)) {
-            $auth = Yii::$app->authManager;
-            $currentRoles = $auth->getRolesByUser($user->id);
-            $model->roles = array_keys($currentRoles); 
-        }
+    if ($modelProfile->load(Yii::$app->request->post()) && $modelProfile->save()) {
+        Yii::$app->session->setFlash('success', 'Imagen actualizada correctamente.');
+    }
 
+    if ($model->load(Yii::$app->request->post())) {
         if ($model->save()) {
             Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
-            return $this->redirect(['edit']);
-        } else {
+        } 
+        else {
             Yii::$app->session->setFlash('error', 'Error al guardar el usuario.');
         }
     }
@@ -182,13 +189,16 @@ public function actionUpdate($id)
     return $this->render('update', [
         'model' => $model,
         'gm' => $gm,
+        'modelProfile' => $modelProfile,
         'roles' => $this->getRolesWithDescriptions(),
     ]);
 }
 
 public function actionDelete($id)
 {
-    $model = User::findOne($id);
+    $user = User::findOne($id);
+    $model = new UserForm();
+    $model->setModel($user);
 
     if ($model) {
         if ($model->status == 3) {
@@ -206,23 +216,55 @@ public function actionDelete($id)
         Yii::$app->session->setFlash('error', 'Usuario no encontrado.');
     }
 
-    return $this->redirect(['edit']);
+    return $this->redirect(['home/edit']);
 }
 
 
 private function getRolesWithDescriptions()
-{
+{   
     $rolesWithDescription = [];
-    foreach (Yii::$app->authManager->getRoles() as $role) {
-        if ($role->name === 'administrator') {
-            continue;
+
+    if (!Yii::$app->user->can('administrator')) {
+        foreach (Yii::$app->authManager->getRoles() as $role) {
+            if ($role->name == 'administrator') {
+                continue; 
+            }
+            $rolesWithDescription[$role->name] = $role->description ?: $role->name;
         }
-        $rolesWithDescription[$role->name] = $role->description ?: $role->name;
+    } else {
+        foreach (Yii::$app->authManager->getRoles() as $role) {
+            $rolesWithDescription[$role->name] = $role->description ?: $role->name;
+        }
     }
-    return $rolesWithDescription;
+
+    return $rolesWithDescription; 
+}
+public function actions()
+{
+    return [
+        'avatar-upload' => [
+            'class' => UploadAction::class,
+            'deleteRoute' => false,
+            'on afterSave' => function ($event) {
+                $file = $event->file;
+                $model = Yii::$app->user->identity->userProfile;
+                $model->picture = $file->getPath();
+                if (!$model->save()) {
+                    Yii::$app->session->setFlash('error', 'Error al guardar la imagen de perfil.');
+                }
+            },
+            'on afterDelete' => function ($event) {
+                $model = Yii::$app->user->identity->userProfile;
+                if ($model->picture) {
+                    $model->picture = null;
+                    if (!$model->save()) {
+                        Yii::$app->session->setFlash('error', 'Error al eliminar la imagen de perfil.');
+                    }
+                }
+            },
+        ],
+    ];
 }
 
 }
-
-
 

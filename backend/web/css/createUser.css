@@ -1,0 +1,26 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.custom-checkbox input[type='checkbox'] {
+    width: 28px;
+    height: 28px;
+    margin-right: 12px;
+}
+
+.custom-checkbox label {
+    font-size: 18px;
+}
+

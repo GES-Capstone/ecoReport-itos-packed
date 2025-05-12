@@ -7,18 +7,6 @@ use yii\widgets\ActiveForm;
 use yii\rbac\Role;
 
 $this->registerCssFile('@web/css/alert.css', ['depends' => [\yii\web\YiiAsset::class]]);
-
-// Cargar grupos
-$groups = MiningGroup::find()->all();
-$groupOptions = ArrayHelper::map($groups, 'id', 'name');
-$groupOptions = ['no_group' => 'Sin grupo'] + $groupOptions;
-
-// Cargar roles
-$auth = Yii::$app->authManager;
-$rolesList = ArrayHelper::map($auth->getRoles(), 'name', 'name');
-
-// Verificar si el usuario tiene el rol de 'administrator'
-$isAdmin = Yii::$app->user->can('administrator'); // O el nombre de tu rol de administrador
 ?>
 
 <?php $form = ActiveForm::begin([
@@ -74,7 +62,7 @@ $isAdmin = Yii::$app->user->can('administrator'); // O el nombre de tu rol de ad
                 <tbody>
                     <?php foreach ($users as $user): ?>
                         <tr>
-                            <td><?= Html::encode($user->username) ?></td>
+                            <td><?= Html::encode(($user->userProfile && trim("{$user->userProfile->firstname} {$user->userProfile->lastname}")) ? "{$user->userProfile->firstname} {$user->userProfile->lastname}" : '-') ?></td>
                             <td><?= Html::encode($user->email) ?></td>
                             <td>
                                 <?php

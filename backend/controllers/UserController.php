@@ -11,12 +11,15 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use trntv\filekit\actions\UploadAction;
+use backend\models\AccountForm; 
 
 /**
  * UserController implements the CRUD actions for User model.
  */
 class UserController extends Controller
 {
+    public $layout = 'homeBase';
     public function behaviors()
     {
         return [
@@ -143,4 +146,69 @@ class UserController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+
+    public function actions()
+{
+    return [
+        'avatar-upload' => [
+            'class' => UploadAction::class,
+            'deleteRoute' => false,
+            'on afterSave' => function ($event) {
+                $file = $event->file;
+                $model = Yii::$app->user->identity->userProfile;
+                $model->picture = $file->getPath();
+                if (!$model->save()) {
+                    Yii::$app->session->setFlash('error', 'Error al guardar la imagen de perfil.');
+                }
+            },
+            'on afterDelete' => function ($event) {
+                $model = Yii::$app->user->identity->userProfile;
+                if ($model->picture) {
+                    $model->picture = null;
+                    if (!$model->save()) {
+                        Yii::$app->session->setFlash('error', 'Error al eliminar la imagen de perfil.');
+                    }
+                }
+            },
+        ],
+    ];
+}
+
+public function actionProfile()
+{
+    $model = Yii::$app->user->identity->userProfile;
+    $user = Yii::$app->user->identity;
+    $modelAccount = new AccountForm();
+    $modelAccount->username = $user->username;
+    $modelAccount->email = $user->email;
+    $modelProfile = new UserForm();
+    $modelProfile->setModel($user);
+
+    if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        Yii::$app->session->setFlash('success', 'Perfil actualizado correctamente.');
+        return $this->redirect(['profile']);
+    }
+
+    if ($modelAccount->load(Yii::$app->request->post()) && $modelAccount->validate()) {
+        if($modelAccount->password !== $modelAccount->password_confirm) {
+            Yii::$app->session->setFlash('error', 'Las contraseñas no coinciden.');
+        } else {
+            $user->setPassword($modelAccount->password);
+            if ($user->save()) {
+                Yii::$app->session->setFlash('success', 'Contraseña cambiada correctamente.');
+                return $this->redirect(['profile']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Error al cambiar la contraseña.');
+            }
+        }
+    }
+    if($modelProfile->load(Yii::$app->request->post()) && $modelProfile->save()) {
+        Yii::$app->session->setFlash('success', 'Nombre de usuario cambiado correctamente.');
+        return $this->redirect(['profile']);
+    }
+
+    return $this->render('profile', ['model' => $model, 'modelAccount' => $modelAccount, 'modelProfile' => $modelProfile]);
+    }
+
 }
