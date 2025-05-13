@@ -19,6 +19,7 @@ class GroupMiningCreateForm extends Model
     public function rules()
     {
         return [
+            [['ges_name'], 'required', 'message' => Yii::t('backend', 'Por favor seleccione o cree un grupo minero. No se puede crear un usuario sin grupo.')],
             [['ges_name'], 'filter', 'filter' => 'trim'],
             [['ges_name'], 'string', 'min' => 1, 'max' => 255],
             [['ges_name'], 'unique',

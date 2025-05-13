@@ -117,7 +117,6 @@ public function actionCreate()
             }
         }
         else {
-            Yii::$app->session->setFlash('error', Yii::t('backend', 'Por favor seleccione o cree un grupo minero. No se puede crear un usuario sin grupo.'));
             return $this->render('create', [
                 'model' => $model,
                 'modelGM' => $modelGM,

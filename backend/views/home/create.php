@@ -6,14 +6,11 @@ use yii\web\JsExpression;
 use common\models\User;
 
 $this->title = 'Creación de Usuario';
-$this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAsset::class]]);
 ?>
 
 <div class="card">
     <div class="card-header bg-primary text-white text-center position-relative" style="height: 60px;">
-        <a href="<?= Yii::$app->urlManager->createUrl(['/home/edit']) ?>" 
-        class="position-absolute start-0 ms-3 text-white" 
-        style="text-decoration: none;">
+        <a href="<?= Yii::$app->urlManager->createUrl(['/home/edit']) ?>" class="position-absolute start-0 ms-3 text-white" style="text-decoration: none;">
             <i class="fa fa-arrow-left fa-lg"></i>
         </a>
         <h5 class="mb-0"><?= Html::encode($this->title) ?></h5>
@@ -23,50 +20,50 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
         <?php $form = ActiveForm::begin(); ?>
         
         <?php
-        // Mostrar errores de validación
-        if ($model->hasErrors() || (isset($modelGM) && $modelGM->hasErrors())) {
+        // Mostrar errores de modelo o mensajes flash (pero no ambos si son errores)
+        $hasModelErrors = $model->hasErrors() || (isset($modelGM) && $modelGM->hasErrors());
+        
+        if ($hasModelErrors) {
             echo '<div class="alert alert-danger mb-4">';
             echo '<h5><i class="fa fa-exclamation-triangle me-2"></i> Por favor corrija los siguientes errores:</h5>';
             echo '<ul class="mb-0">';
             
             foreach ($model->getErrors() as $attribute => $errors) {
-                $attributeLabel = $model->getAttributeLabel($attribute);
                 foreach ($errors as $error) {
-                    echo "<li><strong>{$attributeLabel}</strong>: {$error}</li>";
+                    echo "<li><strong>{$model->getAttributeLabel($attribute)}</strong>: {$error}</li>";
                 }
             }
             
             if (isset($modelGM) && $modelGM->hasErrors()) {
                 foreach ($modelGM->getErrors() as $attribute => $errors) {
-                    $attributeLabel = $modelGM->getAttributeLabel($attribute);
                     foreach ($errors as $error) {
-                        echo "<li><strong>{$attributeLabel}</strong>: {$error}</li>";
+                        echo "<li><strong>{$modelGM->getAttributeLabel($attribute)}</strong>: {$error}</li>";
                     }
                 }
             }
             
-            echo '</ul>';
-            echo '</div>';
+            echo '</ul></div>';
         }
 
-        // Mostrar mensajes flash
+        // Mostrar mensajes flash (excepto errores cuando ya hay errores de modelo)
         foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
-            $class = "alert alert-" . ($key == 'error' ? 'danger' : $key);
+            if ($hasModelErrors && $key == 'error') continue;
             
-            if (!is_array($messages)) {
-                $messages = [$messages];
-            }
+            $class = "alert alert-" . ($key == 'error' ? 'danger' : $key);
+            $messages = is_array($messages) ? $messages : [$messages];
             
             foreach ($messages as $message) {
-                echo '<div class="' . $class . ' mb-3">' . $message . '</div>';
+                echo "<div class=\"{$class} mb-3\">{$message}</div>";
             }
         }
         ?>
 
         <div class="row g-3">
+            <!-- Columna 1: Datos del Usuario -->
             <div class="col-md-4">
                 <div class="card h-100 p-3">
                     <h5 class="fw-bold mb-3">Datos del Usuario</h5>
+                    
                     <?= $form->field($model, 'firstname', [
                         'labelOptions' => ['class' => 'required-indicator']
                     ])->textInput(['maxlength' => true, 'placeholder' => 'Primer Nombre']) ?>
@@ -94,11 +91,14 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
                 </div>
             </div>
 
+            <!-- Columna 2: Roles y Capacidades -->
             <div class="col-md-4">
                 <div class="card h-100 p-3">
                     <h5 class="fw-bold mb-3">Roles y Capacidades</h5>
                     
                     <?php if (Yii::$app->user->can('administrator')): ?>
+                        <?= Html::hiddenInput('selected_mining_group_id', '', ['id' => 'selected_mining_group_id']) ?>
+                        
                         <?= $form->field($modelGM, 'ges_name', [
                             'labelOptions' => ['class' => 'required-indicator']
                         ])->widget(AutoComplete::classname(), [
@@ -108,6 +108,7 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
                                 'autoFill' => true,
                                 'select' => new JsExpression("function(event, ui) {
                                     this.value = ui.item.value;
+                                    $('#selected_mining_group_id').val(ui.item.id);
                                     return false;
                                 }"),
                             ],
@@ -122,13 +123,11 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
                         'labelOptions' => ['class' => 'required-indicator']
                     ])->checkboxList($roles, [
                         'item' => function($index, $label, $name, $checked, $value) {
-                            return '<div class="custom-checkbox mb-2">' .
-                                Html::checkbox($name, $checked, [
-                                    'value' => $value,
-                                    'label' => $label,
-                                    'labelOptions' => ['style' => 'margin-left: 8px;'],
-                                ]) .
-                            '</div>';
+                            return '<div class="mb-2">' . Html::checkbox($name, $checked, [
+                                'value' => $value,
+                                'label' => $label,
+                                'labelOptions' => ['style' => 'margin-left: 8px;'],
+                            ]) . '</div>';
                         }
                     ]) ?>
                     
@@ -145,6 +144,7 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
                 </div>
             </div>
 
+            <!-- Columna 3: Información adicional -->
             <div class="col-md-4">
                 <div class="card h-100 p-3">
                     <h5 class="fw-bold mb-3">Información adicional</h5>
@@ -182,22 +182,9 @@ $this->registerCssFile('@web/css/createUser.css', ['depends' => [\yii\web\YiiAss
 </div>
 
 <style>
+    
 .required-indicator:after {
     content: " *";
     color: #dc3545;
-}
-
-.help-block {
-    color: #6c757d;
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-}
-
-.help-block-error {
-    color: #dc3545;
-}
-
-.custom-checkbox {
-    margin-bottom: 5px;
 }
 </style>
