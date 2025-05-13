@@ -1,15 +1,27 @@
 <?php
-/**
- * @author Eugine Terentev <eugine@terentev.net>
- * @author Victor Gonzalez <victor@vgr.cl>
- * @var yii\web\View $this
- * @var string $content
- */
+
+use backend\widgets\NavbarWidget;
+use backend\widgets\SidebarWidget;
+
+/* @var $this \yii\web\View */
+/* @var $content string */
+
+$this->beginContent('@backend/views/layouts/base.php');
+
 ?>
-<?php $this->beginContent('@backend/views/layouts/common.php'); ?>
-    <div class="box">
-        <div class="box-body">
-            <?php echo $content ?>
-        </div>
+
+<div class="layout-wrapper">
+    <?= NavbarWidget::widget() ?>
+    <div class="d-flex min-vh-100">
+        <?= SidebarWidget::widget() ?>
+
+        <main class="main-content flex-grow-1">
+            <div class="container-fluid p-4">
+                <?= $this->render('//layouts/alerts') ?>
+                <?= $content ?>
+            </div>
+        </main>
     </div>
+</div>
+
 <?php $this->endContent(); ?>
