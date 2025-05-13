@@ -90,7 +90,7 @@ class UserMenuWidget extends Widget
     {
         return Html::a(
             FAS::icon('user') . ' ' . Yii::t('backend', 'Profile'),
-            ['/sign-in/profile'],
+            ['/user/profile'],
             ['class' => 'dropdown-item py-2']
         ) . Html::a(
             FAS::icon('sign-out-alt') . ' ' . Yii::t('backend', 'Logout'),
