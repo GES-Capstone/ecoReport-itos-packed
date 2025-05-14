@@ -11,7 +11,12 @@ class ExcelUploadForm extends Model
      * @var UploadedFile
      */
     public $excelFile;
-    
+
+    /**
+     * @var string Tipo de importación (company, fleet, machinery)
+     */
+    public $type = 'company';
+
     /**
      * @var string Clave única para identificar la carga en la sesión
      */
@@ -24,9 +29,11 @@ class ExcelUploadForm extends Model
     {
         return [
             [['excelFile'], 'required'],
-            [['excelFile'], 'file', 'skipOnEmpty' => false, 
+            [['excelFile'], 'file', 'skipOnEmpty' => false,
                 'extensions' => 'xlsx, xls',
                 'maxSize' => 1024 * 1024 * 5], // 5MB máximo
+            [['type'], 'string'],
+            [['type'], 'in', 'range' => ['company', 'fleet', 'machinery', 'component']]
         ];
     }
 
@@ -37,6 +44,7 @@ class ExcelUploadForm extends Model
     {
         return [
             'excelFile' => 'Excel File',
+            'type' => 'Tipo de Importación',
         ];
     }
 
@@ -53,15 +61,15 @@ class ExcelUploadForm extends Model
         // Generar nombre seguro para el archivo
         $uploadKey = Yii::$app->security->generateRandomString(10);
         $fileName = $uploadKey . '.' . $this->excelFile->extension;
-        
+
         // Crear directorio si no existe
         $uploadDir = Yii::getAlias('@webroot/uploads/excel');
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
-        
+
         $filePath = $uploadDir . '/' . $fileName;
-        
+
         // Guardar archivo
         if ($this->excelFile->saveAs($filePath)) {
             // Guardar información en sesión para validar luego
@@ -72,13 +80,14 @@ class ExcelUploadForm extends Model
                 'path' => $filePath,
                 'timestamp' => time(),
                 'user_id' => Yii::$app->user->id,
+                'type' => $this->type, // Guardar el tipo de importación
             ]);
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Devuelve la clave de carga
      * @return string
