@@ -10,13 +10,13 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 <div class="container-profile">
 
     <div class="card-main">   
-        <div class="card-header bg-primary text-white text-center position-relative" style="height: 60px;">
-            <a href="<?= Yii::$app->urlManager->createUrl(['/']) ?>" 
-               class="position-absolute start-0 ms-3 text-white" 
-               style="text-decoration: none;">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
+            <a href="<?= Yii::$app->urlManager->createUrl(['/']) ?>"
+                class="text-white position-absolute start-0 ms-3"
+                style="text-decoration: none;">
                 <i class="fa fa-arrow-left fa-lg"></i>
             </a>
-            <h5 class="mb-0"><?= Html::encode($this->title) ?></h5>
+            <h5 class="mb-0 text-center"><?= Html::encode($this->title) ?></h5>
         </div>
         <div class="card-body">
 
@@ -32,9 +32,21 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
             <div class="flex-grow-1">
                 <div class="mb-3">
-                    <?= Html::button('Subir nueva imagen', ['class' => 'btn btn-primary w-100 mb-2', 'id' => 'upload-btn']) ?>
-                    <?= Html::button('Cambiar contraseña', ['class' => 'btn btn-warning w-100 mb-2', 'id' => 'change-password-btn']) ?>
-                    <?= Html::button('Cambiar nombre de usuario', ['class' => 'btn btn-secondary w-100', 'id' => 'change-username-btn']) ?>
+                    <?= Html::button('Subir nueva imagen', [
+                        'class' => 'btn btn-primary w-100 mb-2',
+                        'id' => 'upload-btn',
+                        'style' => 'background-color: #0d6efd; border-color: #0b5ed7;'
+                    ]) ?>
+                    <?= Html::button('Cambiar contraseña', [
+                        'class' => 'btn w-100 mb-2',
+                        'id' => 'change-password-btn',
+                        'style' => 'background-color: #5aa9f8; color: white; border: none;'
+                    ]) ?>
+                    <?= Html::button('Cambiar nombre de usuario', [
+                        'class' => 'btn w-100 mb-2',
+                        'id' => 'change-username-btn',
+                        'style' => 'background-color: #1c5d99; color: white; border: none;'
+                    ]) ?>
                 </div>
             </div>
         </div>
@@ -46,8 +58,8 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         </div>
     </div>
         <div id="upload-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header bg-primary text-white">
-                <h6>Subir nueva imagen</h6>
+            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
+                <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
             </div>
             <div class="card-body-secondary">
                 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
@@ -60,7 +72,10 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         </div>
 
         <div id="change-password-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header bg-warning text-white"><h6>Cambiar contraseña</h6></div>
+            <div class="card-header text-white d-flex align-items-center justify-content-center"
+                style="height: 60px; position: relative; background-color: #5aa9f8;">
+                <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
+            </div>
             <div class="card-body-secondary">
                 <?php $form = ActiveForm::begin(); ?>
                 <?= $form->field($modelAccount, 'current_password')->passwordInput(['placeholder' => 'Contraseña actual']) ?>
@@ -74,7 +89,10 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         </div>
 
         <div id="change-username-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header bg-secondary text-white"><h6>Cambiar nombre de usuario</h6></div>
+            <div class="card-header text-white d-flex align-items-center justify-content-center"
+                style="height: 60px; position: relative; background-color: #1c5d99;">
+                <h5 class="mb-0 text-center w-100">Cambiar Nombre de Usuario</h5>
+            </div>
             <div class="card-body-secondary">
                 <?php $form = ActiveForm::begin(); ?>
                 <?= $form->field($modelProfile, 'username')->textInput(['placeholder' => 'Nuevo nombre de usuario']) ?>
