@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use trntv\filekit\widget\Upload;
@@ -9,7 +10,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
 <div class="container-profile">
 
-    <div class="card-main">   
+    <div class="card-main">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
             <a href="<?= Yii::$app->urlManager->createUrl(['/']) ?>"
                 class="text-white position-absolute start-0 ms-3"
@@ -20,7 +21,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         </div>
         <div class="card-body">
 
-            <div class="me-4 text-center">
+            <div class="me-4 text-center p-3">
                 <?= Html::img($model->getAvatar('/img/anonymous.png'), [
                     'id' => 'current-avatar',
                     'class' => 'img-thumbnail rounded-circle',
@@ -30,7 +31,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             </div>
 
 
-            <div class="flex-grow-1">
+            <div class="flex-grow-1 p-3">
                 <div class="mb-3">
                     <?= Html::button('Subir nueva imagen', [
                         'class' => 'btn btn-primary w-100 mb-2',
@@ -54,54 +55,54 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <p><strong><?= Yii::t('backend', 'Username') ?>:</strong> <?= Html::encode($modelProfile->username) ?></p>
             <p><strong><?= Yii::t('backend', 'Name') ?>:</strong> <?= Html::encode(Yii::$app->user->identity->publicIdentity) ?></p>
             <p><strong><?= Yii::t('backend', 'Email') ?>:</strong> <?= Html::encode($modelProfile->email) ?></p>
-            
+
         </div>
     </div>
-        <div id="upload-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
-                <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
-            </div>
-            <div class="card-body-secondary">
-                <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
-                <?= $form->field($model, 'picture')->widget(Upload::class, ['url' => ['avatar-upload']]) ?>
-                <div class="text-center mt-3">
-                    <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
-                </div>
-                <?php ActiveForm::end(); ?>
-            </div>
+    <div id="upload-wrapper" class="card-secondary" style="display: none;">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center  mb-3" style="height: 60px; position: relative;">
+            <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
         </div>
+        <div class="card-body-secondary">
+            <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+            <?= $form->field($model, 'picture')->widget(Upload::class, ['url' => ['avatar-upload']]) ?>
+            <div class="text-center mt-3">
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
+    </div>
 
-        <div id="change-password-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header text-white d-flex align-items-center justify-content-center"
-                style="height: 60px; position: relative; background-color: #5aa9f8;">
-                <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
-            </div>
-            <div class="card-body-secondary">
-                <?php $form = ActiveForm::begin(); ?>
-                <?= $form->field($modelAccount, 'current_password')->passwordInput(['placeholder' => 'Contraseña actual']) ?>
-                <?= $form->field($modelAccount, 'password')->passwordInput(['placeholder' => 'Nueva contraseña']) ?>
-                <?= $form->field($modelAccount, 'password_confirm')->passwordInput(['placeholder' => 'Repetir nueva contraseña']) ?>
-                <div class="text-center mt-3">
-                    <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
-                </div>
-                <?php ActiveForm::end(); ?>
-            </div>
+    <div id="change-password-wrapper" class="card-secondary" style="display: none;">
+        <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
+            style="height: 60px; position: relative; background-color: #5aa9f8;">
+            <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
         </div>
+        <div class="card-body-secondary">
+            <?php $form = ActiveForm::begin(); ?>
+            <?= $form->field($modelAccount, 'current_password')->passwordInput(['placeholder' => 'Contraseña actual']) ?>
+            <?= $form->field($modelAccount, 'password')->passwordInput(['placeholder' => 'Nueva contraseña']) ?>
+            <?= $form->field($modelAccount, 'password_confirm')->passwordInput(['placeholder' => 'Repetir nueva contraseña']) ?>
+            <div class="text-center mt-3">
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
+    </div>
 
-        <div id="change-username-wrapper" class="card-secondary" style="display: none;">
-            <div class="card-header text-white d-flex align-items-center justify-content-center"
-                style="height: 60px; position: relative; background-color: #1c5d99;">
-                <h5 class="mb-0 text-center w-100">Cambiar Nombre de Usuario</h5>
-            </div>
-            <div class="card-body-secondary">
-                <?php $form = ActiveForm::begin(); ?>
-                <?= $form->field($modelProfile, 'username')->textInput(['placeholder' => 'Nuevo nombre de usuario']) ?>
-                <div class="text-center mt-3">
-                    <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
-                </div>
-                <?php ActiveForm::end(); ?>
-            </div>
+    <div id="change-username-wrapper" class="card-secondary" style="display: none;">
+        <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
+            style="height: 60px; position: relative; background-color: #1c5d99;">
+            <h5 class="mb-0 text-center w-100">Cambiar Nombre de Usuario</h5>
         </div>
+        <div class="card-body-secondary">
+            <?php $form = ActiveForm::begin(); ?>
+            <?= $form->field($modelProfile, 'username')->textInput(['placeholder' => 'Nuevo nombre de usuario']) ?>
+            <div class="text-center mt-3">
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
+    </div>
 </div>
 
 
@@ -160,4 +161,3 @@ document.getElementById('avatar-modal').addEventListener('click', function (e) {
 });
 JS);
 ?>
-

@@ -69,7 +69,7 @@ $config = [
             [
                 'controllers' => ['user'],
                 'allow' => true,
-                'roles' => ['administrator'],
+                'roles' => ['administrator', 'manager', 'user'],
             ],
             [
                 'controllers' => ['user'],

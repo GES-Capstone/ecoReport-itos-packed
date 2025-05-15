@@ -15,7 +15,7 @@ $this->beginContent('@backend/views/layouts/base.php');
     <div class="d-flex min-vh-100">
         <?= SidebarWidget::widget() ?>
 
-        <main class="main-content flex-grow-1">
+        <main class="main-content flex-grow-1 pt-5">
             <div class="container-fluid p-4">
                 <?= $this->render('//layouts/alerts') ?>
                 <?= $content ?>

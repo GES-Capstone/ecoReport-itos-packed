@@ -22,7 +22,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         </div>
         <div class="card-body">
 
-            <div class="me-4 text-center">
+            <div class="me-4 text-center p-3">
                 <?= Html::img($modelProfile->getAvatar('/img/anonymous.png'), [
                     'id' => 'current-avatar',
                     'class' => 'img-thumbnail rounded-circle',
@@ -66,14 +66,14 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
     </div>
 
     <div id="upload-wrapper" class="card-secondary" style="display: none;">
-        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="height: 60px; position: relative;">
             <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
             <?= $form->field($modelProfile, 'picture')->widget(Upload::class, ['url' => ['avatar-upload']]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -81,7 +81,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
 
     <div id="change-password-wrapper" class="card-secondary" style="display: none;">
-        <div class="card-header text-white d-flex align-items-center justify-content-center"
+        <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
             style="height: 60px; position: relative; background-color: #5aa9f8;">
             <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
         </div>
@@ -89,7 +89,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Nueva contraseña']) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -109,7 +109,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => 'Correo Electrónico']) ?>
             <?= $form->field($model, 'status')->dropDownList([2 => 'Activo', 1 => 'Inactivo', 3 => 'Eliminado'], ['prompt' => 'Seleccione el Estado']) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -117,8 +117,8 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
 
     <div id="user-roles-wrapper" class="card-secondary" style="display: none;">
-        <div class="card-header text-white d-flex align-items-center justify-content-center"
-                style="height: 60px; position: relative; background-color: #339af0;">
+        <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
+            style="height: 60px; position: relative; background-color: #339af0;">
             <h5 class="mb-0 text-center w-100">Cambiar Roles</h5>
         </div>
         <div class="card-body-secondary">
@@ -135,7 +135,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 }
             ]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
