@@ -28,13 +28,13 @@ class UserMenuWidget extends Widget
     {
         return Html::a(
             $this->renderUserThumbnail($user) .
-                Html::tag('span', $user->publicIdentity, ['class' => 'd-none d-lg-inline ms-1']),
+                Html::tag('span', $user->publicIdentity, ['class' => 'ms-1']),
             '#',
             [
                 'class' => 'nav-link dropdown-toggle d-flex align-items-center',
                 'id' => 'userDropdown',
                 'role' => 'button',
-                'data-bs-toggle' => 'dropdown', // This is the key attribute for Bootstrap 5
+                'data-bs-toggle' => 'dropdown',
                 'aria-expanded' => 'false'
             ]
         ) . $this->renderDropdownMenu($user);
@@ -98,6 +98,44 @@ class UserMenuWidget extends Widget
             [
                 'class' => 'dropdown-item py-2',
                 'data-method' => 'post'
+            ]
+        );
+    }
+
+    public static function renderCompactUserBlock()
+    {
+        $user = Yii::$app->user->identity;
+
+        return Html::tag(
+            'div',
+            Html::img(
+                $user->userProfile->getAvatar('/img/anonymous.png'),
+                [
+                    'class' => 'rounded-circle',
+                    'width' => '40',
+                    'height' => '40',
+                    'style' => 'object-fit: cover;',
+                    'alt' => 'User image'
+                ]
+            ) .
+                Html::a(
+                    Html::tag('div', $user->publicIdentity, ['class' => 'fw-bold ms-2 text-decoration-none']),
+                    ['/user/profile'],
+                    ['class' => 'ms-2 text-dark text-decoration-none flex-grow-1 d-inline-block align-middle']
+                ) .
+                Html::a(
+                    FAS::icon('sign-out-alt'),
+                    ['/sign-in/logout'],
+                    [
+                        'class' => 'btn btn-sm btn-outline-danger ms-auto',
+                        'style' => 'min-width: 36px;',
+                        'data-method' => 'post',
+                        'title' => Yii::t('backend', 'Logout'),
+                    ]
+                ),
+            [
+                'class' => 'd-flex align-items-center px-3 py-2',
+                'style' => 'width: 250px; height: 20px;',
             ]
         );
     }

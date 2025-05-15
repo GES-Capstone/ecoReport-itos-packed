@@ -24,7 +24,7 @@ class NavbarWidget extends Widget
                     $this->renderMenu(),
                 ['class' => 'container-fluid']
             ),
-            ['class' => 'navbar navbar-expand-lg navbar-dark bg-primary shadow-sm fixed-top']
+            ['class' => 'navbar navbar-expand-md navbar-dark bg-primary shadow-sm fixed-top']
         );
     }
 
@@ -33,20 +33,14 @@ class NavbarWidget extends Widget
         return Html::button(
             Html::tag('span', '', ['class' => 'navbar-toggler-icon']),
             [
-                'class' => 'navbar-toggler me-2 order-first',
-                'type' => 'button',
-                'id' => 'mobileSidebarToggle',
-                'title' => 'Toggle Sidebar',
-                'aria-label' => 'Toggle navigation'
-            ]
-        ) . Html::button(
-            Html::tag('span', '', ['class' => 'navbar-toggler-icon']),
-            [
-                'class' => 'btn btn-link d-none d-lg-block order-lg-0 me-3 sidebar-toggle text-white',
+                'class' => 'btn btn-link me-3 text-white',
                 'id' => 'desktopSidebarToggle',
                 'type' => 'button',
                 'title' => 'Toggle Sidebar',
                 'aria-label' => 'Toggle navigation',
+                'data-bs-toggle' => 'offcanvas',
+                'data-bs-target' => '#sidebar',
+                'aria-controls' => 'sidebar',
             ]
         );
     }
@@ -61,7 +55,7 @@ class NavbarWidget extends Widget
                 'onerror' => "this.src='" . Yii::getAlias('@web/img/default-logo.png') . "'"
             ]),
             Yii::$app->homeUrl,
-            ['class' => 'navbar-brand order-lg-1 mx-lg-0 mx-auto']
+            ['class' => 'navbar-brand']
         );
     }
 
@@ -72,7 +66,7 @@ class NavbarWidget extends Widget
             $this->renderNavItems() .
                 UserMenuWidget::widget(),
             [
-                'class' => 'collapse navbar-collapse order-lg-2',
+                'class' => 'd-none d-md-flex w-100 align-items-center justify-content-between',
                 'id' => 'mainNavbar'
             ]
         );

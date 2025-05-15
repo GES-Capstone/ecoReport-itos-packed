@@ -16,8 +16,9 @@ class SidebarWidget extends Widget
             $this->renderHeader() .
                 $this->renderMenu(),
             [
-                'class' => 'sidebar bg-white shadow-sm position-fixed h-100 overflow-auto',
-                'id' => 'sidebar'
+                'class' => 'sidebar bg-white shadow-sm position-fixed h-100 overflow-auto offcanvas offcanvas-start',
+                'id' => 'sidebar',
+                'tabindex' => '-1',
             ]
         );
     }
@@ -29,14 +30,19 @@ class SidebarWidget extends Widget
             Html::tag('img', '', [
                 'src' => Yii::getAlias('@web/img/Logo-EcoReport.jpg'),
                 'alt' => 'EcoReport Logo',
-                'class' => 'logo ',
+                'class' => 'logo h-100 mw-100',
             ]),
-            ['class' => 'sidebar-header d-flex justify-content-between align-items-center p-3 border-bottom']
+            ['class' => 'sidebar-header d-flex justify-content-center align-items-center p-3 border-bottom object-fit-contain']
         );
     }
 
     protected function renderMenu()
     {
-        return SidebarMenuWidget::widget();
+        return SidebarMenuWidget::widget() .
+            Html::tag(
+                'div',
+                Html::tag('div', UserMenuWidget::renderCompactUserBlock(), ['class' => 'd-block d-md-none']),
+                ['class' => 'd-flex justify-content-center p-4 mt-auto border-top']
+            );
     }
 }

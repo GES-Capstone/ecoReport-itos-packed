@@ -78,7 +78,7 @@ class SidebarMenuWidget extends Widget
     protected function renderItem($item)
     {
         $content = Html::a($item['label'], $item['url'], [
-            'class' => 'nav-link d-flex align-items-center ' . (isset($item['active']) && $item['active'] ? 'active' : '')
+            'class' => 'nav-link d-flex align-items-center' . (isset($item['active']) && $item['active'] ? 'active' : '')
         ]);
 
         if (!empty($item['items'])) {
