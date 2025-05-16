@@ -16,7 +16,7 @@ class SidebarWidget extends Widget
             $this->renderHeader() .
                 $this->renderMenu(),
             [
-                'class' => 'sidebar bg-white shadow-sm position-fixed h-100 overflow-auto offcanvas offcanvas-start',
+                'class' => 'sidebar bg-white shadow-sm position-fixed h-100 overflow-auto offcanvas offcanvas-start border-0',
                 'id' => 'sidebar',
                 'tabindex' => '-1',
             ]
@@ -42,7 +42,7 @@ class SidebarWidget extends Widget
             Html::tag(
                 'div',
                 Html::tag('div', UserMenuWidget::renderCompactUserBlock(), ['class' => 'd-block d-md-none']),
-                ['class' => 'd-flex justify-content-center p-4 mt-auto border-top']
+                ['class' => 'd-flex justify-content-center px-4 mt-auto border-top']
             );
     }
 }

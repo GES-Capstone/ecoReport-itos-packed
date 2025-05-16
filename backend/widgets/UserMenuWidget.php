@@ -119,9 +119,9 @@ class UserMenuWidget extends Widget
                 ]
             ) .
                 Html::a(
-                    Html::tag('div', $user->publicIdentity, ['class' => 'fw-bold ms-2 text-decoration-none']),
+                    Html::tag('span', $user->publicIdentity, ['class' => 'fw-bold ps-2 text-decoration-none']),
                     ['/user/profile'],
-                    ['class' => 'ms-2 text-dark text-decoration-none flex-grow-1 d-inline-block align-middle']
+                    ['class' => 'text-dark text-decoration-none flex-grow-1 align-middle pe-5']
                 ) .
                 Html::a(
                     FAS::icon('sign-out-alt'),
@@ -134,8 +134,8 @@ class UserMenuWidget extends Widget
                     ]
                 ),
             [
-                'class' => 'd-flex align-items-center px-3 py-2',
-                'style' => 'width: 250px; height: 20px;',
+                'class' => 'align-items-center p-3',
+                'style' => 'width: 250px;',
             ]
         );
     }
