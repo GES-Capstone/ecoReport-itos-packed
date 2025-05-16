@@ -1,0 +1,19 @@
+.sidebar {
+  --bs-offcanvas-width: 310px;
+}
+
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.has-submenu.open .submenu {
+  max-height: 500px;
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar {
+    --bs-offcanvas-width: 250px;
+  }
+}

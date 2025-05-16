@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use trntv\filekit\behaviors\UploadBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "mining_group".
@@ -18,6 +20,7 @@ use Yii;
  * @property string|null $email
  * @property string $created_at
  * @property string $updated_at
+ * @property string $picture
  * @property string|null $logo_path
  * @property string|null $logo_base_url
  *
@@ -25,14 +28,34 @@ use Yii;
  * @property Location $location
  * @property User[] $users
  */
-class MiningGroup extends \yii\db\ActiveRecord
+class MiningGroup extends ActiveRecord
 {
+    /**
+     * @var 
+     */
+    public $picture;
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'mining_group';
+        return '{{%mining_group}}';
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'picture' => [
+                'class' => UploadBehavior::class,
+                'attribute' => 'picture',
+                'pathAttribute' => 'logo_path',
+                'baseUrlAttribute' => 'logo_base_url'
+            ]
+        ];
     }
 
     /**
@@ -50,6 +73,7 @@ class MiningGroup extends \yii\db\ActiveRecord
             [['email'], 'string', 'max' => 100],
             [['name'], 'unique'],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
+            ['picture', 'safe']
         ];
     }
 
@@ -70,8 +94,7 @@ class MiningGroup extends \yii\db\ActiveRecord
             'email' => 'Email',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
-            'logo_path' => 'Logo Path',
-            'logo_base_url' => 'Logo Base Url',
+            'picture' => Yii::t('common', 'Picture'),
         ];
     }
 
@@ -103,5 +126,16 @@ class MiningGroup extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::class, ['mining_group_id' => 'id']);
+    }
+
+    /**
+     * @param null $default
+     * @return bool|null|string
+     */
+    public function getLogo($default = null)
+    {
+        return $this->logo_path
+            ? Yii::getAlias($this->logo_base_url . '/' . $this->logo_path)
+            : $default;
     }
 }

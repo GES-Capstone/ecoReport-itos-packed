@@ -13,12 +13,13 @@ $config = [
     ],
     'container' => [
         'definitions' => [
-           \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
+            \yii\widgets\LinkPager::class => \yii\bootstrap5\LinkPager::class,
         ],
     ],
 ];
 
-if (YII_DEBUG) {
+// Disable debug toolbar in non-production environments
+if (!YII_DEBUG) {
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => yii\debug\Module::class,

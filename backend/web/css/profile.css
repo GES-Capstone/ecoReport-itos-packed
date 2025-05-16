@@ -1,0 +1,82 @@
+.container-profile{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    gap: 10px;
+}
+
+.card-main, .card-secondary {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s ease-in-out;
+    width: 500px;
+    height: 600px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-body-secondary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    max-height: 600px;
+}
+
+.card-body-secondary-update {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    max-height: 600px;
+}
+
+.avatar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.custom-checkbox input[type='checkbox'] {
+    width: 28px;
+    height: 28px;
+    margin-right: 12px;
+}
+
+.custom-checkbox label {
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .container-profile {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .card-main, .card-secondary {
+        width: 90%;
+        height: auto;
+    }
+
+    .card-body-secondary {
+        height: auto;
+    }
+}

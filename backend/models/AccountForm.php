@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use yii\base\Model;
+use common\models\User;
 
 /**
  * Account form
@@ -12,6 +13,7 @@ class AccountForm extends Model
 {
     public $username;
     public $email;
+    public $current_password;
     public $password;
     public $password_confirm;
 
@@ -41,7 +43,15 @@ class AccountForm extends Model
                     $query->andWhere(['not', ['id' => Yii::$app->user->getId()]]);
                 }
             ],
-            ['password', 'string'],
+            ['current_password', 'required', 'when' => function ($model) {
+                return !empty($model->password);
+            }],
+            ['current_password', 'string', 'min' => 6],
+            ['current_password', 'validateCurrentPassword'],
+            ['current_password', 'required', 'when' => function ($model) {
+                return !empty($model->password);
+            }],
+            ['password', 'string', 'min' => 6],
             [['password_confirm'], 'compare', 'compareAttribute' => 'password']
         ];
     }
@@ -54,8 +64,17 @@ class AccountForm extends Model
         return [
             'username' => Yii::t('backend', 'Username'),
             'email' => Yii::t('backend', 'Email'),
+            'current_password' =>Yii::t('backend', 'Contraseña actual'),
             'password' => Yii::t('backend', 'Password'),
             'password_confirm' => Yii::t('backend', 'Password Confirm')
         ];
+    }
+
+    public function validateCurrentPassword($attribute, $params)
+    {
+        $user = User::findOne(Yii::$app->user->id);
+        if (!$user || !$user->validatePassword($this->current_password)) {
+            $this->addError($attribute, Yii::t('backend', 'The current password is incorrect.'));
+        }
     }
 }

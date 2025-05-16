@@ -17,7 +17,7 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id', 'status'], 'integer'],
+            [['id', 'status', 'mining_group_id'], 'integer'],
             [['created_at', 'updated_at', 'logged_at'], 'default', 'value' => null],
             [['username', 'auth_key', 'password_hash', 'email'], 'safe'],
         ];
@@ -51,6 +51,7 @@ class UserSearch extends User
         $query->andFilterWhere([
             'id' => $this->id,
             'status' => $this->status,
+            'mining_group_id' => $this->mining_group_id,
         ]);
 
         if ($this->created_at !== null) {

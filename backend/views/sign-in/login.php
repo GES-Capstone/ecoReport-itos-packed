@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
@@ -7,39 +8,38 @@ use yii\bootstrap5\ActiveForm;
 /* @var $model \backend\models\LoginForm */
 
 $this->title = Yii::t('backend', 'Sign In');
-$this->params['breadcrumbs'][] = $this->title;
 $this->params['body-class'] = 'login-page';
 ?>
-<div class="login-box">
-    <div class="login-logo">
-        <?php echo Html::encode($this->title) ?>
-    </div><!-- /.login-logo -->
 
-    <div class="card">
-        <div class="card-body login-card-body">
-            <p class="login-box-msg"><?php echo Yii::t('backend', 'Sign in to start your session') ?></p>
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-md-4">
+        <div class="text-center mb-4">
+            <h3><?= Html::encode($this->title) ?></h3>
+            <p class="text-muted"><?= Yii::t('backend', 'Sign in to start your session') ?></p>
+        </div>
 
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
-            <?php echo $form->errorSummary($model) ?>
-            <?php echo $form->field($model, 'username', [
-                'inputTemplate' => '<div class="input-group">
-                    {input}
-                    <div class="input-group-append"><span class="input-group-text"><span class="fas fa-user"></span></span></div>
-                </div>',
-            ]) ?>
-            <?php echo $form->field($model, 'password', [
-                'inputTemplate' => '<div class="input-group">
-                    {input}
-                    <div class="input-group-append"><span class="input-group-text"><span class="fas fa-lock"></span></span></div>
-                </div>',
-            ])->passwordInput() ?>
-            <?php echo $form->field($model, 'rememberMe')->checkbox() ?>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
+                <?= $form->errorSummary($model) ?>
 
-            <?php echo Html::submitButton(Yii::t('backend', 'Sign In'). ' <span class="fas fa-arrow-right fa-sm"></span>', [
-                'class' => 'btn btn-primary btn-block',
-                'name' => 'login-button'
-            ]) ?>
-            <?php ActiveForm::end() ?>
+                <?= $form->field($model, 'username', [
+                    'inputTemplate' => '<div class="input-group mb-3">{input}<span class="input-group-text"><i class="fas fa-user"></i></span></div>',
+                ]) ?>
+
+                <?= $form->field($model, 'password', [
+                    'inputTemplate' => '<div class="input-group mb-3">{input}<span class="input-group-text"><i class="fas fa-lock"></i></span></div>',
+                ])->passwordInput() ?>
+
+                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+
+                <?= Html::submitButton(
+                    Yii::t('backend', 'Sign In') . ' <i class="fas fa-arrow-right fa-sm"></i>',
+                    ['class' => 'btn btn-primary w-100', 'name' => 'login-button']
+                ) ?>
+
+                <?php ActiveForm::end(); ?>
+            </div>
         </div>
     </div>
 </div>

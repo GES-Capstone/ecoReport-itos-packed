@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "initial_configuration".
+ * This is the model class for table "initial_configuration" .
  *
  * @property int $id
  * @property int $step
@@ -19,7 +19,7 @@ class InitialConfiguration extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'initial_configuration';
+        return '{{%initial_configuration}}';
     }
 
     /**

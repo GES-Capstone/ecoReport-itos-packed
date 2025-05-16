@@ -21,7 +21,7 @@ class UserScope extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'user_scope';
+        return '{{%user_scope}}';
     }
 
     /**

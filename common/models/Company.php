@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use trntv\filekit\behaviors\UploadBehavior;
 
 /**
  * This is the model class for table "company".
@@ -16,6 +17,7 @@ use Yii;
  * @property string|null $operational_address
  * @property string|null $phone
  * @property string|null $email
+ * @property string $picture
  * @property string|null $logo_path Path to logo image
  * @property string|null $logo_base_url Base URL for logo image
  *
@@ -31,7 +33,22 @@ class Company extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'company';
+        return '{{%company}}';
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'picture' => [
+                'class' => UploadBehavior::class,
+                'attribute' => 'picture',
+                'pathAttribute' => 'logo_path',
+                'baseUrlAttribute' => 'logo_base_url'
+            ]
+        ];
     }
 
     /**
@@ -48,6 +65,7 @@ class Company extends \yii\db\ActiveRecord
             [['email'], 'string', 'max' => 100],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
+            ['picture', 'safe']
         ];
     }
 
@@ -68,6 +86,7 @@ class Company extends \yii\db\ActiveRecord
             'email' => 'Email',
             'logo_path' => 'Logo Path',
             'logo_base_url' => 'Logo Base Url',
+            'picture' => Yii::t('common', 'Picture'),
         ];
     }
 
@@ -109,5 +128,16 @@ class Company extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_scope', ['company_id' => 'id']);
+    }
+
+    /**
+     * @param null $default
+     * @return bool|null|string
+     */
+    public function getLogo($default = null)
+    {
+        return $this->logo_path
+            ? Yii::getAlias($this->logo_base_url . '/' . $this->logo_path)
+            : $default;
     }
 }
