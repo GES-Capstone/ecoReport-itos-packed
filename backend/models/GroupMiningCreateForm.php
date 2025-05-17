@@ -5,6 +5,7 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use common\models\MiningGroup;
+
 /**
  * Account form
  */
@@ -19,10 +20,12 @@ class GroupMiningCreateForm extends Model
     public function rules()
     {
         return [
-            [['ges_name'], 'required', 'message' => Yii::t('backend', 'Por favor seleccione o cree un grupo minero. No se puede crear un usuario sin grupo.')],
+            [['ges_name'], 'required', 'message' => Yii::t('backend', 'Please select or create a Mining Group. User\'s can\'t be created without a Mining Group.')],
             [['ges_name'], 'filter', 'filter' => 'trim'],
             [['ges_name'], 'string', 'min' => 1, 'max' => 255],
-            [['ges_name'], 'unique',
+            [
+                ['ges_name'],
+                'unique',
                 'targetClass' => '\common\models\MiningGroup',
                 'message' => Yii::t('backend', 'This name has already been taken.'),
                 'filter' => function ($query) {
@@ -47,17 +50,17 @@ class GroupMiningCreateForm extends Model
      * @inheritdoc
      */
 
-     public function save() 
-     {
-         if ($this->validate()) {
-             $miningGroup = new MiningGroup();
-             $miningGroup->ges_name = $this->ges_name;
-             $miningGroup->name = $this->ges_name;
-             if ($miningGroup->save()) {
-                 $this->miningGroup = $miningGroup;
-                 return true;
-             }
-         }
-         return false;
-     }
+    public function save()
+    {
+        if ($this->validate()) {
+            $miningGroup = new MiningGroup();
+            $miningGroup->ges_name = $this->ges_name;
+            $miningGroup->name = $this->ges_name;
+            if ($miningGroup->save()) {
+                $this->miningGroup = $miningGroup;
+                return true;
+            }
+        }
+        return false;
+    }
 }

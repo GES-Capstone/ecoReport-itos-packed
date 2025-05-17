@@ -38,16 +38,16 @@ class SidebarMenuWidget extends Widget
 
         if (Yii::$app->user->can('manager') || Yii::$app->user->can('administrator')) {
             $items[] = [
-                'label' => FAS::icon('users-cog') . Html::tag('span', Yii::t('backend', 'Gestionar Usuarios'), ['class' => 'ms-2']) .
+                'label' => FAS::icon('users-cog') . Html::tag('span', Yii::t('backend', 'Manage Users'), ['class' => 'ms-2']) .
                     FAS::icon('angle-down', ['class' => 'submenu-toggle']),
                 'url' => '#',
                 'items' => [
                     [
-                        'label' => FAR::icon('edit') . Html::tag('span', Yii::t('backend', 'Editar Usuario'), ['class' => 'ms-2']),
+                        'label' => FAR::icon('edit') . Html::tag('span', Yii::t('backend', 'Edit Users'), ['class' => 'ms-2']),
                         'url' => ['/home/edit']
                     ],
                     [
-                        'label' => FAR::icon('plus-square') . Html::tag('span', Yii::t('backend', 'Crear Usuario'), ['class' => 'ms-2']),
+                        'label' => FAR::icon('plus-square') . Html::tag('span', Yii::t('backend', 'Create Users'), ['class' => 'ms-2']),
                         'url' => ['/home/create']
                     ]
                 ]

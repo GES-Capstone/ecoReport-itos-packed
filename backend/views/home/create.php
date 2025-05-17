@@ -5,11 +5,10 @@ use yii\widgets\ActiveForm;
 use yii\jui\AutoComplete;
 use yii\web\JsExpression;
 
-$this->title = 'Creación de Usuario';
+$this->title = Yii::t('backend', 'User Creation');
 ?>
 
 <?php
-// Mostrar mensajes flash
 foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
     $class = "alert alert-" . ($key == 'error' ? 'danger' : $key);
     $messages = is_array($messages) ? $messages : [$messages];
@@ -31,25 +30,23 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 <div class="row g-3 pt-3">
     <div class="col-md-4">
         <div class="card h-100 p-3 rounded-3">
-            <h5 class="fw-bold mb-3">Datos del Usuario</h5>
-            <?= $form->field($model, 'firstname')->textInput(['maxlength' => true, 'placeholder' => 'Primer Nombre', 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'middlename')->textInput(['maxlength' => true, 'placeholder' => 'Segundo Nombre', 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'lastname')->textInput(['maxlength' => true, 'placeholder' => 'Apellido', 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => 'Nombre de Usuario', 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => 'Correo Electrónico', 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'placeholder' => 'Contraseña', 'class' => 'form-control']) ?>
+            <h5 class="fw-bold mb-3"><?= Yii::t('backend', 'User Data') ?></h5>
+            <?= $form->field($model, 'firstname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'First Name'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'middlename')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Middle Name'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'lastname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Last Name'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Username'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Email Address'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Password'), 'class' => 'form-control']) ?>
         </div>
     </div>
 
     <div class="col-md-4">
         <div class="card h-100 p-3 rounded-3">
-            <h5 class="fw-bold mb-3">Roles y Capacidades</h5>
+            <h5 class="fw-bold mb-3"><?= Yii::t('backend', 'Roles and Capabilities') ?></h5>
 
             <?php if (Yii::$app->user->can('administrator')): ?>
-                <!-- Campo oculto para el ID del grupo seleccionado -->
                 <?= Html::hiddenInput('selected_mining_group_id', '', ['id' => 'selected_mining_group_id']) ?>
 
-                <!-- Campo de autocompletado para búsqueda de grupos mineros -->
                 <?= $form->field($modelGM, 'ges_name')->widget(AutoComplete::classname(), [
                     'clientOptions' => [
                         'source' => yii\helpers\Url::to(['home/search-groups']),
@@ -63,9 +60,10 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
                     ],
                     'options' => [
                         'class' => 'form-control',
-                        'placeholder' => 'Escribe para buscar grupos existentes...',
+                        'placeholder' => Yii::t('backend', 'Type here to look for existing Mining Groups...'),
                     ]
-                ])->label('Grupo Minero')->hint('<small class="text-muted">Si el grupo ya existe, el usuario será asignado a ese grupo. Si es nuevo, se creará automáticamente.</small>') ?>
+                ])->label(Yii::t('backend', 'Mining Group'))->hint('<small class="text-muted">' .
+                    Yii::t('backend', 'If the group already exists, the user will be assigned to that group. If it\'s new, it will be created automatically.') . '</small>') ?>
             <?php endif; ?>
 
             <?= $form->field($model, 'roles')->checkboxList($roles, [
@@ -80,34 +78,37 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
             ]) ?>
 
             <?= $form->field($model, 'status')->dropDownList([
-                2 => 'Activo',
-                1 => 'Inactivo',
-                3 => 'Eliminado'
-            ], ['prompt' => 'Seleccione el Estado', 'class' => 'form-select']) ?>
+                2 => Yii::t('backend', 'Active'),
+                1 => Yii::t('backend', 'Inactive'),
+                3 => Yii::t('backend', 'Deleted')
+            ], [
+                'prompt' => Yii::t('backend', 'Select Status'),
+                'class' => 'form-select'
+            ]) ?>
         </div>
     </div>
 
     <div class="col-md-4">
         <div class="card h-100 p-3 rounded-3">
-            <h5 class="fw-bold mb-3">Información adicional</h5>
+            <h5 class="fw-bold mb-3"><?= Yii::t('backend', 'Additional Information') ?></h5>
 
             <div class="alert alert-info">
-                <h6 class="alert-heading"><i class="fa fa-info-circle me-2"></i>Recordatorio:</h6>
-                <p class="mb-0">Complete todos los campos requeridos para crear un usuario.</p>
+                <h6 class="alert-heading"><i class="fa fa-info-circle me-2"></i><?= Yii::t('backend', 'Reminder') ?>:</h6>
+                <p class="mb-0"><?= Yii::t('backend', 'Complete all the required fields to create a user') ?></p>
             </div>
 
             <ul class="list-group mt-3">
                 <li class="list-group-item d-flex align-items-center">
                     <i class="fa fa-check-circle text-success me-2"></i>
-                    <span>Todos los usuarios deben pertenecer a un grupo minero</span>
+                    <span><?= Yii::t('backend', 'All Users must belong to a Mining Group') ?></span>
                 </li>
                 <li class="list-group-item d-flex align-items-center">
                     <i class="fa fa-check-circle text-success me-2"></i>
-                    <span>Al menos un rol debe ser asignado</span>
+                    <span><?= Yii::t('backend', 'At least one role must be assigned') ?></span>
                 </li>
                 <li class="list-group-item d-flex align-items-center">
                     <i class="fa fa-check-circle text-success me-2"></i>
-                    <span>Las contraseñas deben tener al menos 6 caracteres</span>
+                    <span><?= Yii::t('backend', 'Passwords must contain at least 6 characters') ?></span>
                 </li>
             </ul>
         </div>
@@ -115,8 +116,8 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 </div>
 
 <div class="form-group text-center mt-4">
-    <?= Html::submitButton('Crear Usuario', ['class' => 'btn btn-success px-5 py-2']) ?>
-    <?= Html::a('Cancelar', ['home/edit'], ['class' => 'btn btn-outline-secondary px-5 py-2 ms-2']) ?>
+    <?= Html::submitButton(Yii::t('backend', 'Create User'), ['class' => 'btn btn-success px-5 py-2']) ?>
+    <?= Html::a(Yii::t('backend', 'Cancel'), ['home/edit'], ['class' => 'btn btn-outline-secondary px-5 py-2 ms-2']) ?>
 </div>
 
 <?php ActiveForm::end(); ?>

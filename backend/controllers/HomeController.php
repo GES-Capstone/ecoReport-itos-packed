@@ -14,10 +14,25 @@ use backend\models\GroupMiningCreateForm;
 use trntv\filekit\actions\UploadAction;
 use common\models\MiningGroup;
 use common\models\InitialConfiguration;
+use yii\filters\VerbFilter;
 
 class HomeController extends Controller
 {
     public $layout = 'main';
+
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['post'],
+                    'activate' => ['post'],
+                    'restore' => ['post'],
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {
@@ -211,7 +226,6 @@ class HomeController extends Controller
                 ->andWhere(['auth_assignment.item_name' => $role_filter]);
         }
 
-        // Aplicar filtro de estado
         $query->andWhere(['status' => $status_filter]);
         $users = $query->all();
 
@@ -224,9 +238,9 @@ class HomeController extends Controller
 
         // Opciones para el filtro de estado
         $statusOptions = [
-            User::STATUS_ACTIVE => 'Activos',
-            User::STATUS_NOT_ACTIVE => 'No Activos',
-            User::STATUS_DELETED => 'Eliminados'
+            User::STATUS_ACTIVE => Yii::t('backend', 'Active Users'),
+            User::STATUS_NOT_ACTIVE => Yii::t('backend', 'Inactive Users'),
+            User::STATUS_DELETED => Yii::t('backend', 'Deleted Users'),
         ];
 
         return $this->render('edit', [
@@ -239,7 +253,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Activa un usuario con estado No Activo
+     * Activates an inactive user
      */
     public function actionActivate($id)
     {
@@ -258,19 +272,28 @@ class HomeController extends Controller
         if ($user->status == User::STATUS_NOT_ACTIVE) {
             $model->status = User::STATUS_ACTIVE;
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', 'Usuario activado correctamente.');
+                Yii::$app->session->setFlash(
+                    'success',
+                    Yii::t('backend', 'User activated successfully.')
+                );
             } else {
-                Yii::$app->session->setFlash('error', 'Error al activar el usuario.');
+                Yii::$app->session->setFlash(
+                    'error',
+                    Yii::t('backend', 'Error activating user.')
+                );
             }
         } else {
-            Yii::$app->session->setFlash('error', 'El usuario no está en estado inactivo.');
+            Yii::$app->session->setFlash(
+                'warning',
+                Yii::t('backend', 'The user is not in inactive status.')
+            );
         }
 
         return $this->redirect(['home/edit', 'status_filter' => User::STATUS_NOT_ACTIVE]);
     }
 
     /**
-     * Restaura un usuario eliminado
+     * Restore a deleted user
      */
     public function actionRestore($id)
     {
