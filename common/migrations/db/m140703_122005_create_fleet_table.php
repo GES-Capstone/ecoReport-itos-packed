@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%fleet}}`.
  */
-class m140703_000005_create_fleet_table extends Migration
+class m140703_122005_create_fleet_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -15,7 +15,7 @@ class m140703_000005_create_fleet_table extends Migration
         $this->createTable('{{%fleet}}', [
             'id' => $this->primaryKey(),
             'mining_group_id' => $this->integer(),
-            'company_id' => $this->integer(),
+            'area_id' => $this->integer(),
             'location_id' => $this->integer(),
             'name' => $this->string(255)->notNull(),
             'description' => $this->text(),
@@ -31,9 +31,9 @@ class m140703_000005_create_fleet_table extends Migration
         );
 
         $this->createIndex(
-            'idx-fleet-company_id',
+            'idx-fleet-area_id',
             '{{%fleet}}',
-            'company_id'
+            'area_id'
         );
 
         $this->createIndex(
@@ -42,24 +42,23 @@ class m140703_000005_create_fleet_table extends Migration
             'location_id'
         );
 
-        // Añade claves foráneas
         $this->addForeignKey(
             'fk-fleet-mining_group_id',
             '{{%fleet}}',
             'mining_group_id',
             '{{%mining_group}}',
             'id',
-            'SET NULL',
+            'CASCADE',
             'CASCADE'
         );
 
         $this->addForeignKey(
-            'fk-fleet-company_id',
+            'fk-fleet-area_id',
             '{{%fleet}}',
-            'company_id',
-            '{{%company}}',
+            'area_id',
+            '{{%area}}',
             'id',
-            'SET NULL',
+            'CASCADE',
             'CASCADE'
         );
 
@@ -81,12 +80,12 @@ class m140703_000005_create_fleet_table extends Migration
     {
         // Eliminar primero las claves foráneas
         $this->dropForeignKey('fk-fleet-mining_group_id', '{{%fleet}}');
-        $this->dropForeignKey('fk-fleet-company_id', '{{%fleet}}');
+        $this->dropForeignKey('fk-fleet-area_id', '{{%fleet}}');
         $this->dropForeignKey('fk-fleet-location_id', '{{%fleet}}');
         
         // Eliminar los índices
         $this->dropIndex('idx-fleet-mining_group_id', '{{%fleet}}');
-        $this->dropIndex('idx-fleet-company_id', '{{%fleet}}');
+        $this->dropIndex('idx-fleet-area_id', '{{%fleet}}');
         $this->dropIndex('idx-fleet-location_id', '{{%fleet}}');
         
         // Finalmente eliminar la tabla

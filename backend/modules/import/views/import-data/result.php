@@ -9,7 +9,11 @@ $this->title = 'Import Results';
 $this->params['breadcrumbs'][] = ['label' => 'Import Data', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-$totalProcessed = $stats['companies_created'] + $stats['companies_updated'];
+// Calcular el total procesado con las estadísticas disponibles en el servicio
+$totalProcessed = $stats['machinery_created'] + $stats['areas_created'] + 
+                  $stats['fleets_created'] + $stats['companies_created'] + 
+                  $stats['machinery_types_created'];
+
 $hasErrors = count($stats['errors']) > 0;
 ?>
 
@@ -35,12 +39,20 @@ $hasErrors = count($stats['errors']) > 0;
                                 <td class="col-md-2"><?= $stats['companies_created'] ?></td>
                             </tr>
                             <tr>
-                                <th>Companies updated:</th>
-                                <td><?= $stats['companies_updated'] ?></td>
+                                <th>Machinery Types created:</th>
+                                <td><?= $stats['machinery_types_created'] ?></td>
                             </tr>
                             <tr>
-                                <th>Locations created:</th>
-                                <td><?= $stats['locations_created'] ?></td>
+                                <th>Areas created:</th>
+                                <td><?= $stats['areas_created'] ?></td>
+                            </tr>
+                            <tr>
+                                <th>Fleets created:</th>
+                                <td><?= $stats['fleets_created'] ?></td>
+                            </tr>
+                            <tr>
+                                <th>Machinery created:</th>
+                                <td><?= $stats['machinery_created'] ?></td>
                             </tr>
                             <tr class="success">
                                 <th>Total processed:</th>

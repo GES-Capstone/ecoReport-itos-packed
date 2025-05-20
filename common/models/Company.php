@@ -28,6 +28,7 @@ use trntv\filekit\behaviors\UploadBehavior;
  */
 class Company extends \yii\db\ActiveRecord
 {
+    public $picture;
     /**
      * {@inheritdoc}
      */
