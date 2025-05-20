@@ -16,6 +16,7 @@ use Yii;
  */
 class Location extends \yii\db\ActiveRecord
 {
+    public $location_url;
     /**
      * {@inheritdoc}
      */
@@ -30,7 +31,8 @@ class Location extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['latitude', 'longitude'], 'required'],
+            [['location_url'], 'required', 'message' => Yii::t('backend', '{attribute} cannot be blank.')],
+            ['location_url', 'match', 'pattern' => '/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/', 'message' => Yii::t('backend', 'Incorrect format. Use: latitude,longitude')],
             [['latitude', 'longitude'], 'number'],
         ];
     }
@@ -44,6 +46,7 @@ class Location extends \yii\db\ActiveRecord
             'id' => 'ID',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
+            'location_url' => Yii::t('backend', 'Coordinates (latitude,longitude)'),
         ];
     }
 
@@ -66,4 +69,22 @@ class Location extends \yii\db\ActiveRecord
     {
         return $this->hasMany(MiningGroup::class, ['location_id' => 'id']);
     }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->location_url = rtrim(rtrim($this->latitude, '0'), '.') . ',' . rtrim(rtrim($this->longitude, '0'), '.');
+    }
+
+    public function beforeValidate()
+    {
+        if (!empty($this->location_url) && strpos($this->location_url, ',') !== false) {
+            list($lat, $lng) = explode(',', $this->location_url);
+            $this->latitude = trim($lat);
+            $this->longitude = trim($lng);
+        }
+        return parent::beforeValidate();
+    }
+
+   
 }

@@ -26,6 +26,12 @@ class m150725_192740_seed_data extends Migration
             'commercial_address' => '1234 Main St, Suite 100, Cityville, ST 12345',
             'operational_address' => '5678 Industrial Rd, Cityville, ST 12345',
         ]);
+        +$this->insert('{{%initial_configuration}}', [
+            'id' => 1,
+            'step' => 0,
+            'status' => 'not started',
+            'mining_group_id' => 1,
+        ]);
 
         $this->insert('{{%user}}', [
             'id' => 1,

@@ -82,15 +82,20 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
 
     <div id="change-password-wrapper" class="card-secondary" style="display: none;">
-        <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
+        <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
             style="height: 60px; position: relative; background-color: #5aa9f8;">
             <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
         </div>
         <div class="card-body-secondary">
-            <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'Nueva contraseña']) ?>
+            <?php $form = ActiveForm::begin([
+                'method' => 'post',
+                'options' => ['style' => 'text-align:center;']
+            ]); ?>
+            
+            <?= Html::hiddenInput('change_password', '1') ?>
+            
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
+                <?= Html::submitButton('Generar nueva contraseña', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -142,6 +147,15 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?php ActiveForm::end(); ?>
         </div>
     </div>
+
+    <div id="loading-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; justify-content: center; align-items: center;">
+        <div style="color: white; font-size: 1.5rem; text-align: center;">
+            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+            </div>
+            <div>Cargando...</div>
+        </div>
+    </div>
 </div>
 
 <div id="avatar-modal" class="modal" tabindex="-1" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:9999;">
@@ -152,37 +166,32 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 <?php
 $this->registerJs(<<<JS
 
-function hideAllForms() {
-    document.getElementById('upload-wrapper').style.display = 'none';
-    document.getElementById('change-password-wrapper').style.display = 'none';
-    document.getElementById('user-data-wrapper').style.display = 'none';
-    document.getElementById('user-roles-wrapper').style.display = 'none';
+function toggleVisibility(targetId, others) {
+    const target = document.getElementById(targetId);
+    const isVisible = target.style.display === 'block';
+
+    others.forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
+
+    target.style.display = isVisible ? 'none' : 'block';
 }
 
-
 document.getElementById('upload-btn').addEventListener('click', function () {
-    hideAllForms(); 
-    document.getElementById('upload-wrapper').style.display = 'block'; 
+    toggleVisibility('upload-wrapper', ['change-password-wrapper', 'user-data-wrapper', 'user-roles-wrapper']);
 });
-
 
 document.getElementById('change-password-btn').addEventListener('click', function () {
-    hideAllForms();
-    document.getElementById('change-password-wrapper').style.display = 'block';  
+    toggleVisibility('change-password-wrapper', ['upload-wrapper', 'user-data-wrapper', 'user-roles-wrapper']);
 });
-
 
 document.getElementById('edit-data-btn').addEventListener('click', function () {
-    hideAllForms(); 
-    document.getElementById('user-data-wrapper').style.display = 'block'; 
+    toggleVisibility('user-data-wrapper', ['upload-wrapper', 'change-password-wrapper', 'user-roles-wrapper']);
 });
-
 
 document.getElementById('edit-roles-btn').addEventListener('click', function () {
-    hideAllForms();
-    document.getElementById('user-roles-wrapper').style.display = 'block'; 
+    toggleVisibility('user-roles-wrapper', ['upload-wrapper', 'change-password-wrapper', 'user-data-wrapper']);
 });
-
 
 document.getElementById('current-avatar').addEventListener('click', function () {
     const modal = document.getElementById('avatar-modal');
@@ -191,16 +200,25 @@ document.getElementById('current-avatar').addEventListener('click', function () 
     modal.style.display = 'flex';
 });
 
-
 document.getElementById('close-avatar-modal').addEventListener('click', function () {
     document.getElementById('avatar-modal').style.display = 'none';
 });
-
 
 document.getElementById('avatar-modal').addEventListener('click', function (e) {
     if (e.target === this) {
         this.style.display = 'none';
     }
 });
+
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    });
+});
+
+window.addEventListener('load', () => {
+    document.getElementById('loading-overlay').style.display = 'none';
+});
+
 JS);
 ?>
