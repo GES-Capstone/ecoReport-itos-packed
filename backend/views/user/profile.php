@@ -103,6 +103,14 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?php ActiveForm::end(); ?>
         </div>
     </div>
+    <div id="loading-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; justify-content: center; align-items: center;">
+        <div style="color: white; font-size: 1.5rem; text-align: center;">
+            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+            </div>
+            <div>Cargando...</div>
+        </div>
+    </div>
 </div>
 
 
@@ -159,5 +167,16 @@ document.getElementById('avatar-modal').addEventListener('click', function (e) {
         this.style.display = 'none';
     }
 });
+
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    });
+});
+
+window.addEventListener('load', () => {
+    document.getElementById('loading-overlay').style.display = 'none';
+});
+
 JS);
 ?>

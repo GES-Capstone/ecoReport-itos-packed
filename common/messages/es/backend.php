@@ -261,5 +261,7 @@ return [
     'Are you sure you want to restore this user?' => '¿Está seguro de que desea restaurar este usuario?',
     'Are you sure that you want to restore this user?' => '¿Está seguro de que desea restaurar este usuario?',
     'Confirm Restoration' => 'Confirmar Restauración',
-
+    'Coordinates (latitude,longitude)' => 'Coordenadas (latitud,longitud)',
+    '{attribute} cannot be blank.' => '{attribute} no puede estar vacío.',
+    'Incorrect format. Use: latitude,longitude' => 'Formato incorrecto. Usa: latitud,longitud',
 ];

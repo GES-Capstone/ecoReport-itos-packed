@@ -18,6 +18,19 @@ $config = [
             'enableAutoLogin' => true,
             'as afterLogin' => common\behaviors\LoginTimestampBehavior::class,
         ],
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,
+            'viewPath' => '@common/mail',
+            'useFileTransport' => false, // Cambia a false para enviar correos reales
+            'transport' => [
+                'scheme' => 'smtp',
+                'host' => 'smtp.gmail.com',
+                'username' => 'mauricie.seba@gmail.com',
+                'password' => 'ocpu eudp qgmb eqgu',  // recuerda usar password de aplicación si usas gmail
+                'port' => 587,
+                'encryption' => 'tls',
+            ],
+        ],
     ],
     'modules' => [
         'content' => [

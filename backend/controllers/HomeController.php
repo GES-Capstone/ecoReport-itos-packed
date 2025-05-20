@@ -51,18 +51,11 @@ class HomeController extends Controller
             $modelGM->load(Yii::$app->request->post());
             $model->load(Yii::$app->request->post());
 
+            $randomPassword = Yii::$app->security->generateRandomString(10);
+            $model->password = $randomPassword;
+
             // Capturar el ID de grupo si se seleccionó de un dropdown
             $selectedGroupId = Yii::$app->request->post('selected_mining_group_id', null);
-
-            if (empty($model->password)) {
-                Yii::$app->session->setFlash('error', Yii::t('backend', 'Por favor ingrese una Contraseña.'));
-                return $this->render('create', [
-                    'model' => $model,
-                    'modelGM' => $modelGM,
-                    'roles' => $this->getRolesWithDescriptions(),
-                    'miningGroups' => $this->getMiningGroupsList()
-                ]);
-            }
 
             if (empty($model->roles)) {
                 Yii::$app->session->setFlash('error', Yii::t('backend', 'Por favor seleccione al menos un rol.'));
@@ -137,6 +130,12 @@ class HomeController extends Controller
             $model->mining_group_id = $miningGroupId;
 
             if ($model->save()) {
+                Yii::$app->mailer->compose()
+                    ->setTo($model->email)
+                    ->setFrom(['mauricie.seba@gmail.com' => 'EcoReportItos'])
+                    ->setSubject('Credenciales de acceso - EcoReportItos')
+                    ->setTextBody("Hola {$model->username},\n\nTu cuenta ha sido creada.\n\nUsuario: {$model->username}\nContraseña: {$randomPassword}\n\nPuedes acceder en: http://backend.yii2-starter-kit.localhost/\n\nSaludos,\nEquipo de Mi App")
+                    ->send();
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Usuario Creado Correctamente.'));
                 return $this->redirect(['index']);
             } else {
@@ -344,12 +343,30 @@ class HomeController extends Controller
             Yii::$app->session->setFlash('success', 'Imagen actualizada correctamente.');
         }
 
-        if ($model->load(Yii::$app->request->post())) {
+        // Detectar si el formulario "cambiar contraseña" fue enviado
+        if (Yii::$app->request->post('change_password') !== null) {
+            // Generar nueva contraseña solo aquí
+            $newPassword = Yii::$app->security->generateRandomString(10);
+            $model->password = $newPassword;
+
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
+                Yii::$app->mailer->compose()
+                    ->setTo($user->email)
+                    ->setFrom(['mauricie.seba@gmail.com' => 'EcoReportItos'])
+                    ->setSubject('Tu nueva contraseña')
+                    ->setTextBody("Hola {$user->username},\n\nTu nueva contraseña es: {$newPassword}\n\nPor favor, cámbiala después de ingresar.")
+                    ->send();
+                Yii::$app->session->setFlash('success', 'Contraseña generada y enviada por correo.');
+                return $this->redirect(['update', 'id' => $id]);
             } else {
-                Yii::$app->session->setFlash('error', 'Error al guardar el usuario.');
+                Yii::$app->session->setFlash('error', 'Error al guardar la nueva contraseña.');
             }
+        }
+
+        // Código normal para cargar otros datos y renderizar la vista
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
+            return $this->redirect(['update', 'id' => $id]);
         }
 
         return $this->render('update', [
@@ -359,6 +376,7 @@ class HomeController extends Controller
             'roles' => $this->getRolesWithDescriptions(),
         ]);
     }
+
 
     public function actionDelete($id)
     {
