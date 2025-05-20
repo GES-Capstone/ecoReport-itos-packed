@@ -58,18 +58,42 @@ class SignInController extends Controller
     public function actionLogin()
     {
         $this->layout = 'base';
+
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->redirectToInitialConfig();
         }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            return $this->render('login', [
-                'model' => $model
-            ]);
+            return $this->redirectToInitialConfig();
         }
+
+        return $this->render('login', ['model' => $model]);
+    }
+
+    protected function redirectToInitialConfig()
+    {
+        $user = Yii::$app->user->identity;
+
+        $miningGroupId = $user->mining_group_id ?? null;
+
+        if (!$miningGroupId) {
+            Yii::$app->session->setFlash('error', 'No tienes un grupo minero asignado.');
+            return $this->goHome();
+        }
+
+        $config = \common\models\InitialConfiguration::findOne(['mining_group_id' => $miningGroupId]);
+
+        if (!$config) {
+            Yii::$app->session->setFlash('error', 'No se encontró la configuración inicial para tu grupo minero.');
+            return $this->goHome();
+        }
+        if($config->step == 0){
+            $config->step = 1;
+            $config->status = 'in progress';
+            $config->save();
+        }
+        return $this->redirect(['initial-configuration/step' . $config->step]);
     }
 
     public function actionLogout()
