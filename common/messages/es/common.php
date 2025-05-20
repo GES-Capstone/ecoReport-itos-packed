@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Message translations.
  *
@@ -76,4 +77,5 @@ return [
     'Username' => 'Nombre de Usuario',
     'Value' => 'Valor',
     'Draft' => 'Borrador',
+    'Profession' => 'Profesión',
 ];

@@ -13,15 +13,15 @@ class m150725_192740_seed_data extends Migration
     {
         $this->insert('{{%location}}', [
             'id' => 1,
-            'latitude' => 37.7749,
-            'longitude' => -122.4194,
+            'latitude' => -29.45151,
+            'longitude' => -71.23921,
         ]);
 
         $this->insert('{{%mining_group}}', [
             'id' => 1,
             'location_id' => 1,
-            'name' => 'Alpha Group inc.',
-            'ges_name' => 'Alpha Group',
+            'name' => 'El Tofo',
+            'ges_name' => 'El Tofo',
             'description' => 'Webmaster group',
             'commercial_address' => '1234 Main St, Suite 100, Cityville, ST 12345',
             'operational_address' => '5678 Industrial Rd, Cityville, ST 12345',
@@ -65,6 +65,7 @@ class m150725_192740_seed_data extends Migration
         $this->insert('{{%user_profile}}', [
             'user_id' => 1,
             'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'Super Admin',
             'firstname' => 'John',
             'lastname' => 'Doe'
         ]);

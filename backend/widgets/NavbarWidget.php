@@ -13,8 +13,7 @@ class NavbarWidget extends Widget
     public function run()
     {
         $miningGroup = MiningGroup::findOne(['id' => Yii::$app->user->identity->mining_group_id]);
-        $logoUrl = $miningGroup ? $miningGroup->getLogo() : Yii::getAlias('@web/img/default-logo.png');
-
+        $logoUrl = $miningGroup && $miningGroup->getLogo() ? $miningGroup->getLogo() : Yii::getAlias('@web/img/default-logo.png');
         return Html::tag(
             'nav',
             Html::tag(
@@ -52,7 +51,7 @@ class NavbarWidget extends Widget
             Html::img($logoUrl, [
                 'alt' => 'Company Logo',
                 'height' => '40',
-                'onerror' => "this.src='" . Yii::getAlias('@web/img/default-logo.png') . "'"
+                'onerror' => "this.src='" . Yii::getAlias('@web/img/default-logo.png') . "'",
             ]),
             Yii::$app->homeUrl,
             ['class' => 'navbar-brand']

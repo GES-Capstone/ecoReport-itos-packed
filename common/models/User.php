@@ -325,6 +325,18 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return string
+     * 
+     */
+    public function getProfession()
+    {
+        if ($this->userProfile && $this->userProfile->profession) {
+            return $this->userProfile->profession;
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getId()

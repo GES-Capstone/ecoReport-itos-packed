@@ -61,6 +61,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         <div class="card-footer text-center">
             <p><strong><?= Yii::t('backend', 'Username') ?>:</strong> <?= Html::encode($model->username) ?></p>
             <p><strong><?= Yii::t('backend', 'Name') ?>:</strong> <?= Html::encode("{$modelProfile->firstname} {$modelProfile->lastname}" ?: '-') ?></p>
+            <p><strong><?= Yii::t('backend', 'Profession') ?>:</strong> <?= Html::encode($modelProfile->profession ?: '-') ?></p>
             <p><strong><?= Yii::t('backend', 'Email') ?>:</strong> <?= Html::encode($model->email) ?></p>
         </div>
     </div>
@@ -105,6 +106,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?php $form = ActiveForm::begin(); ?>
             <?= $form->field($modelProfile, 'firstname')->textInput(['maxlength' => true, 'placeholder' => 'Nombre']) ?>
             <?= $form->field($modelProfile, 'lastname')->textInput(['maxlength' => true, 'placeholder' => 'Apellido']) ?>
+            <?= $form->field($modelProfile, 'profession')->textInput(['maxlength' => true, 'placeholder' => 'Profesión']) ?>
             <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => 'Nombre de Usuario']) ?>
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => 'Correo Electrónico']) ?>
             <?= $form->field($model, 'status')->dropDownList([2 => 'Activo', 1 => 'Inactivo', 3 => 'Eliminado'], ['prompt' => 'Seleccione el Estado']) ?>

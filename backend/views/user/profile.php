@@ -54,6 +54,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
         <div class="card-footer text-center">
             <p><strong><?= Yii::t('backend', 'Username') ?>:</strong> <?= Html::encode($modelProfile->username) ?></p>
             <p><strong><?= Yii::t('backend', 'Name') ?>:</strong> <?= Html::encode(Yii::$app->user->identity->publicIdentity) ?></p>
+            <p><strong><?= Yii::t('backend', 'Profession') ?>:</strong> <?= Html::encode($model->profession ?: '-') ?></p>
             <p><strong><?= Yii::t('backend', 'Email') ?>:</strong> <?= Html::encode($modelProfile->email) ?></p>
 
         </div>

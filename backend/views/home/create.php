@@ -34,9 +34,9 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
             <?= $form->field($model, 'firstname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'First Name'), 'class' => 'form-control']) ?>
             <?= $form->field($model, 'middlename')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Middle Name'), 'class' => 'form-control']) ?>
             <?= $form->field($model, 'lastname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Last Name'), 'class' => 'form-control']) ?>
+            <?= $form->field($model, 'profession')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Profession'), 'class' => 'form-control']) ?>
             <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Username'), 'class' => 'form-control']) ?>
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Email Address'), 'class' => 'form-control']) ?>
-            <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Password'), 'class' => 'form-control']) ?>
         </div>
     </div>
 

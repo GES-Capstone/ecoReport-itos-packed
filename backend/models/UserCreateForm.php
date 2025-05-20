@@ -12,6 +12,7 @@ class UserCreateForm extends Model
     public $firstname;
     public $middlename;
     public $lastname;
+    public $profession;
     public $username;
     public $email;
     public $password;
@@ -23,8 +24,8 @@ class UserCreateForm extends Model
     public function rules()
     {
         return [
-            [['firstname', 'middlename', 'lastname', 'email', 'password', 'status'], 'required'],
-            [['username', 'firstname', 'middlename', 'lastname'], 'string', 'min' => 2, 'max' => 255],
+            [['firstname', 'middlename', 'lastname', 'email', 'status'], 'required'],
+            [['username', 'firstname', 'middlename', 'lastname', 'profession'], 'string', 'min' => 2, 'max' => 255],
             ['email', 'email'],
             ['email', 'unique', 'targetClass' => User::class, 'message' => 'This email has already been taken.'],
             ['password', 'string', 'min' => 6],
@@ -43,6 +44,7 @@ class UserCreateForm extends Model
             'firstname' => Yii::t('common', 'Firstname'),
             'middlename' => Yii::t('common', 'Middlename'),
             'lastname' => Yii::t('common', 'Lastname'),
+            'profession' => Yii::t('common', 'Profession'),
             'status' => Yii::t('backend', 'Status'),
             'roles' => Yii::t('backend', 'Roles'),
             'mining_group_id' => Yii::t('backend', 'Mining Group ID'),
@@ -59,6 +61,7 @@ class UserCreateForm extends Model
         $this->model->firstname = $this->firstname;
         $this->model->middlename = $this->middlename;
         $this->model->lastname = $this->lastname;
+        $this->model->profession = $this->profession;
     }
 
     public function getModel()
@@ -75,11 +78,9 @@ class UserCreateForm extends Model
             $model = $this->getModel();
             $isNewRecord = $model->getIsNewRecord();
 
-            // Comenzar una transacción
             $transaction = Yii::$app->db->beginTransaction();
 
             try {
-                // Crear y guardar el modelo de usuario
                 $model->username = $this->username;
                 $model->email = $this->email;
                 $model->status = $this->status;
@@ -92,19 +93,18 @@ class UserCreateForm extends Model
                     throw new \Exception('User model not saved');
                 }
 
-                // Crear el perfil de usuario y asociarlo al usuario
                 $userProfile = new UserProfile();
-                $userProfile->user_id = $model->id; // Asocia el perfil al usuario recién creado
+                $userProfile->user_id = $model->id;
                 $userProfile->firstname = $this->firstname;
                 $userProfile->middlename = $this->middlename;
                 $userProfile->lastname = $this->lastname;
+                $userProfile->profession = $this->profession;
 
                 if (!$userProfile->save()) {
                     $transaction->rollBack();
                     throw new \Exception('User profile not saved');
                 }
 
-                // Asignar roles al usuario
                 $auth = Yii::$app->authManager;
                 $auth->revokeAll($model->getId());
 
@@ -114,12 +114,10 @@ class UserCreateForm extends Model
                     }
                 }
 
-                // Confirmar la transacción
                 $transaction->commit();
 
                 return true;
             } catch (\Exception $e) {
-                // Si algo falla, revertir la transacción
                 $transaction->rollBack();
                 Yii::error('Error creating user: ' . $e->getMessage());
                 return false;

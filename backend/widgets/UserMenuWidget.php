@@ -28,7 +28,12 @@ class UserMenuWidget extends Widget
     {
         return Html::a(
             $this->renderUserThumbnail($user) .
-                Html::tag('span', $user->publicIdentity, ['class' => 'ms-1']),
+                Html::tag(
+                    'div',
+                    Html::tag('div', $user->publicIdentity, ['class' => 'fw-semibold lh-1']) .
+                        Html::tag('small', $user->userProfile->profession ?? '', ['class' => 'text-muted d-block']),
+                    ['class' => 'ms-1']
+                ),
             '#',
             [
                 'class' => 'nav-link dropdown-toggle d-flex align-items-center',

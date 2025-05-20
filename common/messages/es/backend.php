@@ -261,5 +261,5 @@ return [
     'Are you sure you want to restore this user?' => '¿Está seguro de que desea restaurar este usuario?',
     'Are you sure that you want to restore this user?' => '¿Está seguro de que desea restaurar este usuario?',
     'Confirm Restoration' => 'Confirmar Restauración',
-
+    'Profession' => 'Profesión',
 ];

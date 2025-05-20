@@ -17,7 +17,7 @@ $this->title = Yii::t('backend', 'Edit profile')
     <div class="card-body">
 
         <?php echo $form->field($model, 'picture')->widget(\trntv\filekit\widget\Upload::class, [
-            'url'=>['avatar-upload']
+            'url' => ['avatar-upload']
         ]) ?>
 
         <?php echo $form->field($model, 'firstname')->textInput(['maxlength' => 255]) ?>
@@ -25,6 +25,8 @@ $this->title = Yii::t('backend', 'Edit profile')
         <?php echo $form->field($model, 'middlename')->textInput(['maxlength' => 255]) ?>
 
         <?php echo $form->field($model, 'lastname')->textInput(['maxlength' => 255]) ?>
+
+        <?php echo $form->field($model, 'profession')->textInput(['maxlength' => 255]) ?>
 
         <?php echo $form->field($model, 'locale')->dropDownlist(Yii::$app->params['availableLocales']) ?>
 
@@ -34,7 +36,7 @@ $this->title = Yii::t('backend', 'Edit profile')
         ]) ?>
     </div>
     <div class="card-footer">
-        <?php echo Html::submitButton(FAS::icon('save').' '.Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-primary']) ?>
+        <?php echo Html::submitButton(FAS::icon('save') . ' ' . Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-primary']) ?>
     </div>
 </div>
 <?php ActiveForm::end() ?>
