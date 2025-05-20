@@ -11,8 +11,12 @@ use Yii;
  * @property int|null $mining_group_id
  * @property string $name
  * @property string|null $description
+ * @property string $prefix
+ * @property int|null $last_number
  * @property string|null $photo_base_url
  * @property string|null $photo_path
+ * @property string $created_at
+ * @property string $updated_at
  * @property string $prefix
  * @property int|null $last_number
  *
@@ -38,6 +42,7 @@ class MachineryType extends \yii\db\ActiveRecord
             [['mining_group_id', 'last_number'], 'integer'],
             [['name', 'prefix'], 'required'],
             [['description'], 'string'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
             [['prefix'], 'string', 'max' => 5],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
@@ -54,10 +59,12 @@ class MachineryType extends \yii\db\ActiveRecord
             'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
-            'photo_base_url' => Yii::t('app', 'Photo Base Url'),
-            'photo_path' => Yii::t('app', 'Photo Path'),
             'prefix' => Yii::t('app', 'Prefix'),
             'last_number' => Yii::t('app', 'Last Number'),
+            'photo_base_url' => Yii::t('app', 'Photo Base Url'),
+            'photo_path' => Yii::t('app', 'Photo Path'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
@@ -71,7 +78,11 @@ class MachineryType extends \yii\db\ActiveRecord
         return $this->hasMany(Machinery::class, ['machinery_type_id' => 'id']);
     }
 
-
+    /**
+     * Gets query for [[MiningGroup]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     */
     public function getMiningGroup()
     {
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
@@ -85,10 +96,7 @@ class MachineryType extends \yii\db\ActiveRecord
     {
         return new \common\models\query\MachineryTypeQuery(get_called_class());
     }
-
-
-
-    public function generatePrefix($name)
+        public function generatePrefix($name)
     {
         $name = mb_strtoupper(trim($name));
         $words = explode(' ', $name);

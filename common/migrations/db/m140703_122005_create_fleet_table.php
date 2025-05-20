@@ -19,8 +19,8 @@ class m140703_122005_create_fleet_table extends Migration
             'location_id' => $this->integer(),
             'name' => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'created_at' => $this->integer(),
-            'updated_at' => $this->integer(),
+'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
         // Añade índices para claves foráneas

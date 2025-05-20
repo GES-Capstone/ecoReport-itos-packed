@@ -16,8 +16,8 @@ class m140701_000004_create_functional_status_table extends Migration
             'id' => $this->primaryKey(),
             'mining_group_id'=> $this->integer()->notNull(),
             'status' => $this->string()->notNull(),
-            'created_at' => $this->integer()->notNull(),
-            'updated_at' => $this->integer()->notNull(),
+'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
         $this->createIndex(
             '{{%idx-functional_status-mining_group_id}}',

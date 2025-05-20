@@ -24,6 +24,8 @@ use Yii;
  * @property string|null $description
  * @property string|null $photo_base_url
  * @property string|null $photo_path
+ * @property string $created_at
+ * @property string $updated_at
  * @property string|null $inspection_type
  * @property string|null $family
  *
@@ -52,7 +54,7 @@ class Machinery extends \yii\db\ActiveRecord
         return [
             [['mining_group_id', 'fleet_id', 'functional_status_id', 'machinery_type_id', 'location_id', 'lifespan_years'], 'integer'],
             [['tag'], 'required'],
-            [['start_operation'], 'safe'],
+            [['start_operation', 'created_at', 'updated_at'], 'safe'],
             [['cost'], 'number'],
             [['description', 'inspection_type', 'family'], 'string'],
             [['tag', 'brand', 'model', 'supplier', 'sap_code', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
@@ -87,6 +89,8 @@ class Machinery extends \yii\db\ActiveRecord
             'description' => Yii::t('app', 'Description'),
             'photo_base_url' => Yii::t('app', 'Photo Base Url'),
             'photo_path' => Yii::t('app', 'Photo Path'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
             'inspection_type' => Yii::t('app', 'Inspection Type'),
             'family' => Yii::t('app', 'Family'),
         ];
@@ -112,7 +116,11 @@ class Machinery extends \yii\db\ActiveRecord
         return $this->hasOne(FunctionalStatus::class, ['id' => 'functional_status_id']);
     }
 
- 
+    /**
+     * Gets query for [[Location]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\LocationQuery
+     */
     public function getLocation()
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
@@ -138,7 +146,11 @@ class Machinery extends \yii\db\ActiveRecord
         return $this->hasOne(MachineryType::class, ['id' => 'machinery_type_id']);
     }
 
-
+    /**
+     * Gets query for [[MiningGroup]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     */
     public function getMiningGroup()
     {
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);

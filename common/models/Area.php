@@ -12,6 +12,8 @@ use Yii;
  * @property int|null $company_id
  * @property string $name
  * @property string|null $description
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property Company $company
  * @property Fleet[] $fleets
@@ -36,6 +38,7 @@ class Area extends \yii\db\ActiveRecord
             [['mining_group_id', 'company_id'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
@@ -53,10 +56,16 @@ class Area extends \yii\db\ActiveRecord
             'company_id' => Yii::t('app', 'Company ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
-
+    /**
+     * Gets query for [[Company]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\CompanyQuery
+     */
     public function getCompany()
     {
         return $this->hasOne(Company::class, ['id' => 'company_id']);
@@ -72,7 +81,11 @@ class Area extends \yii\db\ActiveRecord
         return $this->hasMany(Fleet::class, ['area_id' => 'id']);
     }
 
-
+    /**
+     * Gets query for [[MiningGroup]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     */
     public function getMiningGroup()
     {
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);

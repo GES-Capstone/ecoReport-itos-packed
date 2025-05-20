@@ -70,8 +70,11 @@ class ImportDataController extends Controller
         }
 
         try {
-            $type = $fileData['type'] ?? 'machinery';
-
+            if (!isset($fileData['type'])) {
+                throw new \Exception('Tipo de importación no especificado');
+            }
+            $type = $fileData['type'];
+            
             $importService = ImportServiceFactory::create($type);
 
             $stats = $importService->processFile($fileData['path'], Yii::$app->user->id);
@@ -137,9 +140,9 @@ class ImportDataController extends Controller
     private function getTemplateUrls()
     {
         return [
-            'company' => Yii::$app->urlManager->createUrl(['import-data/template', 'type' => 'company']),
-            'machinery' => Yii::$app->urlManager->createUrl(['import-data/template', 'type' => 'machinery']),
-            'component' => Yii::$app->urlManager->createUrl(['import-data/template', 'type' => 'component']),
+            'company' => Yii::$app->urlManager->createUrl(['import/import-data/template', 'type' => 'company']),
+            'machinery' => Yii::$app->urlManager->createUrl(['import/import-data/template', 'type' => 'machinery']),
+            'component' => Yii::$app->urlManager->createUrl(['import/import-data/template', 'type' => 'component']),
         ];
     }
 }

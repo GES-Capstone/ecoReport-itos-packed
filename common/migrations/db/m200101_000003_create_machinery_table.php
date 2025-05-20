@@ -28,6 +28,8 @@ class m200101_000003_create_machinery_table extends Migration
             'description' => $this->text(),
             'photo_base_url' => $this->string(),
             'photo_path' => $this->string(),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
             'inspection_type' => "ENUM('PER COMPONENT', 'COMPLETE')",
             'family' => "ENUM('SEMI','MOBILE','FIXED') DEFAULT 'FIXED'"
         ]);

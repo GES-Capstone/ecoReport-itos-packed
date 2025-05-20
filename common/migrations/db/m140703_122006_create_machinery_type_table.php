@@ -18,6 +18,8 @@ class m140703_122006_create_machinery_type_table extends Migration
             'last_number' => $this->integer()->defaultValue(0),
             'photo_base_url' => $this->string(),
             'photo_path' => $this->string(),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
         // Crea índices para mejorar el rendimiento de las consultas

@@ -10,8 +10,8 @@ use Yii;
  * @property int $id
  * @property int $mining_group_id
  * @property string $status
- * @property int $created_at
- * @property int $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property Machinery[] $machineries
  * @property MiningGroup $miningGroup
@@ -32,8 +32,9 @@ class FunctionalStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'status', 'created_at', 'updated_at'], 'required'],
-            [['mining_group_id', 'created_at', 'updated_at'], 'integer'],
+            [['mining_group_id', 'status'], 'required'],
+            [['mining_group_id'], 'integer'],
+            [['created_at', 'updated_at'], 'safe'],
             [['status'], 'string', 'max' => 255],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];

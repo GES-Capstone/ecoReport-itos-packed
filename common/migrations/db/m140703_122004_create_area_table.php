@@ -21,6 +21,8 @@ class m140703_122004_create_area_table extends Migration
             'company_id' => $this->integer(),
             'name' => $this->string()->notNull(),
             'description' => $this->text(),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
         $this->createIndex(

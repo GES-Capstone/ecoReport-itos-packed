@@ -13,8 +13,8 @@ use Yii;
  * @property int|null $location_id
  * @property string $name
  * @property string|null $description
- * @property int|null $created_at
- * @property int|null $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property Area $area
  * @property Location $location
@@ -37,9 +37,10 @@ class Fleet extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'area_id', 'location_id', 'created_at', 'updated_at'], 'integer'],
+            [['mining_group_id', 'area_id', 'location_id'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
+            [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::class, 'targetAttribute' => ['area_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],

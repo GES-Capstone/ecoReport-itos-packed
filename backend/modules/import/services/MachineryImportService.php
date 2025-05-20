@@ -11,6 +11,7 @@ use common\models\MiningGroup;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use common\models\Location;
 use Yii;
 
 class MachineryImportService implements ImportServiceInterface
@@ -50,6 +51,7 @@ class MachineryImportService implements ImportServiceInterface
                 $usefulLife = trim($sheet->getCell('I' . $row)->getValue());
                 $supplier = trim($sheet->getCell('J' . $row)->getValue());
                 $machineryCost = trim($sheet->getCell('K' . $row)->getValue());
+                $location = trim($sheet->getCell('L' . $row)->getValue());
 
                 $result = $this->processRow(
                     $row,
@@ -64,7 +66,8 @@ class MachineryImportService implements ImportServiceInterface
                     $usefulLife,
                     $supplier,
                     $machineryCost,
-                    $miningGroup->id
+                    $miningGroup->id,
+                    $location,
                 );
 
                 // Actualizar estadísticas según el resultado
@@ -112,7 +115,8 @@ class MachineryImportService implements ImportServiceInterface
         $usefulLife,
         $supplier,
         $machineryCost,
-        $miningGroupId
+        $miningGroupId,
+        $location
     ) {
         $result = [
             'success' => false,
@@ -146,7 +150,7 @@ class MachineryImportService implements ImportServiceInterface
             return $result;
         }
 
-        $validFamilies = ['SEMI', 'MOVIL', 'MÓVIL', 'FIJO'];
+        $validFamilies = ['SEMI', 'MOVIL', 'MÓVIL', 'FIJO', 'FIXED', 'MOBILE'];
         $normalizedFamily = strtoupper(trim($machineryFamily));
 
         if (!in_array($normalizedFamily, $validFamilies)) {
@@ -200,6 +204,7 @@ class MachineryImportService implements ImportServiceInterface
             //crear tag de equipo
 
             // Crear nueva maquinaria (cada fila es una unidad física diferente)
+            $processLocation = $this->generateLocation($location);
             $machineryResult = $this->processMachinery(
                 $miningGroupId,
                 $fleet->id,
@@ -211,6 +216,7 @@ class MachineryImportService implements ImportServiceInterface
                 $usefulLife,
                 $supplier,
                 $machineryCost,
+                $processLocation
             );
 
             if (!$machineryResult['success']) {
@@ -242,7 +248,8 @@ class MachineryImportService implements ImportServiceInterface
         $startedOperations,
         $usefulLife,
         $supplier,
-        $machineryCost
+        $machineryCost,
+        $processLocation
     ) {
         $result = [
             'success' => false,
@@ -260,6 +267,7 @@ class MachineryImportService implements ImportServiceInterface
             $machinery->machinery_type_id = $machineryType->id;
             $machinery->family = $machineryFamily;
             $machinery->tag = $machineryType->generateNextTag();
+            $machinery->location_id = $processLocation->id;
 
             // Asignar campos opcionales solo si tienen valor
             if (!empty($brand)) {
@@ -308,7 +316,7 @@ class MachineryImportService implements ImportServiceInterface
             return null;
         }
 
-        $date = trim($date);    
+        $date = trim($date);
 
         // Intentar formato DD-MM-YYYY
         if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $date, $matches)) {
@@ -445,7 +453,7 @@ class MachineryImportService implements ImportServiceInterface
                 $machineryType->name = $machineryTypeName;
                 $machineryType->mining_group_id = $miningGroupId;
                 $machineryType->prefix = $machineryType->generatePrefix($machineryTypeName);
-               
+
 
                 if (!$machineryType->save()) {
                     throw new \Exception("Error guardando tipo de maquinaria: " . implode(", ", $machineryType->getErrorSummary(true)));
@@ -528,6 +536,24 @@ class MachineryImportService implements ImportServiceInterface
 
         return $tag;
     }
+    private function generateLocation($locationData)
+    {
+        $coordinates = explode(',', $locationData);
+        if (count($coordinates) != 2) {
+            throw new \Exception("Formato de ubicación inválido");
+        }
+        $latitude = (float) trim($coordinates[0] ?? '');
+        $longitude = (float) trim($coordinates[1] ?? '');
+
+        $location = new Location();
+        $location->longitude = $longitude;
+        $location->latitude = $latitude;
+
+        if (!$location->save()) {
+            throw new \Exception('Error saving location');
+        }
+        return $location;
+    }
 
     public function generateTemplate($path)
     {
@@ -545,22 +571,24 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('H1', 'Inicio Operaciones (DD-MM-YYYY)');
         $sheet->setCellValue('I1', 'Vida Útil Equipo (años)');
         $sheet->setCellValue('J1', 'Proveedor');
-        $sheet->setCellValue('K1', 'Costo Maquinaria');
+        $sheet->setCellValue('K1', 'Costo Maquinaria MUSD');
+        $sheet->setCellValue('L1', 'Ubicación (lat,lng)');
 
-        // Dar formato a encabezados
-        $sheet->getStyle('A1:K1')->applyFromArray([
+        // Dar formato a encabezados - Color de fondo más visible
+        $sheet->getStyle('A1:L1')->applyFromArray([
             'font' => [
                 'bold' => true,
-                'color' => ['rgb' => 'FFFFFF'],
+                'color' => ['rgb' => '000000'], // Texto negro
             ],
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '4472C4'],
+                'startColor' => ['rgb' => '99CCFF'], // Azul claro para encabezados normales
             ],
         ]);
 
+
         // Auto-ajustar anchos de columna
-        foreach (range('A', 'K') as $col) {
+        foreach (range('A', 'L') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -576,10 +604,15 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('I2', '10');
         $sheet->setCellValue('J2', 'Komatsu');
         $sheet->setCellValue('K2', '800000');
+        $sheet->setCellValue('L2', '-29.9574,-71.3089');
 
-        // Resaltar campos obligatorios con asterisco
-        $sheet->getStyle('A1:C1')->getFont()->getColor()->setRGB('FF0000');
-        $sheet->getStyle('F1:G1')->getFont()->getColor()->setRGB('FF0000');
+        // Dar formato a los datos de ejemplo
+        $sheet->getStyle('A2:L2')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'EEEEEE'], // Gris claro para la fila de ejemplo
+            ],
+        ]);
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save($path);

@@ -4,17 +4,35 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $stats array */
 /* @var $fileName string */
+/* @var $type string */
 
 $this->title = 'Import Results';
 $this->params['breadcrumbs'][] = ['label' => 'Import Data', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-// Calcular el total procesado con las estadísticas disponibles en el servicio
-$totalProcessed = $stats['machinery_created'] + $stats['areas_created'] + 
-                  $stats['fleets_created'] + $stats['companies_created'] + 
-                  $stats['machinery_types_created'];
+// Detectar automáticamente las estadísticas de creación
+$creationStats = [];
+$totalProcessed = 0;
 
-$hasErrors = count($stats['errors']) > 0;
+// Buscar todas las claves que terminen en "_created"
+foreach ($stats as $key => $value) {
+    if (strpos($key, '_created') !== false && is_numeric($value)) {
+        $creationStats[$key] = $value;
+        $totalProcessed += $value;
+    }
+}
+
+// Si no hay estadísticas de creación, mostrar al menos las que existan
+if (empty($creationStats)) {
+    foreach ($stats as $key => $value) {
+        if ($key !== 'errors' && is_numeric($value)) {
+            $creationStats[$key] = $value;
+            $totalProcessed += $value;
+        }
+    }
+}
+
+$hasErrors = isset($stats['errors']) && count($stats['errors']) > 0;
 ?>
 
 <div class="import-data-result">
@@ -34,33 +52,25 @@ $hasErrors = count($stats['errors']) > 0;
                 <div class="col-md-8">
                     <table class="table table-striped table-bordered">
                         <tbody>
+                            <?php 
+                            // Mostrar cada estadística disponible
+                            foreach ($creationStats as $statKey => $statValue): 
+                                // Convertir clave a título legible (ej: "companies_created" → "Companies created")
+                                $statTitle = ucfirst(str_replace('_', ' ', $statKey));
+                            ?>
                             <tr>
-                                <th class="col-md-4">Companies created:</th>
-                                <td class="col-md-2"><?= $stats['companies_created'] ?></td>
+                                <th class="col-md-4"><?= $statTitle ?>:</th>
+                                <td class="col-md-2"><?= $statValue ?></td>
                             </tr>
-                            <tr>
-                                <th>Machinery Types created:</th>
-                                <td><?= $stats['machinery_types_created'] ?></td>
-                            </tr>
-                            <tr>
-                                <th>Areas created:</th>
-                                <td><?= $stats['areas_created'] ?></td>
-                            </tr>
-                            <tr>
-                                <th>Fleets created:</th>
-                                <td><?= $stats['fleets_created'] ?></td>
-                            </tr>
-                            <tr>
-                                <th>Machinery created:</th>
-                                <td><?= $stats['machinery_created'] ?></td>
-                            </tr>
+                            <?php endforeach; ?>
+                            
                             <tr class="success">
                                 <th>Total processed:</th>
                                 <td><strong><?= $totalProcessed ?></strong></td>
                             </tr>
                             <tr class="<?= $hasErrors ? 'danger' : 'success' ?>">
                                 <th>Errors found:</th>
-                                <td><strong><?= count($stats['errors']) ?></strong></td>
+                                <td><strong><?= count($stats['errors'] ?? []) ?></strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -89,7 +99,7 @@ $hasErrors = count($stats['errors']) > 0;
                 <p><strong>The following errors were encountered during import:</strong></p>
             </div>
             <ul class="error-list">
-                <?php foreach ($stats['errors'] as $error): ?>
+                <?php foreach ($stats['errors'] ?? [] as $error): ?>
                     <li><?= Html::encode($error) ?></li>
                 <?php endforeach; ?>
             </ul>
