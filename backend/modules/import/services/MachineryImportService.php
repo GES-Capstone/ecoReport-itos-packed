@@ -242,7 +242,7 @@ class MachineryImportService implements ImportServiceInterface
         $miningGroupId,
         $fleetId,
         $machineryType,
-        $machineryFamily, // Enum: 'SEMI', 'MOBILE', 'FIXED'
+        $machineryFamily,
         $brand,
         $model,
         $startedOperations,
@@ -483,6 +483,7 @@ class MachineryImportService implements ImportServiceInterface
         }
 
         try {
+            $area = Area::findOne($areaId);
             $fleet = Fleet::findOne(['name' => $fleetName, 'area_id' => $areaId, 'mining_group_id' => $miningGroupId]);
             if (!$fleet) {
                 $fleet = new Fleet();
@@ -566,7 +567,7 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('C1', 'Planta/Flota*');
         $sheet->setCellValue('D1', 'Marca');
         $sheet->setCellValue('E1', 'Modelo');
-        $sheet->setCellValue('F1', 'Familia Equipos* (SEMI/MOBILE/FIXED)');
+        $sheet->setCellValue('F1', 'Familia Equipos* (SEMI/MOVIL/FIJO)');
         $sheet->setCellValue('G1', 'Área*');
         $sheet->setCellValue('H1', 'Inicio Operaciones (DD-MM-YYYY)');
         $sheet->setCellValue('I1', 'Vida Útil Equipo (años)');
