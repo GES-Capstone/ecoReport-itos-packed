@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use trntv\filekit\widget\Upload;
 
-$this->title = Yii::t('backend', 'Mi Perfil');
+$this->title = Yii::t('backend', 'My Profile');
 $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset::class]]);
 ?>
 
@@ -33,17 +33,17 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
             <div class="flex-grow-1 p-3">
                 <div class="mb-3">
-                    <?= Html::button('Subir nueva imagen', [
+                    <?= Html::button(Yii::t('backend', 'Upload New Image'), [
                         'class' => 'btn btn-primary w-100 mb-2',
                         'id' => 'upload-btn',
                         'style' => 'background-color: #0d6efd; border-color: #0b5ed7;'
                     ]) ?>
-                    <?= Html::button('Cambiar contraseña', [
+                    <?= Html::button(Yii::t('backend', 'Change Password'), [
                         'class' => 'btn w-100 mb-2',
                         'id' => 'change-password-btn',
                         'style' => 'background-color: #5aa9f8; color: white; border: none;'
                     ]) ?>
-                    <?= Html::button('Cambiar nombre de usuario', [
+                    <?= Html::button(Yii::t('backend', 'Change Username'), [
                         'class' => 'btn w-100 mb-2',
                         'id' => 'change-username-btn',
                         'style' => 'background-color: #1c5d99; color: white; border: none;'
@@ -61,13 +61,13 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
     </div>
     <div id="upload-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center  mb-3" style="height: 60px; position: relative;">
-            <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Upload New Image') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
             <?= $form->field($model, 'picture')->widget(Upload::class, ['url' => ['avatar-upload']]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success  mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -76,15 +76,15 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
     <div id="change-password-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
             style="height: 60px; position: relative; background-color: #5aa9f8;">
-            <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change Password') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($modelAccount, 'current_password')->passwordInput(['placeholder' => 'Contraseña actual']) ?>
-            <?= $form->field($modelAccount, 'password')->passwordInput(['placeholder' => 'Nueva contraseña']) ?>
-            <?= $form->field($modelAccount, 'password_confirm')->passwordInput(['placeholder' => 'Repetir nueva contraseña']) ?>
+            <?= $form->field($modelAccount, 'current_password')->passwordInput(['placeholder' => Yii::t('backend', 'Current Password')]) ?>
+            <?= $form->field($modelAccount, 'password')->passwordInput(['placeholder' => Yii::t('backend', 'New Password')]) ?>
+            <?= $form->field($modelAccount, 'password_confirm')->passwordInput(['placeholder' => Yii::t('backend', 'Repeat New Password')]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success  mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
@@ -93,23 +93,15 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
     <div id="change-username-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header text-white d-flex align-items-center justify-content-center  mb-3"
             style="height: 60px; position: relative; background-color: #1c5d99;">
-            <h5 class="mb-0 text-center w-100">Cambiar Nombre de Usuario</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change Username') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($modelProfile, 'username')->textInput(['placeholder' => 'Nuevo nombre de usuario']) ?>
+            <?= $form->field($modelProfile, 'username')->textInput(['placeholder' => Yii::t('backend', 'New Username')]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success  mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success  mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
-        </div>
-    </div>
-    <div id="loading-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; justify-content: center; align-items: center;">
-        <div style="color: white; font-size: 1.5rem; text-align: center;">
-            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-            </div>
-            <div>Cargando...</div>
         </div>
     </div>
 </div>

@@ -25,7 +25,9 @@ class AccountForm extends Model
         return [
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
-            ['username', 'unique',
+            [
+                'username',
+                'unique',
                 'targetClass' => '\common\models\User',
                 'message' => Yii::t('backend', 'This username has already been taken.'),
                 'filter' => function ($query) {
@@ -36,7 +38,9 @@ class AccountForm extends Model
             ['email', 'filter', 'filter' => 'trim'],
             ['email', 'required'],
             ['email', 'email'],
-            ['email', 'unique',
+            [
+                'email',
+                'unique',
                 'targetClass' => '\common\models\User',
                 'message' => Yii::t('backend', 'This email has already been taken.'),
                 'filter' => function ($query) {
@@ -64,7 +68,7 @@ class AccountForm extends Model
         return [
             'username' => Yii::t('backend', 'Username'),
             'email' => Yii::t('backend', 'Email'),
-            'current_password' =>Yii::t('backend', 'Contraseña actual'),
+            'current_password' => Yii::t('backend', 'Current Password'),
             'password' => Yii::t('backend', 'Password'),
             'password_confirm' => Yii::t('backend', 'Password Confirm')
         ];

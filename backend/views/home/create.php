@@ -113,14 +113,6 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
             </ul>
         </div>
     </div>
-    <div id="loading-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; justify-content: center; align-items: center;">
-        <div style="color: white; font-size: 1.5rem; text-align: center;">
-            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-            </div>
-            <div>Cargando...</div>
-        </div>
-    </div>
 </div>
 
 <div class="form-group text-center mt-4">
@@ -132,14 +124,19 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 
 <?php
 $this->registerJs(<<<JS
-$('form').on('beforeSubmit', function(e) {
-    $('#loading-overlay').show();
-    return true;
-});
-
-window.addEventListener('load', () => {
-    $('#loading-overlay').hide();
+$(document).ready(function() {
+    $('form').on('beforeSubmit', function() {
+        $('#loading-overlay').removeClass('d-none').addClass('d-flex');
+        return true;
+    });
+    
+    $(window).on('load', function() {
+        $('#loading-overlay').addClass('d-none').removeClass('d-flex');
+    });
+    
+    $(document).ajaxComplete(function() {
+        $('#loading-overlay').addClass('d-none').removeClass('d-flex');
+    });
 });
 JS);
 ?>
-

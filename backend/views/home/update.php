@@ -91,9 +91,9 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 'method' => 'post',
                 'options' => ['style' => 'text-align:center;']
             ]); ?>
-            
+
             <?= Html::hiddenInput('change_password', '1') ?>
-            
+
             <div class="text-center mt-3">
                 <?= Html::submitButton('Generar nueva contraseña', ['class' => 'btn btn-success mb-3']) ?>
             </div>
@@ -145,15 +145,6 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
-        </div>
-    </div>
-
-    <div id="loading-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; justify-content: center; align-items: center;">
-        <div style="color: white; font-size: 1.5rem; text-align: center;">
-            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-            </div>
-            <div>Cargando...</div>
         </div>
     </div>
 </div>

@@ -31,6 +31,16 @@ $keyStorage = Yii::$app->keyStorage;
 
 <?= $content ?>
 
+<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
+    style="background-color: rgba(0,0,0,0.6); z-index: 9999;">
+    <div class="text-center text-white">
+        <div class="spinner-grow text-light mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden"><?= Yii::t('backend', 'Loading, please wait...') ?></span>
+        </div>
+        <div class="fs-5"><?= Yii::t('backend', 'Loading, please wait...') ?></div>
+    </div>
+</div>
+
 <?php $this->endBody() ?>
 <?= Html::endTag('body') ?>
 

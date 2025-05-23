@@ -50,7 +50,9 @@ class UserForm extends Model
             ['password', 'string', 'min' => 6],
 
             [['status'], 'integer'],
-            [['roles'], 'each',
+            [
+                ['roles'],
+                'each',
                 'rule' => ['in', 'range' => ArrayHelper::getColumn(
                     Yii::$app->authManager->getRoles(),
                     'name'
@@ -95,14 +97,14 @@ class UserForm extends Model
      */
     public function attributeLabels()
     {
-    return [
-        'username' => 'Nombre de Usuario',
-        'email' => 'Correo Electrónico',
-        'password' => 'Contraseña',
-        'status' => 'Estado',
-        'mining_group_id' => 'Grupo Minero',
-        'roles' => 'Roles del Usuario',
-    ];
+        return [
+            'username' => Yii::t('backend', 'Username'),
+            'email' => Yii::t('backend', 'Email'),
+            'password' => Yii::t('backend', 'Password'),
+            'status' => Yii::t('backend', 'Status'),
+            'mining_group_id' => Yii::t('backend', 'Mining Group ID'),
+            'roles' => Yii::t('backend', 'Roles'),
+        ];
     }
 
     /**

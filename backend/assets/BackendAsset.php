@@ -16,6 +16,7 @@ class BackendAsset extends AssetBundle
     public $js = [
         'js/layout.js',
         'js/button-modal.js',
+        'js/loading-overlay.js',
     ];
 
     public $depends = [

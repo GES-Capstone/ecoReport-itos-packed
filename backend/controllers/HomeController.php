@@ -137,7 +137,7 @@ class HomeController extends Controller
                     ->setTextBody("Hola {$model->username},\n\nTu cuenta ha sido creada.\n\nUsuario: {$model->username}\nContraseña: {$randomPassword}\n\nPuedes acceder en: http://backend.yii2-starter-kit.localhost/\n\nSaludos,\nEquipo de Mi App")
                     ->send();
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Usuario Creado Correctamente.'));
-                return $this->redirect(['index']);
+                return $this->redirect(['home/edit']);
             } else {
                 Yii::$app->session->setFlash('error', Yii::t('backend', 'Error Creando Usuario.'));
             }
