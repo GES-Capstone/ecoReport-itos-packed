@@ -16,7 +16,11 @@ class m150725_192740_seed_data extends Migration
             'latitude' => -29.45151,
             'longitude' => -71.23921,
         ]);
-
+        $this->insert('{{%location}}', [
+            'id' => 2,
+            'latitude' => -28.973558,
+            'longitude' => -70.154134,
+        ]);
         $this->insert('{{%mining_group}}', [
             'id' => 1,
             'location_id' => 1,
@@ -26,16 +30,42 @@ class m150725_192740_seed_data extends Migration
             'commercial_address' => '1234 Main St, Suite 100, Cityville, ST 12345',
             'operational_address' => '5678 Industrial Rd, Cityville, ST 12345',
         ]);
-        +$this->insert('{{%initial_configuration}}', [
+        $this->insert('{{%mining_group}}', [
+            'id' => 2,
+            'location_id' => 2,
+            'name' => 'Alpha Minerals',
+            'ges_name' => 'Alpha Minerals',
+            'description' => 'Unearthing tomorrow\'s riches with relentless precision, from deep-shaft gold to open-pit coal, powered by innovation and grit.',
+            'commercial_address' => '2500 Mineral Peak Blvd, Suite 1200',
+            'operational_address' => '4500 Quarry Access Road',
+        ]);
+        $this->insert('{{%initial_configuration}}', [
             'id' => 1,
             'step' => 0,
             'status' => 'not started',
             'mining_group_id' => 1,
         ]);
-
+        $this->insert('{{%initial_configuration}}', [
+            'id' => 2,
+            'step' => 0,
+            'status' => 'not started',
+            'mining_group_id' => 2,
+        ]);
         $this->insert('{{%user}}', [
             'id' => 1,
             'mining_group_id' => 1,
+            'username' => 'ges',
+            'email' => 'ges@example.com',
+            'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('ges'),
+            'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
+            'status' => User::STATUS_ACTIVE,
+            'created_at' => time(),
+            'updated_at' => time()
+        ]);
+        $this->insert('{{%user}}', [
+            'id' => 2,
+            'mining_group_id' => 2,
             'username' => 'webmaster',
             'email' => 'webmaster@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('webmaster'),
@@ -46,7 +76,8 @@ class m150725_192740_seed_data extends Migration
             'updated_at' => time()
         ]);
         $this->insert('{{%user}}', [
-            'id' => 2,
+            'id' => 3,
+            'mining_group_id' => 2,
             'username' => 'manager',
             'email' => 'manager@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('manager'),
@@ -57,9 +88,34 @@ class m150725_192740_seed_data extends Migration
             'updated_at' => time()
         ]);
         $this->insert('{{%user}}', [
-            'id' => 3,
+            'id' => 4,
+            'mining_group_id' => 2,
+            'username' => 'reviewer',
+            'email' => 'user1@example.com',
+            'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('reviewer'),
+            'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
+            'status' => User::STATUS_ACTIVE,
+            'created_at' => time(),
+            'updated_at' => time()
+        ]);
+        $this->insert('{{%user}}', [
+            'id' => 5,
+            'username' => 'inspector',
+            'mining_group_id' => 2,
+            'email' => 'user2@example.com',
+            'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('inspector'),
+            'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
+            'status' => User::STATUS_ACTIVE,
+            'created_at' => time(),
+            'updated_at' => time()
+        ]);
+        $this->insert('{{%user}}', [
+            'id' => 6,
+            'mining_group_id' => 2,
             'username' => 'user',
-            'email' => 'user@example.com',
+            'email' => 'user3@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('user'),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
@@ -77,11 +133,38 @@ class m150725_192740_seed_data extends Migration
         ]);
         $this->insert('{{%user_profile}}', [
             'user_id' => 2,
-            'locale' => Yii::$app->sourceLanguage
+            'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'Webmaster',
+            'firstname' => 'Jane',
+            'lastname' => 'Smith'
         ]);
         $this->insert('{{%user_profile}}', [
             'user_id' => 3,
-            'locale' => Yii::$app->sourceLanguage
+            'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'Manager',
+            'firstname' => 'Alice',
+            'lastname' => 'Johnson'
+        ]);
+        $this->insert('{{%user_profile}}', [
+            'user_id' => 4,
+            'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'Reviewer',
+            'firstname' => 'Bob',
+            'lastname' => 'Brown'
+        ]);
+        $this->insert('{{%user_profile}}', [
+            'user_id' => 5,
+            'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'Inspector',
+            'firstname' => 'Charlie',
+            'lastname' => 'Davis'
+        ]);
+        $this->insert('{{%user_profile}}', [
+            'user_id' => 6,
+            'locale' => Yii::$app->sourceLanguage,
+            'profession' => 'User',
+            'firstname' => 'Eve',
+            'lastname' => 'Wilson'
         ]);
 
         $this->insert('{{%page}}', [

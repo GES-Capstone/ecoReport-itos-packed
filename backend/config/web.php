@@ -90,7 +90,13 @@ $config = [
             ],
             [
                 'allow' => true,
-                'roles' => ['manager', 'administrator'],
+                'roles' => ['administrator'],
+            ],
+            [
+                'controllers' => ['home'],
+                'allow' => true,
+                'roles' => ['super-adminstrator', 'administrator', 'manager', 'reviewer', 'inspector', 'user'],
+                'actions' => ['index'],
             ],
         ],
     ],

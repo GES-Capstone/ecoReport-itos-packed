@@ -36,7 +36,7 @@ class SidebarMenuWidget extends Widget
             ]
         ];
 
-        if (Yii::$app->user->can('manager') || Yii::$app->user->can('administrator')) {
+        if (Yii::$app->user->can('createUser')) {
             $items[] = [
                 'label' => FAS::icon('users-cog') . Html::tag('span', Yii::t('backend', 'Manage Users'), ['class' => 'ms-2']) .
                     FAS::icon('angle-down', ['class' => 'submenu-toggle']),

@@ -276,4 +276,7 @@ return [
     'New Password' => 'Nueva Contraseña',
     'Repeat New Password' => 'Repetir Nueva Contraseña',
     'Mining Group ID' => 'ID del Grupo Minero',
+    'You are not allowed to access this page or it doesn\'t exist' => 'No tienes permiso para acceder a esta página o no existe',
+    'If you believe this is an error, please contact the administrator.' => 'Si crees que esto es un error, por favor contacta al administrador.',
+    'Go to Main Page' => 'Ir a la Página Principal',
 ];
