@@ -14,8 +14,6 @@ class m140703_122006_create_machinery_type_table extends Migration
             'mining_group_id' => $this->integer(),
             'name' => $this->string()->notNull(),
             'description' => $this->text(),
-            'prefix' => $this->string(5)->notNull(), 
-            'last_number' => $this->integer()->defaultValue(0),
             'photo_base_url' => $this->string(),
             'photo_path' => $this->string(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),

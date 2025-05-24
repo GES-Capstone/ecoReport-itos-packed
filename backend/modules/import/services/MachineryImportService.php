@@ -8,6 +8,7 @@ use common\models\Fleet;
 use common\models\Area;
 use common\models\Machinery;
 use common\models\MiningGroup;
+use common\models\MiningProcess;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -27,6 +28,7 @@ class MachineryImportService implements ImportServiceInterface
         }
         $stats = [
             'machinery_created' => 0,
+            'mining_process_created' => 0,
             'areas_created' => 0,
             'fleets_created' => 0,
             'companies_created' => 0,
@@ -40,18 +42,20 @@ class MachineryImportService implements ImportServiceInterface
             $highestRow = $sheet->getHighestRow();
 
             for ($row = 2; $row <= $highestRow; $row++) {
-                $company = trim($sheet->getCell('A' . $row)->getValue());
-                $machineryType = trim($sheet->getCell('B' . $row)->getValue());
-                $fleetData = trim($sheet->getCell('C' . $row)->getValue());
-                $brand = trim($sheet->getCell('D' . $row)->getValue());
-                $model = trim($sheet->getCell('E' . $row)->getValue());
-                $machineryFamily = trim($sheet->getCell('F' . $row)->getValue());
-                $areaData = trim($sheet->getCell('G' . $row)->getValue());
-                $startedOperations = trim($sheet->getCell('H' . $row)->getValue());
-                $usefulLife = trim($sheet->getCell('I' . $row)->getValue());
-                $supplier = trim($sheet->getCell('J' . $row)->getValue());
-                $machineryCost = trim($sheet->getCell('K' . $row)->getValue());
-                $location = trim($sheet->getCell('L' . $row)->getValue());
+                $company = trim($sheet->getCell('A' . $row)->getValue() ?? '');
+                $miningProcess = trim($sheet->getCell('B' . $row)->getValue() ?? '');
+                $machineryFamily = trim($sheet->getCell('C' . $row)->getValue() ?? '');
+                $areaData = trim($sheet->getCell('D' . $row)->getValue() ?? '');
+                $fleetData = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+                $machineryType = trim($sheet->getCell('F' . $row)->getValue() ?? '');
+                $tag = trim($sheet->getCell('G' . $row)->getValue() ?? '');
+                $brand = trim($sheet->getCell('H' . $row)->getValue() ?? '');
+                $model = trim($sheet->getCell('I' . $row)->getValue() ?? '');
+                $startedOperations = trim($sheet->getCell('J' . $row)->getValue() ?? '');
+                $usefulLife = trim($sheet->getCell('K' . $row)->getValue() ?? '');
+                $supplier = trim($sheet->getCell('L' . $row)->getValue() ?? '');
+                $machineryCost = trim($sheet->getCell('M' . $row)->getValue() ?? '');
+                $location = trim($sheet->getCell('N' . $row)->getValue() ?? '');
 
                 $result = $this->processRow(
                     $row,
@@ -68,6 +72,8 @@ class MachineryImportService implements ImportServiceInterface
                     $machineryCost,
                     $miningGroup->id,
                     $location,
+                    $miningProcess,
+                    $tag,
                 );
 
                 // Actualizar estadísticas según el resultado
@@ -86,6 +92,9 @@ class MachineryImportService implements ImportServiceInterface
 
                     if ($result['company']['isNew']) {
                         $stats['companies_created']++;
+                    }
+                    if ($result['miningProcess']['isNew']) {
+                        $stats['mining_process_created']++;
                     }
 
                     if ($result['machineryType']['isNew']) {
@@ -116,12 +125,15 @@ class MachineryImportService implements ImportServiceInterface
         $supplier,
         $machineryCost,
         $miningGroupId,
-        $location
+        $location,
+        $miningProcess,
+        $tag
     ) {
         $result = [
             'success' => false,
             'error' => null,
             'company' => ['isNew' => false],
+            'miningProcess' => ['isNew' => false],
             'machinery' => ['isNew' => false],
             'area' => ['isNew' => false],
             'fleet' => ['isNew' => false],
@@ -131,6 +143,14 @@ class MachineryImportService implements ImportServiceInterface
         // Validación de campos obligatorios
         if (empty($companyName)) {
             $result['error'] = "Empty company name";
+            return $result;
+        }
+        if (empty($miningProcess)) {
+            $result['error'] = "Empty mining process";
+            return $result;
+        }
+        if (empty($tag)) {
+            $result['error'] = "Empty tag";
             return $result;
         }
         if (empty($machineryType)) {
@@ -175,8 +195,14 @@ class MachineryImportService implements ImportServiceInterface
             $company = $companyResult['company'];
             $result['company']['isNew'] = $companyResult['isNew'];
 
-            // Encontrar o crear área
-            $areaResult = $this->findArea($areaData, $company->id, $miningGroupId);
+            $miningProcessResult = $this->findMiningProcess($miningProcess, $company->id, $miningGroupId);
+            if (!$miningProcessResult['success']) {
+                throw new \Exception($miningProcessResult['error']);
+            }
+            $result['miningProcess']['isNew'] = $miningProcessResult['isNew'];
+            $miningProcess = $miningProcessResult['miningProcess'];
+
+            $areaResult = $this->findArea($areaData, $miningProcess->id, $miningGroupId);
             if (!$areaResult['success']) {
                 throw new \Exception($areaResult['error']);
             }
@@ -201,7 +227,6 @@ class MachineryImportService implements ImportServiceInterface
 
             // Procesar fecha de inicio de operaciones
             $formattedStartedOperations = $this->formatDate($startedOperations);
-            //crear tag de equipo
 
             // Crear nueva maquinaria (cada fila es una unidad física diferente)
             $processLocation = $this->generateLocation($location);
@@ -216,7 +241,8 @@ class MachineryImportService implements ImportServiceInterface
                 $usefulLife,
                 $supplier,
                 $machineryCost,
-                $processLocation
+                $processLocation,
+                $tag
             );
 
             if (!$machineryResult['success']) {
@@ -249,7 +275,8 @@ class MachineryImportService implements ImportServiceInterface
         $usefulLife,
         $supplier,
         $machineryCost,
-        $processLocation
+        $processLocation,
+        $tag
     ) {
         $result = [
             'success' => false,
@@ -266,8 +293,8 @@ class MachineryImportService implements ImportServiceInterface
             $machinery->fleet_id = $fleetId;
             $machinery->machinery_type_id = $machineryType->id;
             $machinery->family = $machineryFamily;
-            $machinery->tag = $machineryType->generateNextTag();
             $machinery->location_id = $processLocation->id;
+            $machinery->tag = $tag;
 
             // Asignar campos opcionales solo si tienen valor
             if (!empty($brand)) {
@@ -397,7 +424,7 @@ class MachineryImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function findArea($areaName, $companyId, $miningGroupId)
+    private function findArea($areaName, $miningProcessId, $miningGroupId)
     {
         $result = [
             'success' => false,
@@ -412,11 +439,11 @@ class MachineryImportService implements ImportServiceInterface
         }
 
         try {
-            $area = Area::findOne(['name' => $areaName, 'company_id' => $companyId, 'mining_group_id' => $miningGroupId]);
+            $area = Area::findOne(['name' => $areaName, 'mining_process_id' => $miningProcessId, 'mining_group_id' => $miningGroupId]);
             if (!$area) {
                 $area = new Area();
                 $area->name = $areaName;
-                $area->company_id = $companyId;
+                $area->mining_process_id = $miningProcessId;
                 $area->mining_group_id = $miningGroupId;
 
                 if (!$area->save()) {
@@ -452,7 +479,6 @@ class MachineryImportService implements ImportServiceInterface
                 $machineryType = new MachineryType();
                 $machineryType->name = $machineryTypeName;
                 $machineryType->mining_group_id = $miningGroupId;
-                $machineryType->prefix = $machineryType->generatePrefix($machineryTypeName);
 
 
                 if (!$machineryType->save()) {
@@ -502,40 +528,6 @@ class MachineryImportService implements ImportServiceInterface
         }
         return $result;
     }
-    private function generateTag($machineryTypeName)
-    {
-        $machineryTypeName = mb_strtoupper(trim($machineryTypeName));
-
-        // Dividir el nombre en palabras
-        $words = explode(' ', $machineryTypeName);
-
-        // Generar el prefijo según el número de palabras
-        if (count($words) == 1) {
-            // Para tipos de una palabra, usar las dos primeras letras
-            $prefix = mb_substr($words[0], 0, 2);
-        } else {
-            // Para tipos de varias palabras, usar la inicial de cada palabra
-            $prefix = '';
-            foreach ($words as $word) {
-                if (!empty($word)) {
-                    $prefix .= mb_substr($word, 0, 1);
-                }
-            }
-        }
-
-        // Asegurarse de que el prefijo tenga al menos 2 caracteres
-        if (strlen($prefix) < 2) {
-            $prefix = str_pad($prefix, 2, $prefix);
-        }
-
-        // Generar un número único usando uniqid (únicamente los primeros 3 dígitos)
-        $uniqueNumber = substr(uniqid(), -3);
-
-        // Crear el tag final
-        $tag = $prefix . '-' . $uniqueNumber;
-
-        return $tag;
-    }
     private function generateLocation($locationData)
     {
         $coordinates = explode(',', $locationData);
@@ -555,59 +547,95 @@ class MachineryImportService implements ImportServiceInterface
         return $location;
     }
 
+    private function findMiningProcess($miningProcessName, $companyId, $miningGroupId)
+    {
+        $result = [
+            'success' => false,
+            'error' => null,
+            'miningProcess' => null,
+            'isNew' => false
+        ];
+
+        if (empty($miningProcessName)) {
+            $result['error'] = "Nombre de proceso minero vacío";
+            return $result;
+        }
+
+        try {
+            $miningProcess = MiningProcess::findOne(['name' => $miningProcessName, 'company_id' => $companyId, 'mining_group_id' => $miningGroupId]);
+            if (!$miningProcess) {
+                $miningProcess = new MiningProcess();
+                $miningProcess->name = $miningProcessName;
+                $miningProcess->company_id = $companyId;
+                $miningProcess->mining_group_id = $miningGroupId;
+
+                if (!$miningProcess->save()) {
+                    throw new \Exception("Error guardando proceso minero: " . implode(", ", $miningProcess->getErrorSummary(true)));
+                }
+                $result['isNew'] = true;
+            }
+            $result['success'] = true;
+            $result['miningProcess'] = $miningProcess;
+        } catch (\Exception $e) {
+            $result['error'] = "Error procesando proceso minero: " . $e->getMessage();
+        }
+        return $result;
+    }
+
     public function generateTemplate($path)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Establecer títulos de columnas
         $sheet->setCellValue('A1', 'Compañía*');
-        $sheet->setCellValue('B1', 'Tipo de Equipo*');
-        $sheet->setCellValue('C1', 'Planta/Flota*');
-        $sheet->setCellValue('D1', 'Marca');
-        $sheet->setCellValue('E1', 'Modelo');
-        $sheet->setCellValue('F1', 'Familia Equipos* (SEMI/MOBILE/FIXED)');
-        $sheet->setCellValue('G1', 'Área*');
-        $sheet->setCellValue('H1', 'Inicio Operaciones (DD-MM-YYYY)');
-        $sheet->setCellValue('I1', 'Vida Útil Equipo (años)');
-        $sheet->setCellValue('J1', 'Proveedor');
-        $sheet->setCellValue('K1', 'Costo Maquinaria MUSD');
-        $sheet->setCellValue('L1', 'Ubicación (lat,lng)');
+        $sheet->setCellValue('B1', 'Proceso Minero*');
+        $sheet->setCellValue('C1', 'Familia Equipos* (SEMI/MOVIL/FIJO)');
+        $sheet->setCellValue('D1', 'Área*');
+        $sheet->setCellValue('E1', 'Planta/Flota*');
+        $sheet->setCellValue('F1', 'Tipo de Equipo*');
+        $sheet->setCellValue('G1', 'Tag/Código*');
+        $sheet->setCellValue('H1', 'Marca');
+        $sheet->setCellValue('I1', 'Modelo');
+        $sheet->setCellValue('J1', 'Inicio Operaciones (DD-MM-YYYY)');
+        $sheet->setCellValue('K1', 'Vida Útil Equipo (años)');
+        $sheet->setCellValue('L1', 'Proveedor');
+        $sheet->setCellValue('M1', 'Costo Maquinaria MUSD');
+        $sheet->setCellValue('N1', 'Ubicación (lat,lng)');
 
-        // Dar formato a encabezados - Color de fondo más visible
-        $sheet->getStyle('A1:L1')->applyFromArray([
+        $sheet->getStyle('A1:N1')->applyFromArray([
             'font' => [
                 'bold' => true,
-                'color' => ['rgb' => '000000'], // Texto negro
+                'color' => ['rgb' => '000000'],
             ],
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '99CCFF'], // Azul claro para encabezados normales
+                'startColor' => ['rgb' => '99CCFF'],
             ],
         ]);
 
-
         // Auto-ajustar anchos de columna
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         // Ejemplo de datos
         $sheet->setCellValue('A2', 'EL TOFO');
-        $sheet->setCellValue('B2', 'CAEX');
-        $sheet->setCellValue('C2', 'CAEX-KMTSU');
-        $sheet->setCellValue('D2', 'Komatsu');
-        $sheet->setCellValue('E2', '830E-AC');
-        $sheet->setCellValue('F2', 'MOBILE');
-        $sheet->setCellValue('G2', 'TRANSPORTE MINA');
-        $sheet->setCellValue('H2', '01-02-2014');
-        $sheet->setCellValue('I2', '10');
-        $sheet->setCellValue('J2', 'Komatsu');
-        $sheet->setCellValue('K2', '800000');
-        $sheet->setCellValue('L2', '-29.9574,-71.3089');
+        $sheet->setCellValue('B2', 'EXTRACCIÓN');
+        $sheet->setCellValue('C2', 'MOBILE');
+        $sheet->setCellValue('D2', 'TRANSPORTE MINA');
+        $sheet->setCellValue('E2', 'CAEX-KMTSU');
+        $sheet->setCellValue('F2', 'CAEX');
+        $sheet->setCellValue('G2', 'CAEX-001');
+        $sheet->setCellValue('H2', 'Komatsu');
+        $sheet->setCellValue('I2', '830E-AC');
+        $sheet->setCellValue('J2', '01-02-2014');
+        $sheet->setCellValue('K2', '10');
+        $sheet->setCellValue('L2', 'Komatsu');
+        $sheet->setCellValue('M2', '800000');
+        $sheet->setCellValue('N2', '-29.9574,-71.3089');
 
         // Dar formato a los datos de ejemplo
-        $sheet->getStyle('A2:L2')->applyFromArray([
+        $sheet->getStyle('A2:N2')->applyFromArray([
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'EEEEEE'], // Gris claro para la fila de ejemplo

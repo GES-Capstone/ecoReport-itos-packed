@@ -11,14 +11,10 @@ use Yii;
  * @property int|null $mining_group_id
  * @property string $name
  * @property string|null $description
- * @property string $prefix
- * @property int|null $last_number
  * @property string|null $photo_base_url
  * @property string|null $photo_path
  * @property string $created_at
  * @property string $updated_at
- * @property string $prefix
- * @property int|null $last_number
  *
  * @property Machinery[] $machineries
  * @property MiningGroup $miningGroup
@@ -39,12 +35,11 @@ class MachineryType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'last_number'], 'integer'],
-            [['name', 'prefix'], 'required'],
+            [['mining_group_id'], 'integer'],
+            [['name'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
-            [['prefix'], 'string', 'max' => 5],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];
     }
@@ -59,8 +54,6 @@ class MachineryType extends \yii\db\ActiveRecord
             'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
-            'prefix' => Yii::t('app', 'Prefix'),
-            'last_number' => Yii::t('app', 'Last Number'),
             'photo_base_url' => Yii::t('app', 'Photo Base Url'),
             'photo_path' => Yii::t('app', 'Photo Path'),
             'created_at' => Yii::t('app', 'Created At'),
@@ -95,53 +88,5 @@ class MachineryType extends \yii\db\ActiveRecord
     public static function find()
     {
         return new \common\models\query\MachineryTypeQuery(get_called_class());
-    }
-        public function generatePrefix($name)
-    {
-        $name = mb_strtoupper(trim($name));
-        $words = explode(' ', $name);
-
-        if (count($words) == 1) {
-            $prefix = mb_substr($words[0], 0, 2);
-        } else {
-            $prefix = '';
-            foreach ($words as $word) {
-                if (!empty($word)) {
-                    $prefix .= mb_substr($word, 0, 1);
-                }
-            }
-        }
-
-        if (strlen($prefix) < 2) {
-            $prefix = str_pad($prefix, 2, $prefix);
-        }
-
-        $this->prefix = $prefix;
-
-        if ($this->last_number === null) {
-            $this->last_number = 0;
-        }
-
-        return $prefix;
-    }
-    public function generateNextTag()
-    {
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            $this->last_number += 1;
-            $this->save(false); // false para evitar validación
-
-           
-            $formattedNumber = str_pad($this->last_number, 3, '0', STR_PAD_LEFT);
-
-           
-            $tag = "{$this->prefix}-{$formattedNumber}";
-
-            $transaction->commit();
-            return $tag;
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            throw $e;
-        }
     }
 }

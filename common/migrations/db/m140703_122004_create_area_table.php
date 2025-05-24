@@ -6,7 +6,7 @@ use yii\db\Migration;
  * Handles the creation of table `{{%area}}`.
  * Has foreign keys to the tables:
  * - `{{%mining_group}}`
- * - `{{%company}}`
+ * - `{{%mining_process}}`
  */
 class m140703_122004_create_area_table extends Migration
 {
@@ -18,7 +18,7 @@ class m140703_122004_create_area_table extends Migration
         $this->createTable('{{%area}}', [
             'id' => $this->primaryKey(),
             'mining_group_id' => $this->integer(),
-            'company_id' => $this->integer(),
+            'mining_process_id' => $this->integer(),
             'name' => $this->string()->notNull(),
             'description' => $this->text(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -32,9 +32,9 @@ class m140703_122004_create_area_table extends Migration
         );
 
         $this->createIndex(
-            'idx-area-company_id',
+            'idx-area-mining_process_id',
             '{{%area}}',
-            'company_id'
+            'mining_process_id'
         );
 
         $this->addForeignKey(
@@ -47,10 +47,10 @@ class m140703_122004_create_area_table extends Migration
         );
 
         $this->addForeignKey(
-            'fk-area-company_id',
+            'fk-area-mining_process_id',
             '{{%area}}',
-            'company_id',
-            '{{%company}}',
+            'mining_process_id',
+            '{{%mining_process}}',
             'id',
             'CASCADE'
         );
@@ -68,7 +68,7 @@ class m140703_122004_create_area_table extends Migration
         );
 
         $this->dropForeignKey(
-            'fk-area-company_id',
+            'fk-area-mining_process_id',
             '{{%area}}'
         );
 
@@ -81,7 +81,7 @@ class m140703_122004_create_area_table extends Migration
         );
 
         $this->dropIndex(
-            'idx-area-company_id',
+            'idx-area-mining_process_id',
             '{{%area}}'
         );
 

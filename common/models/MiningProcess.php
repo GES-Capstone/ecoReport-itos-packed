@@ -5,28 +5,26 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%area}}".
+ * This is the model class for table "{{%mining_process}}".
  *
  * @property int $id
- * @property int|null $mining_group_id
- * @property int|null $mining_process_id
+ * @property int $mining_group_id
+ * @property int $company_id
  * @property string $name
- * @property string|null $description
  * @property string $created_at
  * @property string $updated_at
  *
- * @property Fleet[] $fleets
+ * @property Company $company
  * @property MiningGroup $miningGroup
- * @property MiningProcess $miningProcess
  */
-class Area extends \yii\db\ActiveRecord
+class MiningProcess extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%area}}';
+        return '{{%mining_process}}';
     }
 
     /**
@@ -35,13 +33,12 @@ class Area extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'mining_process_id'], 'integer'],
-            [['name'], 'required'],
-            [['description'], 'string'],
+            [['mining_group_id', 'company_id', 'name'], 'required'],
+            [['mining_group_id', 'company_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
+            [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
-            [['mining_process_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningProcess::class, 'targetAttribute' => ['mining_process_id' => 'id']],
         ];
     }
 
@@ -53,22 +50,21 @@ class Area extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'mining_group_id' => Yii::t('app', 'Mining Group ID'),
-            'mining_process_id' => Yii::t('app', 'Mining Process ID'),
+            'company_id' => Yii::t('app', 'Company ID'),
             'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
     /**
-     * Gets query for [[Fleets]].
+     * Gets query for [[Company]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\FleetQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\CompanyQuery
      */
-    public function getFleets()
+    public function getCompany()
     {
-        return $this->hasMany(Fleet::class, ['area_id' => 'id']);
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
     }
 
     /**
@@ -82,21 +78,11 @@ class Area extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[MiningProcess]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningProcessQuery
-     */
-    public function getMiningProcess()
-    {
-        return $this->hasOne(MiningProcess::class, ['id' => 'mining_process_id']);
-    }
-
-    /**
      * {@inheritdoc}
-     * @return \common\models\query\AreaQuery the active query used by this AR class.
+     * @return \common\models\query\MiningProcessQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new \common\models\query\AreaQuery(get_called_class());
+        return new \common\models\query\MiningProcessQuery(get_called_class());
     }
 }

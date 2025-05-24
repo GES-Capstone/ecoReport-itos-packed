@@ -2,10 +2,8 @@
 
 use yii\db\Migration;
 
-/**
- * Handles the creation of table `{{%functional_status}}`.
- */
-class m140701_000004_create_functional_status_table extends Migration
+
+class m140701_000005_create_functional_status_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -14,10 +12,10 @@ class m140701_000004_create_functional_status_table extends Migration
     {
         $this->createTable('{{%functional_status}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id'=> $this->integer()->notNull(),
+            'mining_group_id' => $this->integer()->notNull(),
             'status' => $this->string()->notNull(),
-'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
         $this->createIndex(
             '{{%idx-functional_status-mining_group_id}}',
@@ -38,7 +36,8 @@ class m140701_000004_create_functional_status_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeDown(){
+    public function safeDown()
+    {
         $this->dropForeignKey(
             '{{%fk-functional_status-mining_group_id}}',
             '{{%functional_status}}'
