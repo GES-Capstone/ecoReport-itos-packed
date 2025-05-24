@@ -268,7 +268,7 @@ class MachineryImportService implements ImportServiceInterface
         $miningGroupId,
         $fleetId,
         $machineryType,
-        $machineryFamily, // Enum: 'SEMI', 'MOBILE', 'FIXED'
+        $machineryFamily,
         $brand,
         $model,
         $startedOperations,
@@ -509,6 +509,7 @@ class MachineryImportService implements ImportServiceInterface
         }
 
         try {
+            $area = Area::findOne($areaId);
             $fleet = Fleet::findOne(['name' => $fleetName, 'area_id' => $areaId, 'mining_group_id' => $miningGroupId]);
             if (!$fleet) {
                 $fleet = new Fleet();
@@ -588,6 +589,7 @@ class MachineryImportService implements ImportServiceInterface
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setCellValue('A1', 'Compañía*');
+<<<<<<< HEAD
         $sheet->setCellValue('B1', 'Proceso Minero*');
         $sheet->setCellValue('C1', 'Familia Equipos* (SEMI/MOVIL/FIJO)');
         $sheet->setCellValue('D1', 'Área*');
@@ -601,6 +603,19 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('L1', 'Proveedor');
         $sheet->setCellValue('M1', 'Costo Maquinaria MUSD');
         $sheet->setCellValue('N1', 'Ubicación (lat,lng)');
+=======
+        $sheet->setCellValue('B1', 'Tipo de Equipo*');
+        $sheet->setCellValue('C1', 'Planta/Flota*');
+        $sheet->setCellValue('D1', 'Marca');
+        $sheet->setCellValue('E1', 'Modelo');
+        $sheet->setCellValue('F1', 'Familia Equipos* (SEMI/MOVIL/FIJO)');
+        $sheet->setCellValue('G1', 'Área*');
+        $sheet->setCellValue('H1', 'Inicio Operaciones (DD-MM-YYYY)');
+        $sheet->setCellValue('I1', 'Vida Útil Equipo (años)');
+        $sheet->setCellValue('J1', 'Proveedor');
+        $sheet->setCellValue('K1', 'Costo Maquinaria MUSD');
+        $sheet->setCellValue('L1', 'Ubicación (lat,lng)');
+>>>>>>> 27c9324c9d9fddfac4bfd50cc98ec45e1dd535b7
 
         $sheet->getStyle('A1:N1')->applyFromArray([
             'font' => [
