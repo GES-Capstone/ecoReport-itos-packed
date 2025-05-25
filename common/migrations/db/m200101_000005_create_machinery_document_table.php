@@ -19,14 +19,9 @@ class m200101_000004_create_machinery_document_table extends Migration
             'name' => $this->string()->notNull(),
             'base_url' => $this->string(),
             'file_path' => $this->string(),
-            'file_size' => $this->integer(), // tamaño en bytes
             'mime_type' => $this->string(), // tipo de archivo
             'description' => $this->text(),
-            // Metadatos adicionales
             'upload_date' => $this->dateTime()->defaultExpression('CURRENT_TIMESTAMP'),
-            'expiry_date' => $this->date(), // útil para garantías, certificaciones, etc.
-            'version' => $this->string(), // para control de versiones
-            'created_by' => $this->integer(), // ID del usuario que subió el documento
         ]);
 
         // Agregar clave foránea a la tabla de maquinaria
