@@ -4,11 +4,11 @@ use Yii;
 use backend\modules\import\services\ImportServiceInterface;
 use common\models\User;
 use common\models\Machinery;
-use common\models\Location;
 use common\models\Component;
+use common\models\MiningGroup;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ComponentImportService implements ImportServiceInterface
 {
@@ -18,10 +18,13 @@ class ComponentImportService implements ImportServiceInterface
         if (!$miningGroup) {
             throw new \Exception('User not associated to mining group');
         }
+        
         $stats = [
-            "components_ created" => 0,
+            "components_created" => 0,  // Corregido: removido espacio extra
+            'components_updated' => 0,  // Agregado: faltaba inicialización
             'errors' => [],
         ];
+        
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheet = $spreadsheet->getActiveSheet();
@@ -37,9 +40,6 @@ class ComponentImportService implements ImportServiceInterface
                 $usefulLifeHours = trim($sheet->getCell('G' . $row)->getValue() ?? '');
                 $supplier = trim($sheet->getCell('H' . $row)->getValue() ?? '');
                 $componentCost = trim($sheet->getCell('I' . $row)->getValue() ?? '');
-                $maintenancePlan = trim($sheet->getCell('J' . $row)->getValue() ?? '');
-                $inspectionPlan = trim($sheet->getCell('K' . $row)->getValue() ?? '');
-                $location = trim($sheet->getCell('L' . $row)->getValue() ?? '');
 
                 $result = $this->processRow(
                     $machineryTag,
@@ -51,11 +51,9 @@ class ComponentImportService implements ImportServiceInterface
                     $usefulLifeHours,
                     $supplier,
                     $componentCost,
-                    $maintenancePlan,
-                    $inspectionPlan,
-                    $location,
                     $miningGroup->id
                 );
+                
                 if ($result['success']) {
                     if ($result['isNew']) {
                         $stats['components_created']++;
@@ -65,13 +63,16 @@ class ComponentImportService implements ImportServiceInterface
                 } else {
                     $stats['errors'][] = "Fila $row: " . $result['error'];
                 }
-                return $stats;
-
             }
+            
+            // Movido fuera del bucle
+            return $stats;
+            
         } catch (\Exception $e) {
             throw new \Exception('Error procesando archivo: ' . $e->getMessage());
         }
     }
+
     public function processRow(
         $machineryTag,
         $componentName,
@@ -82,9 +83,6 @@ class ComponentImportService implements ImportServiceInterface
         $usefulLifeHours,
         $supplier,
         $componentCost,
-        $maintenancePlan,
-        $inspectionPlan,
-        $location,
         $miningGroupId
     ) {
         $result = [
@@ -93,64 +91,21 @@ class ComponentImportService implements ImportServiceInterface
             'error' => null,
         ];
 
-        // Validar campos uno por uno
-        if (empty($machineryTag)) {
-            $result['error'] = 'El campo Tag Equipo es requerido';
-            return $result;
-        }
+        // Validaciones mejoradas
+        $validationErrors = $this->validateRow([
+            'machineryTag' => $machineryTag,
+            'componentName' => $componentName,
+            'componentTag' => $componentTag,
+            'model' => $model,
+            'startedOperations' => $startedOperations,
+            'usefulLifeYear' => $usefulLifeYear,
+            'usefulLifeHours' => $usefulLifeHours,
+            'supplier' => $supplier,
+            'componentCost' => $componentCost,
+        ]);
 
-        if (empty($componentName)) {
-            $result['error'] = 'El campo Nombre Componente es requerido';
-            return $result;
-        }
-
-        if (empty($componentTag)) {
-            $result['error'] = 'El campo Tag Componente es requerido';
-            return $result;
-        }
-
-        if (empty($model)) {
-            $result['error'] = 'El campo Modelo es requerido';
-            return $result;
-        }
-
-        if (empty($startedOperations)) {
-            $result['error'] = 'El campo Inicio de Operaciones es requerido';
-            return $result;
-        }
-
-        if (empty($usefulLifeYear)) {
-            $result['error'] = 'El campo Vida Útil (Años) es requerido';
-            return $result;
-        }
-
-        if (empty($usefulLifeHours)) {
-            $result['error'] = 'El campo Vida Útil (Horas) es requerido';
-            return $result;
-        }
-
-        if (empty($supplier)) {
-            $result['error'] = 'El campo Proveedor es requerido';
-            return $result;
-        }
-
-        if (empty($componentCost)) {
-            $result['error'] = 'El campo Costo Componente es requerido';
-            return $result;
-        }
-
-        if (empty($maintenancePlan)) {
-            $result['error'] = 'El campo Plan de Mantenimiento es requerido';
-            return $result;
-        }
-
-        if (empty($inspectionPlan)) {
-            $result['error'] = 'El campo Plan de Inspección es requerido';
-            return $result;
-        }
-
-        if (empty($location)) {
-            $result['error'] = 'El campo Ubicación es requerido';
+        if (!empty($validationErrors)) {
+            $result['error'] = implode(', ', $validationErrors);
             return $result;
         }
 
@@ -159,61 +114,106 @@ class ComponentImportService implements ImportServiceInterface
             $result['error'] = 'El equipo no existe';
             return $result;
         }
-        
-        $component = $this->createComponent($machinery, $componentName, $componentTag, $model, $startedOperations, $usefulLifeYear, $usefulLifeHours, $supplier, $componentCost, $maintenancePlan, $inspectionPlan, $location);
+
+        // Verificar si el componente ya existe
+        $existingComponent = Component::findOne(['tag' => $componentTag]);
+        if ($existingComponent) {
+            $result['isNew'] = false;
+            $component = $existingComponent;
+        } else {
+            $component = new Component();
+        }
+
+        try {
+            $createResult = $this->createComponent(
+                $component,
+                $machinery, 
+                $componentName, 
+                $componentTag, 
+                $model, 
+                $startedOperations, 
+                $usefulLifeYear, 
+                $usefulLifeHours, 
+                $supplier, 
+                $componentCost, 
+            );
+            
+            if ($createResult) {
+                $result['success'] = true;
+            } else {
+                $result['error'] = 'Error al guardar el componente';
+            }
+        } catch (\Exception $e) {
+            $result['error'] = $e->getMessage();
+        }
 
         return $result;
     }
-    //por ahora asi, hay que cambiar el tag del equipo por el tag personalizado
-    private function findMachinery($machineryTag,$miningGroupId)
+
+    private function validateRow($data)
     {
-        $machinery = Machinery::findOne(['tag' => $machineryTag], ['mining_group_id' => $miningGroup->id]);
-        if ($machinery) {
-            return $machinery;
+        $errors = [];
+        $requiredFields = [
+            'machineryTag' => 'El campo Tag Equipo es requerido',
+            'componentName' => 'El campo Nombre Componente es requerido',
+            'componentTag' => 'El campo Tag Componente es requerido',
+            'model' => 'El campo Modelo es requerido',
+            'startedOperations' => 'El campo Inicio de Operaciones es requerido',
+            'usefulLifeYear' => 'El campo Vida Útil (Años) es requerido',
+            'usefulLifeHours' => 'El campo Vida Útil (Horas) es requerido',
+            'supplier' => 'El campo Proveedor es requerido',
+            'componentCost' => 'El campo Costo Componente es requerido',
+        ];
+
+        foreach ($requiredFields as $field => $message) {
+            if (empty($data[$field])) {
+                $errors[] = $message;
+            }
         }
-        return null;
+
+        return $errors;
     }
 
-    private function createComponent($machinery, $componentName, $componentTag, $model, $startedOperations, $usefulLifeYear, $usefulLifeHours, $supplier, $componentCost, $maintenancePlan, $inspectionPlan, $location){
-        $component = new Component();
+    private function findMachinery($machineryTag, $miningGroupId)
+    {
+        // Corregida la sintaxis del findOne
+        $machinery = Machinery::findOne([
+            'tag' => $machineryTag, 
+            'mining_group_id' => $miningGroupId
+        ]);
+        
+        return $machinery;
+    }
+
+    private function createComponent($component, $machinery, $componentName, $componentTag, $model, $startedOperations, $usefulLifeYear, $usefulLifeHours, $supplier, $componentCost)
+    {
         $component->machinery_id = $machinery->id;
         $component->name = $componentName;
         $component->tag = $componentTag;
         $component->model = $model;
-       
         $component->useful_life_years = $usefulLifeYear;
         $component->useful_life_hours = $usefulLifeHours;
         $component->supplier = $supplier;
         $component->cost = $componentCost;
-        $component->maintenance_plan = $maintenancePlan;
-        $component->inspection_plan = $inspectionPlan;
 
         $startedOperationsFormatted = $this->formatDate($startedOperations);
+        if ($startedOperationsFormatted === null) {
+            throw new \Exception('Formato de fecha inválido');
+        }
         $component->started_operations = $startedOperationsFormatted;
-       
-        $locationFormatted = $this->generateLocation($location);
-        $component->location_id = $locationFormatted->id;
 
 
-    }
-    private function generateLocation($locationData)
-    {
-        $coordinates = explode(',', $locationData);
-        if (count($coordinates) != 2) {
-            throw new \Exception("Formato de ubicación inválido");
+        // Guardar el componente
+        if (!$component->save()) {
+            $errors = implode(', ', $component->getFirstErrors());
+            throw new \Exception('Error al guardar componente: ' . $errors);
         }
-        $latitude = (float) trim($coordinates[0] ?? '');
-        $longitude = (float) trim($coordinates[1] ?? '');
 
-        $location = new Location();
-        $location->longitude = $longitude;
-        $location->latitude = $latitude;
-
-        if (!$location->save()) {
-            throw new \Exception('Error saving location');
-        }
-        return $location;
+        return true;
     }
+
+
+
     private function formatDate($date)
     {
         if (empty($date)) {
@@ -254,16 +254,59 @@ class ComponentImportService implements ImportServiceInterface
 
         return null;
     }
+
     public function generateTemplate($path)
     {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
+        // Establecer las cabeceras con los nuevos campos
+        $sheet->setCellValue('A1', 'TAG EQUIPO (ID)*');
+        $sheet->setCellValue('B1', 'COMPONENTE*');
+        $sheet->setCellValue('C1', 'TAG COMPONENTE*');
+        $sheet->setCellValue('D1', 'MODELO');
+        $sheet->setCellValue('E1', 'INICIO OPERACIONES (DD-MM-YYYY)*');
+        $sheet->setCellValue('F1', 'VIDA ÚTIL COMPONENTE (años)');
+        $sheet->setCellValue('G1', 'VIDA ÚTIL COMPONENTE (horas)');
+        $sheet->setCellValue('H1', 'PROVEEDOR');
+        $sheet->setCellValue('I1', 'COSTO COMPONENTE (MUSD)');
+
+        // Aplicar estilos a las cabeceras
+        $sheet->getStyle('A1:J1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => '000000'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '99CCFF'],
+            ],
+        ]);
+
+        // Auto-ajustar anchos de columna
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+
+        // Dar formato a los datos de ejemplo
+        $sheet->getStyle('A2:J3')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'EEEEEE'],
+            ],
+        ]);
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save($path);
+
+        return true;
     }
+
+
     private function getMiningGroup($userId)
     {
-        $user = User::findOne($userId);
-        if ($user && $user->miningGroup) {
-            return $user->miningGroup()->one();
-        }
-        return null;
+        $user = User::find()->with('miningGroup')->where(['id' => $userId])->one();
+        return $user ? $user->miningGroup : null;
     }
 }

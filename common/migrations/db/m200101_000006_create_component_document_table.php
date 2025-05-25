@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%component_document}}`.
  */
-class m200101_000005_create_component_document_table extends Migration
+class m200101_000006_create_component_document_table extends Migration
 {
     public function safeUp()
     {

@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%component}}`.
  */
-class m200101_000004_create_component_table extends Migration
+class m200101_000003_create_component_table extends Migration
 {
     public function safeUp()
     {
@@ -20,7 +20,7 @@ class m200101_000004_create_component_table extends Migration
             'model' => $this->string(),
             
             // Vida útil
-            'useful_life_years' => $this->integer(),
+            'useful_life_years' => $this->double(),
             'useful_life_hours' => $this->integer(),
             
             'supplier' => $this->string(),
@@ -28,9 +28,6 @@ class m200101_000004_create_component_table extends Migration
             
             // Fecha de inicio de operaciones
             'started_operations' => $this->date(),
-            
-            // Relación con location
-            'location_id' => $this->integer(),
             
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),

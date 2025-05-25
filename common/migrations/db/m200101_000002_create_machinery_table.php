@@ -5,11 +5,10 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%machinery}}`.
  */
-class m200101_000003_create_machinery_table extends Migration
+class m200101_000002_create_machinery_table extends Migration
 {
     public function safeUp()
     {
-        // En MariaDB, los ENUM se definen directamente en la columna
         $this->createTable('{{%machinery}}', [
             'id' => $this->primaryKey(),
             'mining_group_id' => $this->integer(),
