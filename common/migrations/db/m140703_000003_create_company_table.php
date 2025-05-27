@@ -24,6 +24,8 @@ class m140703_000003_create_company_table extends Migration
             'email' => $this->string(100),
             'logo_path' => $this->string(255)->comment('Path to logo image'),
             'logo_base_url' => $this->string(255)->comment('Base URL for logo image'),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
         $this->createIndex(

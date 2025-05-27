@@ -52,6 +52,9 @@ $config = [
             'class' => backend\modules\rbac\Module::class,
             'defaultRoute' => 'rbac-auth-item/index',
         ],
+        'import' => [
+            'class' => 'backend\modules\import\Module',
+        ],
     ],
     'as globalAccess' => [
         'class' => common\behaviors\GlobalAccessBehavior::class,
@@ -87,6 +90,24 @@ $config = [
             [
                 'controllers' => ['user'],
                 'allow' => false,
+            ],
+            [
+                'controllers' => ['import/mining-group'],
+                'allow' => true,
+                'roles' => ['webmaster', 'manager'],
+                'actions' => ['create', 'assign'],
+            ],
+            [
+                'controllers' => ['import/mining-group'],
+                'allow' => false,
+                'roles' => ['user'],
+                'actions' => ['create', 'assign'],
+            ],
+            [
+                'controllers' => ['import/import-data'],
+                'allow' => true,
+                'roles' => ['@'],
+                'actions' => ['index', 'process'],
             ],
             [
                 'allow' => true,

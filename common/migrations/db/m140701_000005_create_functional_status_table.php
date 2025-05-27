@@ -1,0 +1,53 @@
+<?php
+
+use yii\db\Migration;
+
+
+class m140701_000005_create_functional_status_table extends Migration
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function safeUp()
+    {
+        $this->createTable('{{%functional_status}}', [
+            'id' => $this->primaryKey(),
+            'mining_group_id' => $this->integer()->notNull(),
+            'status' => $this->string()->notNull(),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+        ]);
+        $this->createIndex(
+            '{{%idx-functional_status-mining_group_id}}',
+            '{{%functional_status}}',
+            'mining_group_id'
+        );
+        $this->addForeignKey(
+            '{{%fk-functional_status-mining_group_id}}',
+            '{{%functional_status}}',
+            'mining_group_id',
+            '{{%mining_group}}',
+            'id',
+            'CASCADE',
+            'CASCADE',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown()
+    {
+        $this->dropForeignKey(
+            '{{%fk-functional_status-mining_group_id}}',
+            '{{%functional_status}}'
+        );
+
+        $this->dropIndex(
+            '{{%idx-functional_status-mining_group_id}}',
+            '{{%functional_status}}'
+        );
+
+        $this->dropTable('{{%functional_status}}');
+    }
+}
