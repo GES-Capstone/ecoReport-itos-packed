@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use common\models\User;
 use common\models\UserProfile;
+use yii\helpers\ArrayHelper;
 
 class UserCreateForm extends Model
 {
@@ -30,7 +31,13 @@ class UserCreateForm extends Model
             ['email', 'unique', 'targetClass' => User::class, 'message' => 'This email has already been taken.'],
             ['password', 'string', 'min' => 6],
             [['status'], 'integer'],
-            [['roles'], 'each', 'rule' => ['in', 'range' => array_keys(Yii::$app->authManager->getRoles())]],
+            ['roles', 'required'],
+            ['roles', 'required'],
+            ['roles', 'string'],
+            ['roles', 'in', 'range' => ArrayHelper::getColumn(
+                Yii::$app->authManager->getRoles(),
+                'name'
+            )],
             [['mining_group_id'], 'integer'],
         ];
     }
@@ -108,9 +115,10 @@ class UserCreateForm extends Model
                 $auth = Yii::$app->authManager;
                 $auth->revokeAll($model->getId());
 
-                if ($this->roles && is_array($this->roles)) {
-                    foreach ($this->roles as $role) {
-                        $auth->assign($auth->getRole($role), $model->getId());
+                if (!empty($this->roles)) {
+                    $role = $auth->getRole($this->roles);
+                    if ($role) {
+                        $auth->assign($role, $model->getId());
                     }
                 }
 

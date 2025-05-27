@@ -2,12 +2,11 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\helpers\ArrayHelper;
-use common\models\MiningGroup;
 use trntv\filekit\widget\Upload;
 
-$this->title = 'Editar Usuario: ' . $model->username;
+$this->title = Yii::t('backend', 'Editing User') . ": " . $model->username;
 $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset::class]]);
+$this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets\BackendAsset::class]);
 ?>
 
 <div class="container-profile">
@@ -18,7 +17,7 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 style="text-decoration: none;">
                 <i class="fa fa-arrow-left fa-lg"></i>
             </a>
-            <h5 class="mb-0 text-center"><?= Html::encode($this->title) ?></h5>
+            <h5 class="mb-0 text-center"><?= Yii::t('backend', 'Edit User') . ": " . $model->username ?></h5>
         </div>
         <div class="card-body">
 
@@ -31,29 +30,36 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 ]) ?>
             </div>
 
-
             <div class="flex-grow-1">
                 <div class="mb-3 px-4">
-                    <?= Html::button('Subir nueva imagen', [
+                    <?= Html::button(Yii::t('backend', 'Update Profile Picture'), [
                         'class' => 'btn btn-primary w-100 mb-2',
                         'id' => 'upload-btn',
                         'style' => 'background-color: #0d6efd; border-color: #0b5ed7;'
                     ]) ?>
-                    <?= Html::button('Cambiar contraseña', [
+                    <?= Html::button(Yii::t('backend', 'Change Password'), [
                         'class' => 'btn w-100 mb-2',
                         'id' => 'change-password-btn',
                         'style' => 'background-color: #5aa9f8; color: white; border: none;'
                     ]) ?>
-                    <?= Html::button('Cambiar datos', [
+                    <?= Html::button(Yii::t('backend', 'Update Profile'), [
                         'class' => 'btn w-100 mb-2',
                         'id' => 'edit-data-btn',
                         'style' => 'background-color: #1c5d99; color: white; border: none;'
                     ]) ?>
-                    <?= Html::button('Actualizar rol', [
+                    <?= Html::button(Yii::t('backend', 'Update Role'), [
                         'class' => 'btn w-100',
                         'id' => 'edit-roles-btn',
                         'style' => 'background-color: #339af0; color: white; border: none;'
                     ]) ?>
+
+                    <?php if (Yii::$app->user->can('changePermissions')): ?>
+                        <?= Html::button(Yii::t('backend', 'Update Permissions'), [
+                            'class' => 'btn w-100 mt-2',
+                            'id' => 'edit-permissions-btn',
+                            'style' => 'background-color: #228be6; color: white; border: none;'
+                        ]) ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -68,23 +74,24 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
 
     <div id="upload-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="height: 60px; position: relative;">
-            <h5 class="mb-0 text-center w-100">Subir nueva imagen</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Upload a New Image') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
-            <?= $form->field($modelProfile, 'picture')->widget(Upload::class, ['url' => ['avatar-upload']]) ?>
+            <?= $form->field($modelProfile, 'picture')->widget(Upload::class, [
+                'url' => ['avatar-upload', 'id' => $modelProfile->user_id],
+            ]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save changes'), ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 
-
     <div id="change-password-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
             style="height: 60px; position: relative; background-color: #5aa9f8;">
-            <h5 class="mb-0 text-center w-100">Cambiar contraseña</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change Password') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin([
@@ -95,45 +102,43 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
             <?= Html::hiddenInput('change_password', '1') ?>
 
             <div class="text-center mt-3">
-                <?= Html::submitButton('Generar nueva contraseña', ['class' => 'btn btn-success mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Generate a New Password'), ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
-
 
     <div id="user-data-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header text-white d-flex align-items-center justify-content-center"
             style="height: 60px; position: relative; background-color: #1c5d99;">
-            <h5 class="mb-0 text-center w-100">Datos del Usuario</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change User Details') ?></h5>
         </div>
         <div class="card-body-secondary-update">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($modelProfile, 'firstname')->textInput(['maxlength' => true, 'placeholder' => 'Nombre']) ?>
-            <?= $form->field($modelProfile, 'lastname')->textInput(['maxlength' => true, 'placeholder' => 'Apellido']) ?>
-            <?= $form->field($modelProfile, 'profession')->textInput(['maxlength' => true, 'placeholder' => 'Profesión']) ?>
-            <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => 'Nombre de Usuario']) ?>
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => 'Correo Electrónico']) ?>
-            <?= $form->field($model, 'status')->dropDownList([2 => 'Activo', 1 => 'Inactivo', 3 => 'Eliminado'], ['prompt' => 'Seleccione el Estado']) ?>
+            <?= $form->field($modelProfile, 'firstname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'First Name')]) ?>
+            <?= $form->field($modelProfile, 'lastname')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Last Name')]) ?>
+            <?= $form->field($modelProfile, 'profession')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Profession')]) ?>
+            <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Username')]) ?>
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Email')]) ?>
+            <?= $form->field($model, 'status')->dropDownList([2 => Yii::t('backend', 'Active'), 1 => Yii::t('backend', 'Inactive'), 3 => Yii::t('backend', 'Deleted')], ['prompt' => Yii::t('backend', 'Select the Status')]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 
-
     <div id="user-roles-wrapper" class="card-secondary" style="display: none;">
         <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
             style="height: 60px; position: relative; background-color: #339af0;">
-            <h5 class="mb-0 text-center w-100">Cambiar Roles</h5>
+            <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change Roles') ?></h5>
         </div>
         <div class="card-body-secondary">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($model, 'roles')->checkboxList($roles, [
+            <?= $form->field($model, 'roles')->radioList($roles, [
                 'item' => function ($index, $label, $name, $checked, $value) {
-                    return '<div class="custom-checkbox">' .
-                        Html::checkbox($name, $checked, [
+                    return '<div class="custom-radio">' .
+                        Html::radio($name, $checked, [
                             'value' => $value,
                             'label' => $label,
                             'labelOptions' => ['style' => 'margin-left: 8px;'],
@@ -142,74 +147,41 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                 }
             ]) ?>
             <div class="text-center mt-3">
-                <?= Html::submitButton('Guardar cambios', ['class' => 'btn btn-success mb-3']) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success mb-3']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>
+
+    <?php if (Yii::$app->user->can('changePermissions')): ?>
+        <div id="user-permissions-wrapper" class="card-secondary" style="display: none;">
+            <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
+                style="height: 60px; position: relative; background-color: #228be6;">
+                <h5 class="mb-0 text-center w-100"><?= Yii::t('backend', 'Change Permissions') ?></h5>
+            </div>
+            <div class="card-body-secondary">
+                <?php $form = ActiveForm::begin(); ?>
+                <?= $form->field($model, 'permissions')->checkboxList($permissions, [
+                    'item' => function ($index, $label, $name, $checked, $value) {
+                        return '<div class="custom-checkbox">' .
+                            Html::checkbox($name, $checked, [
+                                'value' => $value,
+                                'label' => $label,
+                                'labelOptions' => ['style' => 'margin-left: 8px;'],
+                            ]) .
+                            '</div>';
+                    }
+                ]) ?>
+                <div class="text-center mt-3">
+                    <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success mb-3']) ?>
+                </div>
+                <?php ActiveForm::end(); ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <div id="avatar-modal" class="modal" tabindex="-1" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:9999;">
     <span id="close-avatar-modal" style="position:absolute; top:20px; right:30px; color:white; font-size:30px; cursor:pointer;">&times;</span>
     <img id="avatar-modal-img" src="" style="max-width:90%; max-height:90%; border-radius:10px;" />
 </div>
-
-<?php
-$this->registerJs(<<<JS
-
-function toggleVisibility(targetId, others) {
-    const target = document.getElementById(targetId);
-    const isVisible = target.style.display === 'block';
-
-    others.forEach(id => {
-        document.getElementById(id).style.display = 'none';
-    });
-
-    target.style.display = isVisible ? 'none' : 'block';
-}
-
-document.getElementById('upload-btn').addEventListener('click', function () {
-    toggleVisibility('upload-wrapper', ['change-password-wrapper', 'user-data-wrapper', 'user-roles-wrapper']);
-});
-
-document.getElementById('change-password-btn').addEventListener('click', function () {
-    toggleVisibility('change-password-wrapper', ['upload-wrapper', 'user-data-wrapper', 'user-roles-wrapper']);
-});
-
-document.getElementById('edit-data-btn').addEventListener('click', function () {
-    toggleVisibility('user-data-wrapper', ['upload-wrapper', 'change-password-wrapper', 'user-roles-wrapper']);
-});
-
-document.getElementById('edit-roles-btn').addEventListener('click', function () {
-    toggleVisibility('user-roles-wrapper', ['upload-wrapper', 'change-password-wrapper', 'user-data-wrapper']);
-});
-
-document.getElementById('current-avatar').addEventListener('click', function () {
-    const modal = document.getElementById('avatar-modal');
-    const modalImg = document.getElementById('avatar-modal-img');
-    modalImg.src = this.src;
-    modal.style.display = 'flex';
-});
-
-document.getElementById('close-avatar-modal').addEventListener('click', function () {
-    document.getElementById('avatar-modal').style.display = 'none';
-});
-
-document.getElementById('avatar-modal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        this.style.display = 'none';
-    }
-});
-
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', () => {
-        document.getElementById('loading-overlay').style.display = 'flex';
-    });
-});
-
-window.addEventListener('load', () => {
-    document.getElementById('loading-overlay').style.display = 'none';
-});
-
-JS);
-?>

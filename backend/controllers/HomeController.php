@@ -43,8 +43,8 @@ class HomeController extends Controller
     {
         $model = new UserCreateForm();
         $modelGM = new GroupMiningCreateForm();
+        $rolesList = $this->getRolesWithDescriptions();
 
-        // Para manejar un grupo seleccionado de un dropdown
         $selectedGroupId = null;
 
         if (Yii::$app->request->post()) {
@@ -54,11 +54,10 @@ class HomeController extends Controller
             $randomPassword = Yii::$app->security->generateRandomString(10);
             $model->password = $randomPassword;
 
-            // Capturar el ID de grupo si se seleccionó de un dropdown
             $selectedGroupId = Yii::$app->request->post('selected_mining_group_id', null);
 
             if (empty($model->roles)) {
-                Yii::$app->session->setFlash('error', Yii::t('backend', 'Por favor seleccione al menos un rol.'));
+                Yii::$app->session->setFlash('error', Yii::t('backend', 'Please Select a Role.'));
                 return $this->render('create', [
                     'model' => $model,
                     'modelGM' => $modelGM,
@@ -68,7 +67,7 @@ class HomeController extends Controller
             }
 
             if (empty($model->status)) {
-                Yii::$app->session->setFlash('error', Yii::t('backend', 'Por favor seleccione un estado.'));
+                Yii::$app->session->setFlash('error', Yii::t('backend', 'Please Select a Status.'));
                 return $this->render('create', [
                     'model' => $model,
                     'modelGM' => $modelGM,
@@ -80,10 +79,8 @@ class HomeController extends Controller
             $miningGroupId = null;
 
             if (!empty($selectedGroupId)) {
-                // Si se seleccionó un grupo del dropdown, usamos ese ID
                 $miningGroupId = $selectedGroupId;
             } else if (!empty($modelGM->ges_name)) {
-                // Buscar si ya existe un grupo con ese nombre
                 $existingGroup = MiningGroup::find()
                     ->where([
                         'or',
@@ -93,11 +90,9 @@ class HomeController extends Controller
                     ->one();
 
                 if ($existingGroup) {
-                    // Si el grupo ya existe, usamos su ID
                     $miningGroupId = $existingGroup->id;
-                    Yii::$app->session->setFlash('info', Yii::t('backend', 'Usuario asignado a grupo minero existente.'));
+                    Yii::$app->session->setFlash('info', Yii::t('backend', 'User assigned to existing mining group.'));
                 } else {
-                    // Si no existe, creamos un nuevo grupo
                     if ($modelGM->save()) {
                         $miningGroupId = $modelGM->miningGroup->id;
 
@@ -106,7 +101,7 @@ class HomeController extends Controller
                         $initialConfig->status = 'not started';
                         $initialConfig->mining_group_id = $miningGroupId;
                         if (!$initialConfig->save()) {
-                            Yii::$app->session->setFlash('error', Yii::t('backend', 'Error Creando Configuración Inicial.'));
+                            Yii::$app->session->setFlash('error', Yii::t('backend', 'Error creating initial configuration.'));
                             return $this->render('create', [
                                 'model' => $model,
                                 'modelGM' => $modelGM,
@@ -115,7 +110,7 @@ class HomeController extends Controller
                             ]);
                         }
                     } else {
-                        Yii::$app->session->setFlash('error', Yii::t('backend', 'Error Creando Grupo Minero.'));
+                        Yii::$app->session->setFlash('error', Yii::t('backend', 'Error creating mining group.'));
                         return $this->render('create', [
                             'model' => $model,
                             'modelGM' => $modelGM,
@@ -126,7 +121,6 @@ class HomeController extends Controller
                 }
             }
 
-            // Asignar el grupo minero al usuario
             $model->mining_group_id = $miningGroupId;
 
             if ($model->save()) {
@@ -139,8 +133,17 @@ class HomeController extends Controller
                 Yii::$app->session->setFlash('success', Yii::t('backend', 'Usuario Creado Correctamente.'));
                 return $this->redirect(['home/edit']);
             } else {
-                Yii::$app->session->setFlash('error', Yii::t('backend', 'Error Creando Usuario.'));
+                Yii::$app->session->setFlash('error', Yii::t('backend', 'Error creating user.'));
             }
+        }
+
+
+
+        if (! Yii::$app->user->can('super-administrator')) {
+            unset(
+                $rolesList['super-administrator'],
+                $rolesList['administrator']
+            );
         }
 
         return $this->render('create', [
@@ -152,7 +155,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Obtiene la lista de grupos mineros para el dropdown
+     * 
      * @return array
      */
     protected function getMiningGroupsList()
@@ -164,7 +167,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Búsqueda AJAX de grupos mineros
+     * 
      * @param string $term El término de búsqueda
      * @return array Resultados en formato JSON
      */
@@ -235,7 +238,6 @@ class HomeController extends Controller
         $auth = Yii::$app->authManager;
         $rolesList = \yii\helpers\ArrayHelper::map($auth->getRoles(), 'name', 'name');
 
-        // Opciones para el filtro de estado
         $statusOptions = [
             User::STATUS_ACTIVE => Yii::t('backend', 'Active Users'),
             User::STATUS_NOT_ACTIVE => Yii::t('backend', 'Inactive Users'),
@@ -252,7 +254,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Activates an inactive user
+     * 
      */
     public function actionActivate($id)
     {
@@ -343,9 +345,7 @@ class HomeController extends Controller
             Yii::$app->session->setFlash('success', 'Imagen actualizada correctamente.');
         }
 
-        // Detectar si el formulario "cambiar contraseña" fue enviado
         if (Yii::$app->request->post('change_password') !== null) {
-            // Generar nueva contraseña solo aquí
             $newPassword = Yii::$app->security->generateRandomString(10);
             $model->password = $newPassword;
 
@@ -363,10 +363,22 @@ class HomeController extends Controller
             }
         }
 
-        // Código normal para cargar otros datos y renderizar la vista
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
             return $this->redirect(['update', 'id' => $id]);
+        }
+
+        if (Yii::$app->request->isGet) {
+            $auth = Yii::$app->authManager;
+            $allUserPermissions = array_keys($auth->getPermissionsByUser($user->id));
+            $model->permissions = $allUserPermissions;
+        }
+
+
+        $permissionsRaw = Yii::$app->authManager->getPermissions();
+        $permissions = [];
+        foreach ($permissionsRaw as $permission) {
+            $permissions[$permission->name] = $permission->description ?: $permission->name;
         }
 
         return $this->render('update', [
@@ -374,9 +386,9 @@ class HomeController extends Controller
             'gm' => $gm,
             'modelProfile' => $modelProfile,
             'roles' => $this->getRolesWithDescriptions(),
+            'permissions' => $permissions,
         ]);
     }
-
 
     public function actionDelete($id)
     {
@@ -403,46 +415,53 @@ class HomeController extends Controller
         return $this->redirect(['home/edit']);
     }
 
-
     private function getRolesWithDescriptions()
     {
         $rolesWithDescription = [];
+        $allRoles = Yii::$app->authManager->getRoles();
 
-        if (!Yii::$app->user->can('administrator')) {
-            foreach (Yii::$app->authManager->getRoles() as $role) {
-                if ($role->name == 'administrator') {
-                    continue;
-                }
-                $rolesWithDescription[$role->name] = $role->description ?: $role->name;
+        $isSuperAdmin = Yii::$app->user->can('super-administrator');
+        $isAdmin = Yii::$app->user->can('administrator');
+
+        foreach ($allRoles as $role) {
+            if (!$isSuperAdmin && $role->name === 'super-administrator') {
+                continue;
             }
-        } else {
-            foreach (Yii::$app->authManager->getRoles() as $role) {
-                $rolesWithDescription[$role->name] = $role->description ?: $role->name;
+
+            if ($isAdmin && !$isSuperAdmin && $role->name === 'administrator') {
+                continue;
             }
+
+            $rolesWithDescription[$role->name] = $role->description ?: $role->name;
         }
 
         return $rolesWithDescription;
     }
+
     public function actions()
     {
         return [
             'avatar-upload' => [
-                'class' => UploadAction::class,
+                'class'       => UploadAction::class,
                 'deleteRoute' => false,
-                'on afterSave' => function ($event) {
-                    $file = $event->file;
-                    $model = Yii::$app->user->identity->userProfile;
-                    $model->picture = $file->getPath();
+                'on afterSave'   => function ($event) {
+                    $profileId = Yii::$app->request->get('id');
+                    $model = UserProfile::findOne(['user_id' => $profileId]);
+                    if (!$model) {
+                        throw new NotFoundHttpException('Profile not found.');
+                    }
+                    $model->picture = $event->file->getPath();
                     if (!$model->save()) {
-                        Yii::$app->session->setFlash('error', 'Error al guardar la imagen de perfil.');
+                        Yii::$app->session->setFlash('error', Yii::t('backend', 'Error saving profile picture.'));
                     }
                 },
                 'on afterDelete' => function ($event) {
-                    $model = Yii::$app->user->identity->userProfile;
-                    if ($model->picture) {
+                    $profileId = Yii::$app->request->get('id');
+                    $model = UserProfile::findOne(['user_id' => $profileId]);
+                    if ($model && $model->picture !== null) {
                         $model->picture = null;
                         if (!$model->save()) {
-                            Yii::$app->session->setFlash('error', 'Error al eliminar la imagen de perfil.');
+                            Yii::$app->session->setFlash('error', Yii::t('backend', 'Error deleting profile picture.'));
                         }
                     }
                 },

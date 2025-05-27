@@ -15,6 +15,7 @@ class m150625_215624_init_permissions extends Migration
         $superAdminRole = $this->auth->getRole(User::ROLE_SUPER_ADMINISTRATOR);
 
         $loginToBackend = $this->auth->createPermission('loginToBackend');
+        $loginToBackend->description = Yii::t('backend', 'Allow to login');
         $this->auth->add($loginToBackend);
 
         $this->auth->addChild($userRole, $loginToBackend);
@@ -25,10 +26,18 @@ class m150625_215624_init_permissions extends Migration
         $this->auth->addChild($superAdminRole, $loginToBackend);
 
         $createUser = $this->auth->createPermission('createUser');
+        $createUser->description = Yii::t('backend', 'Allow to create users');
         $this->auth->add($createUser);
 
         $this->auth->addChild($administratorRole, $createUser);
         $this->auth->addChild($superAdminRole, $createUser);
+
+        $changePermissions = $this->auth->createPermission('changePermissions');
+        $changePermissions->description = Yii::t('backend', 'Allow to change user permissions');
+        $this->auth->add($changePermissions);
+
+        $this->auth->addChild($administratorRole, $changePermissions);
+        $this->auth->addChild($superAdminRole, $changePermissions);
     }
 
     public function down()

@@ -6,6 +6,7 @@ use yii\jui\AutoComplete;
 use yii\web\JsExpression;
 
 $this->title = Yii::t('backend', 'User Creation');
+$this->registerJsFile('@web/js/user/user-create.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 ?>
 
 <?php
@@ -42,7 +43,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 
     <div class="col-md-4">
         <div class="card h-100 p-3 rounded-3">
-            <h5 class="fw-bold mb-3"><?= Yii::t('backend', 'Roles and Capabilities') ?></h5>
+            <h5 class="fw-bold mb-3"><?= Yii::t('backend', 'Mining Group, Role and Status') ?></h5>
 
             <?php if (Yii::$app->user->can('administrator')): ?>
                 <?= Html::hiddenInput('selected_mining_group_id', '', ['id' => 'selected_mining_group_id']) ?>
@@ -66,14 +67,16 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
                     Yii::t('backend', 'If the group already exists, the user will be assigned to that group. If it\'s new, it will be created automatically.') . '</small>') ?>
             <?php endif; ?>
 
-            <?= $form->field($model, 'roles')->checkboxList($roles, [
+            <?= $form->field($model, 'roles')->radioList($roles, [
                 'item' => function ($index, $label, $name, $checked, $value) {
-                    return '<div class="form-check">' . Html::checkbox($name, $checked, [
-                        'value' => $value,
-                        'label' => $label,
-                        'class' => 'form-check-input',
-                        'labelOptions' => ['class' => 'form-check-label'],
-                    ]) . '</div>';
+                    return '<div class="form-check">'
+                        . Html::radio($name, $checked, [
+                            'value'        => $value,
+                            'label'        => $label,
+                            'class'        => 'form-check-input',
+                            'labelOptions' => ['class' => 'form-check-label'],
+                        ])
+                        . '</div>';
                 }
             ]) ?>
 
@@ -121,22 +124,3 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 </div>
 
 <?php ActiveForm::end(); ?>
-
-<?php
-$this->registerJs(<<<JS
-$(document).ready(function() {
-    $('form').on('beforeSubmit', function() {
-        $('#loading-overlay').removeClass('d-none').addClass('d-flex');
-        return true;
-    });
-    
-    $(window).on('load', function() {
-        $('#loading-overlay').addClass('d-none').removeClass('d-flex');
-    });
-    
-    $(document).ajaxComplete(function() {
-        $('#loading-overlay').addClass('d-none').removeClass('d-flex');
-    });
-});
-JS);
-?>
