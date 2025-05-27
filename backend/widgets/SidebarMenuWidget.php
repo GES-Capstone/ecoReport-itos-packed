@@ -44,11 +44,11 @@ class SidebarMenuWidget extends Widget
                 'items' => [
                     [
                         'label' => FAR::icon('edit') . Html::tag('span', Yii::t('backend', 'Edit Users'), ['class' => 'ms-2']),
-                        'url' => ['/home/edit']
+                        'url' => ['/users/edit']
                     ],
                     [
                         'label' => FAR::icon('plus-square') . Html::tag('span', Yii::t('backend', 'Create Users'), ['class' => 'ms-2']),
-                        'url' => ['/home/create']
+                        'url' => ['/users/create']
                     ]
                 ]
             ];

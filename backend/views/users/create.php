@@ -22,7 +22,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 
 <?php $form = ActiveForm::begin(); ?>
 <div class="card-header bg-primary text-white text-center position-relative pt-3" style="height: 60px;">
-    <a href="<?= Yii::$app->urlManager->createUrl(['/home/edit']) ?>" class="position-absolute start-0 ms-3 text-white" style="text-decoration: none;">
+    <a href="<?= Yii::$app->urlManager->createUrl(['/users/edit']) ?>" class="position-absolute start-0 ms-3 text-white" style="text-decoration: none;">
         <i class="fa fa-arrow-left fa-lg"></i>
     </a>
     <h5 class="mb-0"><?= Html::encode($this->title) ?></h5>
@@ -50,7 +50,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 
                 <?= $form->field($modelGM, 'ges_name')->widget(AutoComplete::classname(), [
                     'clientOptions' => [
-                        'source' => yii\helpers\Url::to(['home/search-groups']),
+                        'source' => yii\helpers\Url::to(['users/search-groups']),
                         'minLength' => 1,
                         'autoFill' => true,
                         'select' => new JsExpression("function(event, ui) {
@@ -120,7 +120,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $messages) {
 
 <div class="form-group text-center mt-4">
     <?= Html::submitButton(Yii::t('backend', 'Create User'), ['class' => 'btn btn-success px-5 py-2']) ?>
-    <?= Html::a(Yii::t('backend', 'Cancel'), ['home/edit'], ['class' => 'btn btn-outline-secondary px-5 py-2 ms-2']) ?>
+    <?= Html::a(Yii::t('backend', 'Cancel'), ['users/edit'], ['class' => 'btn btn-outline-secondary px-5 py-2 ms-2']) ?>
 </div>
 
 <?php ActiveForm::end(); ?>

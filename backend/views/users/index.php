@@ -23,7 +23,7 @@ $user = Yii::$app->user->identity;
                     </div>
                     <h5 class="card-title"><?= Yii::t('backend', 'Users') ?></h5>
                     <p class="card-text text-muted"><?= Yii::t('backend', 'Manage system users, roles, and access control.') ?></p>
-                    <a href="<?= \yii\helpers\Url::to(['users/edit']) ?>" class="btn btn-outline-primary"><?= Yii::t('backend', 'View Users') ?></a>
+                    <a href="<?= \yii\helpers\Url::to(['/user']) ?>" class="btn btn-outline-primary"><?= Yii::t('backend', 'View Users') ?></a>
                 </div>
             </div>
         </div>

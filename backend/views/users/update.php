@@ -12,7 +12,7 @@ $this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets
 <div class="container-profile">
     <div class="card-main">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
-            <a href="<?= Yii::$app->urlManager->createUrl(['/home/edit']) ?>"
+            <a href="<?= Yii::$app->urlManager->createUrl(['/users/edit']) ?>"
                 class="text-white position-absolute start-0 ms-3"
                 style="text-decoration: none;">
                 <i class="fa fa-arrow-left fa-lg"></i>

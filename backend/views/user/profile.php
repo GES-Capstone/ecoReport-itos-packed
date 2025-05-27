@@ -6,10 +6,10 @@ use trntv\filekit\widget\Upload;
 
 $this->title = Yii::t('backend', 'My Profile');
 $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset::class]]);
+$this->registerJsFile('@web/js/user/profile.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 ?>
 
 <div class="container-profile">
-
     <div class="card-main">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-center" style="height: 60px; position: relative;">
             <a href="<?= Yii::$app->urlManager->createUrl(['/']) ?>"
@@ -29,7 +29,6 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
                     'alt' => 'Avatar'
                 ]) ?>
             </div>
-
 
             <div class="flex-grow-1 p-3">
                 <div class="mb-3">
@@ -111,65 +110,3 @@ $this->registerCssFile('@web/css/profile.css', ['depends' => [\yii\web\YiiAsset:
     <span id="close-avatar-modal" style="position:absolute; top:20px; right:30px; color:white; font-size:30px; cursor:pointer;">&times;</span>
     <img id="avatar-modal-img" src="" style="max-width:90%; max-height:90%; border-radius:10px;" />
 </div>
-
-<?php
-$this->registerJs(<<<JS
-function toggleVisibility(targetId, others) {
-    const target = document.getElementById(targetId);
-    const isVisible = target.style.display === 'block';
-    
-
-    others.forEach(id => {
-        document.getElementById(id).style.display = 'none';
-    });
-
-
-    target.style.display = isVisible ? 'none' : 'block';
-}
-
-
-document.getElementById('upload-btn').addEventListener('click', function () {
-    toggleVisibility('upload-wrapper', ['change-password-wrapper', 'change-username-wrapper']);
-});
-
-document.getElementById('change-password-btn').addEventListener('click', function () {
-    toggleVisibility('change-password-wrapper', ['upload-wrapper', 'change-username-wrapper']);
-});
-
-
-document.getElementById('change-username-btn').addEventListener('click', function () {
-    toggleVisibility('change-username-wrapper', ['upload-wrapper', 'change-password-wrapper']);
-});
-
-
-document.getElementById('current-avatar').addEventListener('click', function () {
-    const modal = document.getElementById('avatar-modal');
-    const modalImg = document.getElementById('avatar-modal-img');
-    modalImg.src = this.src;
-    modal.style.display = 'flex';
-});
-
-
-document.getElementById('close-avatar-modal').addEventListener('click', function () {
-    document.getElementById('avatar-modal').style.display = 'none';
-});
-
-
-document.getElementById('avatar-modal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        this.style.display = 'none';
-    }
-});
-
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', () => {
-        document.getElementById('loading-overlay').style.display = 'flex';
-    });
-});
-
-window.addEventListener('load', () => {
-    document.getElementById('loading-overlay').style.display = 'none';
-});
-
-JS);
-?>

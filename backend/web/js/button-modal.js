@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (deleteUserId) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `${window.location.origin}/home/delete?id=${deleteUserId}`;
+            form.action = `${window.location.origin}/users/delete?id=${deleteUserId}`;
             
             // Add CSRF token
             const csrfInput = document.createElement('input');
@@ -48,7 +48,7 @@ confirmRestore.addEventListener('click', function() {
     if (restoreUserId) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = `${window.location.origin}/home/restore?id=${restoreUserId}`;
+        form.action = `${window.location.origin}/users/restore?id=${restoreUserId}`;
         
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';

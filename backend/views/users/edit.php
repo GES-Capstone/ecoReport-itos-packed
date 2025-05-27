@@ -15,7 +15,7 @@ $this->title = Yii::t('backend', 'User Management');
 
 <?php $form = ActiveForm::begin([
     'method' => 'get',
-    'action' => ['home/edit'],
+    'action' => ['users/edit'],
 ]); ?>
 
 <div class="card shadow-sm mb-4">
@@ -52,7 +52,7 @@ $this->title = Yii::t('backend', 'User Management');
             </div>
 
             <div class="col-md-2">
-                <?= Html::a(Yii::t('backend', 'Clear'), ['home/edit'], ['class' => 'btn btn-secondary w-100']) ?>
+                <?= Html::a(Yii::t('backend', 'Clear'), ['users/edit'], ['class' => 'btn btn-secondary w-100']) ?>
             </div>
         </div>
 
@@ -105,7 +105,7 @@ $this->title = Yii::t('backend', 'User Management');
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
                                     <?php if ($user->status == User::STATUS_ACTIVE || $user->status == User::STATUS_NOT_ACTIVE): ?>
-                                        <a href="<?= Url::to(['home/update', 'id' => $user->id]) ?>"
+                                        <a href="<?= Url::to(['users/update', 'id' => $user->id]) ?>"
                                             class="btn btn-primary btn-md px-4">
                                             <?= Yii::t('backend', 'Edit') ?>
                                         </a>
@@ -119,7 +119,7 @@ $this->title = Yii::t('backend', 'User Management');
                                             <?= Yii::t('backend', 'Delete') ?>
                                         </button>
                                     <?php elseif ($user->status == User::STATUS_NOT_ACTIVE): ?>
-                                        <?= Html::a(Yii::t('backend', 'Activate'), ['home/activate', 'id' => $user->id], [
+                                        <?= Html::a(Yii::t('backend', 'Activate'), ['users/activate', 'id' => $user->id], [
                                             'class' => 'btn btn-success btn-md px-4',
                                             'data' => [
                                                 'confirm' => Yii::t('backend', 'Are you sure that you want to activate this user?'),
