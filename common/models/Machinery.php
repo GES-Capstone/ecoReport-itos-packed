@@ -14,6 +14,7 @@ use Yii;
  * @property int|null $machinery_type_id
  * @property int|null $location_id
  * @property string $tag
+ * @property string $unique_tag
  * @property string|null $brand
  * @property string|null $model
  * @property string|null $start_operation
@@ -29,6 +30,7 @@ use Yii;
  * @property string|null $inspection_type
  * @property string|null $family
  *
+ * @property Component[] $components
  * @property Fleet $fleet
  * @property FunctionalStatus $functionalStatus
  * @property Location $location
@@ -53,11 +55,11 @@ class Machinery extends \yii\db\ActiveRecord
     {
         return [
             [['mining_group_id', 'fleet_id', 'functional_status_id', 'machinery_type_id', 'location_id', 'lifespan_years'], 'integer'],
-            [['tag'], 'required'],
+            [['tag', 'unique_tag'], 'required'],
             [['start_operation', 'created_at', 'updated_at'], 'safe'],
             [['cost'], 'number'],
             [['description', 'inspection_type', 'family'], 'string'],
-            [['tag', 'brand', 'model', 'supplier', 'sap_code', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
+            [['tag', 'unique_tag', 'brand', 'model', 'supplier', 'sap_code', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
             [['fleet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Fleet::class, 'targetAttribute' => ['fleet_id' => 'id']],
             [['functional_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => FunctionalStatus::class, 'targetAttribute' => ['functional_status_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
@@ -79,6 +81,7 @@ class Machinery extends \yii\db\ActiveRecord
             'machinery_type_id' => Yii::t('app', 'Machinery Type ID'),
             'location_id' => Yii::t('app', 'Location ID'),
             'tag' => Yii::t('app', 'Tag'),
+            'unique_tag' => Yii::t('app', 'Unique Tag'),
             'brand' => Yii::t('app', 'Brand'),
             'model' => Yii::t('app', 'Model'),
             'start_operation' => Yii::t('app', 'Start Operation'),
@@ -94,6 +97,16 @@ class Machinery extends \yii\db\ActiveRecord
             'inspection_type' => Yii::t('app', 'Inspection Type'),
             'family' => Yii::t('app', 'Family'),
         ];
+    }
+
+    /**
+     * Gets query for [[Components]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\ComponentQuery
+     */
+    public function getComponents()
+    {
+        return $this->hasMany(Component::class, ['machinery_id' => 'id']);
     }
 
     /**

@@ -17,6 +17,7 @@ class m200101_000002_create_machinery_table extends Migration
             'machinery_type_id' => $this->integer(),
             'location_id' => $this->integer(),
             'tag' => $this->string()->notNull(),
+            'unique_tag' => $this->string()->notNull(),
             'brand' => $this->string(),
             'model' => $this->string(),
             'start_operation' => $this->date(),

@@ -14,6 +14,7 @@ class m200101_000003_create_component_table extends Migration
             
             // Relación con machinery
             'machinery_id' => $this->integer()->notNull(),
+            'location_id' => $this->integer()->null(),
             
             'name' => $this->string()->notNull(),
             'tag' => $this->string(),

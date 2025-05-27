@@ -178,7 +178,7 @@ class ComponentImportService implements ImportServiceInterface
     {
         // Corregida la sintaxis del findOne
         $machinery = Machinery::findOne([
-            'tag' => $machineryTag, 
+            'unique_tag' => $machineryTag, 
             'mining_group_id' => $miningGroupId
         ]);
         
@@ -304,9 +304,9 @@ class ComponentImportService implements ImportServiceInterface
     }
 
 
-    private function getMiningGroup($userId)
-    {
-        $user = User::find()->with('miningGroup')->where(['id' => $userId])->one();
-        return $user ? $user->miningGroup : null;
-    }
+private function getMiningGroup($userId) 
+{
+    $user = User::find()->where(['id' => $userId])->one();
+    return $user ? $user->miningGroup : null;
+}
 }

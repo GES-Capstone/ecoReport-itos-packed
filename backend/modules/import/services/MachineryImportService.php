@@ -230,6 +230,7 @@ class MachineryImportService implements ImportServiceInterface
 
             // Crear nueva maquinaria (cada fila es una unidad física diferente)
             $processLocation = $this->generateLocation($location);
+            $machineryUniqueTag = $this->generateUniqueTag($tag, $area->name, $fleet->name,$miningProcess->name);
             $machineryResult = $this->processMachinery(
                 $miningGroupId,
                 $fleet->id,
@@ -242,7 +243,8 @@ class MachineryImportService implements ImportServiceInterface
                 $supplier,
                 $machineryCost,
                 $processLocation,
-                $tag
+                $tag,
+                $machineryUniqueTag
             );
 
             if (!$machineryResult['success']) {
@@ -276,7 +278,8 @@ class MachineryImportService implements ImportServiceInterface
         $supplier,
         $machineryCost,
         $processLocation,
-        $tag
+        $tag,
+        $machineryUniqueTag
     ) {
         $result = [
             'success' => false,
@@ -295,6 +298,7 @@ class MachineryImportService implements ImportServiceInterface
             $machinery->family = $machineryFamily;
             $machinery->location_id = $processLocation->id;
             $machinery->tag = $tag;
+            $machinery->unique_tag = $machineryUniqueTag;
 
             // Asignar campos opcionales solo si tienen valor
             if (!empty($brand)) {
@@ -581,6 +585,24 @@ class MachineryImportService implements ImportServiceInterface
             $result['error'] = "Error procesando proceso minero: " . $e->getMessage();
         }
         return $result;
+    }
+    private function generateUniqueTag($tag, $areaName, $fleetName, $miningProcessName) 
+    {
+        // Limpiar y formatear los inputs
+        $cleanTag = $this->cleanString($tag);
+        $cleanArea = $this->cleanString($areaName);
+        $cleanFleet = $this->cleanString($fleetName);
+        $cleanProcess = $this->cleanString($miningProcessName);
+        
+        // Método 1: Concatenación simple con separadores
+        $uniqueTag = $cleanTag . "-" . $cleanArea . "-" . $cleanFleet . "-" . $cleanProcess;   
+        return $uniqueTag;
+    }
+    
+    private function cleanString($string) 
+    {
+        $cleaned = preg_replace('/[^A-Za-z0-9]/', '', $string);
+        return strtoupper($cleaned);
     }
 
     public function generateTemplate($path)
