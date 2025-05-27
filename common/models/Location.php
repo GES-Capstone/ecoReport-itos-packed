@@ -25,13 +25,21 @@ class Location extends \yii\db\ActiveRecord
         return '{{%location}}';
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['default'] = ['location_url', 'latitude', 'longitude'];
+        $scenarios['optional'] = ['location_url', 'latitude', 'longitude'];
+        return $scenarios;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['location_url'], 'required', 'message' => Yii::t('backend', '{attribute} cannot be blank.')],
+            [['location_url'], 'required', 'on' => self::SCENARIO_DEFAULT, 'message' => Yii::t('backend', '{attribute} cannot be blank.')],
             ['location_url', 'match', 'pattern' => '/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/', 'message' => Yii::t('backend', 'Incorrect format. Use: latitude,longitude')],
             [['latitude', 'longitude'], 'number'],
         ];
