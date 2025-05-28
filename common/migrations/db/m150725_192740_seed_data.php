@@ -57,6 +57,10 @@ class m150725_192740_seed_data extends Migration
             'username' => 'ges',
             'email' => 'ges@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('ges'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'ges',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,
@@ -69,6 +73,10 @@ class m150725_192740_seed_data extends Migration
             'username' => 'webmaster',
             'email' => 'webmaster@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('webmaster'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'webmaster',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,
@@ -81,6 +89,10 @@ class m150725_192740_seed_data extends Migration
             'username' => 'manager',
             'email' => 'manager@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('manager'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'manager',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,
@@ -93,6 +105,10 @@ class m150725_192740_seed_data extends Migration
             'username' => 'reviewer',
             'email' => 'user1@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('reviewer'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'reviewer',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,
@@ -105,6 +121,10 @@ class m150725_192740_seed_data extends Migration
             'mining_group_id' => 2,
             'email' => 'user2@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('inspector'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'inspector',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,
@@ -117,6 +137,10 @@ class m150725_192740_seed_data extends Migration
             'username' => 'user',
             'email' => 'user3@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('user'),
+            'password_encrypted' => Yii::$app->security->encryptByKey(
+                'user',
+                Yii::$app->params['passwordEncryptionKey']
+            ),
             'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
             'access_token' => Yii::$app->getSecurity()->generateRandomString(40),
             'status' => User::STATUS_ACTIVE,

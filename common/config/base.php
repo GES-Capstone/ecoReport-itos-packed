@@ -168,6 +168,7 @@ $config = [
             'hu-HU' => 'Magyar',
         ],
         'bsVersion' => '4.x', // bootstrap version
+        'passwordEncryptionKey'  => base64_decode(env('PASSWORD_ENCRYPTION_KEY')),
     ],
 ];
 

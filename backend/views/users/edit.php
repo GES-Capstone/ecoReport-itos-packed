@@ -25,7 +25,7 @@ $this->title = Yii::t('backend', 'User Management');
     <div class="card-body">
 
         <div class="row mb-4">
-            <?php if ($isAdmin): ?>
+            <?php if (Yii::$app->user->can('super-administrator')): ?>
                 <div class="col-md-3">
                     <?= Html::dropDownList('group_user_mining', Yii::$app->request->get('group_user_mining'), $groupOptions, [
                         'class' => 'form-select',

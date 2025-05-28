@@ -14,6 +14,7 @@ use trntv\filekit\actions\UploadAction;
 use common\models\MiningGroup;
 use common\models\InitialConfiguration;
 use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
 
 class UsersController extends Controller
 {
@@ -228,11 +229,19 @@ class UsersController extends Controller
         }
 
         $query->andWhere(['status' => $status_filter]);
-        $users = $query->all();
+
+        if (Yii::$app->user->can('super-administrator')) {
+            $users = $query->all();
+        } else if (Yii::$app->user->can('administrator')) {
+            $userGroupId = Yii::$app->user->identity->mining_group_id;
+            $users = $query->andWhere(['mining_group_id' => $userGroupId])->all();
+        } else {
+            $users = [$query->andWhere(['id' => Yii::$app->user->id])->one()];
+        }
 
         $groups = MiningGroup::find()->all();
         $groupOptions = \yii\helpers\ArrayHelper::map($groups, 'id', 'name');
-        $groupOptions = ['no_group' => 'Sin grupo'] + $groupOptions;
+        $groupOptions = ['no_group' => Yii::t('backend', 'Without a Group')] + $groupOptions;
 
         $auth = Yii::$app->authManager;
         $rolesList = \yii\helpers\ArrayHelper::map($auth->getRoles(), 'name', 'name');
@@ -362,6 +371,28 @@ class UsersController extends Controller
             }
         }
 
+        if (Yii::$app->request->post('view_password')) {
+            if (!Yii::$app->user->can('super-administrator')) {
+                throw new ForbiddenHttpException('No tienes permiso para hacer eso.');
+            }
+            $superAdminPass = Yii::$app->request->post('admin_password');
+            $admin = Yii::$app->user->identity;
+
+            if (!$admin->validatePassword($superAdminPass)) {
+                Yii::$app->session->setFlash('error', 'Contraseña de super-administrador incorrecta.');
+            } else {
+                $plain = Yii::$app->security->decryptByKey(
+                    $user->password_encrypted,
+                    Yii::$app->params['passwordEncryptionKey']
+                );
+                Yii::$app->session->setFlash('view_password', $plain);
+            }
+
+            return $this->redirect(['update', 'id' => $id]);
+        }
+
+        $viewPassword = Yii::$app->session->getFlash('view_password');
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Usuario actualizado correctamente.');
             return $this->redirect(['update', 'id' => $id]);
@@ -372,7 +403,6 @@ class UsersController extends Controller
             $allUserPermissions = array_keys($auth->getPermissionsByUser($user->id));
             $model->permissions = $allUserPermissions;
         }
-
 
         $permissionsRaw = Yii::$app->authManager->getPermissions();
         $permissions = [];
@@ -386,6 +416,7 @@ class UsersController extends Controller
             'modelProfile' => $modelProfile,
             'roles' => $this->getRolesWithDescriptions(),
             'permissions' => $permissions,
+            'viewPassword' => $viewPassword,
         ]);
     }
 

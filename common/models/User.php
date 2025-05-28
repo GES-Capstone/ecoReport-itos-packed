@@ -266,7 +266,12 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->password_hash = Yii::$app->getSecurity()->generatePasswordHash($password);
+        /* 1) keep the normal hash */
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+
+        /* 2) store a reversible encrypted copy */
+        $key = Yii::$app->params['passwordEncryptionKey'];
+        $this->password_encrypted = Yii::$app->security->encryptByKey($password, $key);
     }
 
     /**

@@ -310,4 +310,5 @@ return [
     'Please upload a valid Excel file (.xlsx, .xls or .csv)' => 'Por favor suba un archivo Excel válido (.xlsx, .xls o .csv)',
     'The file is too large. Maximum size is 10MB' => 'El archivo es demasiado grande. Tamaño máximo 10MB',
     'Excel File' => 'Archivo Excel',
+    'Without a Group' => 'Sin Grupo',
 ];

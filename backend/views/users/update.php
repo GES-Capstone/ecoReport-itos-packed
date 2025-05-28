@@ -42,6 +42,13 @@ $this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets
                         'id' => 'change-password-btn',
                         'style' => 'background-color: #5aa9f8; color: white; border: none;'
                     ]) ?>
+                    <?php if (Yii::$app->user->can('super-administrator')): ?>
+                        <?= Html::button(Yii::t('backend', 'View Current Password'), [
+                            'class' => 'btn btn-warning w-100 mb-2',
+                            'id'    => 'view-password-btn',
+                            'style' => 'background-color: #ffc107; color: #212529; border: none;'
+                        ]) ?>
+                    <?php endif; ?>
                     <?= Html::button(Yii::t('backend', 'Update Profile'), [
                         'class' => 'btn w-100 mb-2',
                         'id' => 'edit-data-btn',
@@ -153,6 +160,41 @@ $this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets
         </div>
     </div>
 
+    <?php if (Yii::$app->user->can('super-administrator')): ?>
+        <div id="view-password-wrapper" class="card-secondary"
+            style="display: <?= $viewPassword ? 'block' : 'none' ?>;">
+            <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
+                style="height: 60px; background-color: #ffc107;">
+                <h5 class="mb-0"><?= Yii::t('backend', 'Unlock Current Password') ?></h5>
+            </div>
+            <div class="card-body-secondary">
+                <?php $form = ActiveForm::begin([
+                    'method'  => 'post',
+                    'options' => ['style' => 'text-align:center;']
+                ]); ?>
+
+                <?= Html::hiddenInput('view_password', '1') ?>
+                <?= Html::passwordInput('admin_password', null, [
+                    'class' => 'form-control mb-3',
+                    'placeholder' => Yii::t('backend', 'Your super-admin password'),
+                    'required'    => true,
+                ]) ?>
+                <?= Html::submitButton(Yii::t('backend', 'Unlock'), [
+                    'class' => 'btn btn-warning'
+                ]) ?>
+
+                <?php ActiveForm::end(); ?>
+
+                <?php if ($viewPassword): ?>
+                    <div class="alert alert-info alert-dismissible fade show mt-3 text-center" role="alert" data-timeout="10000">
+                        <?= Yii::t('backend', 'Current password: {pwd}', ['pwd' => $viewPassword]) ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <?php if (Yii::$app->user->can('changePermissions')): ?>
         <div id="user-permissions-wrapper" class="card-secondary" style="display: none;">
             <div class="card-header text-white d-flex align-items-center justify-content-center mb-3"
@@ -178,6 +220,8 @@ $this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets
                 <?php ActiveForm::end(); ?>
             </div>
         </div>
+
+
     <?php endif; ?>
 </div>
 

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'edit-data-btn': 'user-data-wrapper',
         'edit-roles-btn': 'user-roles-wrapper',
         'edit-permissions-btn': 'user-permissions-wrapper',
+        'view-password-btn': 'view-password-wrapper'   // ← add this line
     };
 
     Object.keys(mapping).forEach(buttonId => {
@@ -66,4 +67,5 @@ document.addEventListener('DOMContentLoaded', function () {
         const overlay = document.getElementById('loading-overlay');
         if (overlay) overlay.style.display = 'none';
     });
+    
 });
