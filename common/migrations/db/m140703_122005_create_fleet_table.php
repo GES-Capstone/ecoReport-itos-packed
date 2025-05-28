@@ -14,21 +14,14 @@ class m140703_122005_create_fleet_table extends Migration
     {
         $this->createTable('{{%fleet}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id' => $this->integer(),
             'area_id' => $this->integer(),
-            'location_id' => $this->integer(),
+            'location_id' => $this->integer()->Null(),
             'name' => $this->string(255)->notNull(),
             'description' => $this->text(),
-'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->append('ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
-        // Añade índices para claves foráneas
-        $this->createIndex(
-            'idx-fleet-mining_group_id',
-            '{{%fleet}}',
-            'mining_group_id'
-        );
 
         $this->createIndex(
             'idx-fleet-area_id',
@@ -42,15 +35,6 @@ class m140703_122005_create_fleet_table extends Migration
             'location_id'
         );
 
-        $this->addForeignKey(
-            'fk-fleet-mining_group_id',
-            '{{%fleet}}',
-            'mining_group_id',
-            '{{%mining_group}}',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
 
         $this->addForeignKey(
             'fk-fleet-area_id',
@@ -78,13 +62,10 @@ class m140703_122005_create_fleet_table extends Migration
      */
     public function safeDown()
     {
-        // Eliminar primero las claves foráneas
-        $this->dropForeignKey('fk-fleet-mining_group_id', '{{%fleet}}');
+  
         $this->dropForeignKey('fk-fleet-area_id', '{{%fleet}}');
         $this->dropForeignKey('fk-fleet-location_id', '{{%fleet}}');
         
-        // Eliminar los índices
-        $this->dropIndex('idx-fleet-mining_group_id', '{{%fleet}}');
         $this->dropIndex('idx-fleet-area_id', '{{%fleet}}');
         $this->dropIndex('idx-fleet-location_id', '{{%fleet}}');
         

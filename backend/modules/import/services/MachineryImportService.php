@@ -1,5 +1,7 @@
 <?php
+
 namespace backend\modules\import\services;
+
 use backend\modules\import\services\ImportServiceInterface;
 use common\models\Company;
 use common\models\User;
@@ -230,7 +232,7 @@ class MachineryImportService implements ImportServiceInterface
 
             // Crear nueva maquinaria (cada fila es una unidad física diferente)
             $processLocation = $this->generateLocation($location);
-            $machineryUniqueTag = $this->generateUniqueTag($tag, $area->name, $fleet->name,$miningProcess->name);
+            $machineryUniqueTag = $this->generateUniqueTag($tag, $area->name, $fleet->name, $miningProcess->name);
             $machineryResult = $this->processMachinery(
                 $miningGroupId,
                 $fleet->id,
@@ -254,7 +256,6 @@ class MachineryImportService implements ImportServiceInterface
             $result['machinery']['isNew'] = $machineryResult['isNew'];
             $transaction->commit();
             $result['success'] = true;
-
         } catch (\Exception $e) {
             $transaction->rollBack();
             $result['error'] = $e->getMessage();
@@ -331,7 +332,6 @@ class MachineryImportService implements ImportServiceInterface
 
             $result['success'] = true;
             $result['machinery'] = $machinery;
-
         } catch (\Exception $e) {
             $result['error'] = "Error procesando maquinaria: " . $e->getMessage();
         }
@@ -586,22 +586,24 @@ class MachineryImportService implements ImportServiceInterface
         }
         return $result;
     }
-    private function generateUniqueTag($tag, $areaName, $fleetName, $miningProcessName) 
+    private function generateUniqueTag($tag, $areaName, $fleetName, $miningProcessName)
     {
         // Limpiar y formatear los inputs
         $cleanTag = $this->cleanString($tag);
         $cleanArea = $this->cleanString($areaName);
         $cleanFleet = $this->cleanString($fleetName);
         $cleanProcess = $this->cleanString($miningProcessName);
-        
+
         // Método 1: Concatenación simple con separadores
-        $uniqueTag = $cleanTag . "-" . $cleanArea . "-" . $cleanFleet . "-" . $cleanProcess;   
+        $uniqueTag = $cleanTag . "-" . $cleanArea . "-" . $cleanFleet . "-" . $cleanProcess;
         return $uniqueTag;
     }
-    
-    private function cleanString($string) 
+
+    private function cleanString($string)
     {
-        $cleaned = preg_replace('/[^A-Za-z0-9]/', '', $string);
+        $string = str_replace(' ', '_', $string); // Eliminar espacios, guiones bajos y guiones
+        $cleaned = preg_replace('/[^\p{L}\p{N}_]/u', '', $string);
+
         return strtoupper($cleaned);
     }
 

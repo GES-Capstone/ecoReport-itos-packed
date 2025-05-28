@@ -11,7 +11,6 @@ class m200101_000002_create_machinery_table extends Migration
     {
         $this->createTable('{{%machinery}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id' => $this->integer(),
             'fleet_id' => $this->integer(),
             'functional_status_id' => $this->integer(),
             'machinery_type_id' => $this->integer(),
@@ -34,15 +33,6 @@ class m200101_000002_create_machinery_table extends Migration
             'family' => "ENUM('SEMI','MOBILE','FIXED') DEFAULT 'FIXED'"
         ]);
 
-        // Añadir claves foráneas solo para las columnas existentes
-        $this->addForeignKey(
-            'fk-machinery-mining_group_id',
-            '{{%machinery}}',
-            'mining_group_id',
-            '{{%mining_group}}',
-            'id',
-            'CASCADE'
-        );
 
         $this->addForeignKey(
             'fk-machinery-fleet_id',
@@ -82,8 +72,7 @@ class m200101_000002_create_machinery_table extends Migration
 
     public function safeDown()
     {
-        // Eliminar claves foráneas
-        $this->dropForeignKey('fk-machinery-mining_group_id', '{{%machinery}}');
+      
         $this->dropForeignKey('fk-machinery-fleet_id', '{{%machinery}}');
         $this->dropForeignKey('fk-machinery-functional_status_id', '{{%machinery}}');
         $this->dropForeignKey('fk-machinery-location_id', '{{%machinery}}');

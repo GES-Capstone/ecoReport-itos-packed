@@ -5,19 +5,36 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%area}}".
+ * This is the model class for table "{{%machinery}}".
  *
  * @property int $id
- * @property int|null $mining_group_id
- * @property int|null $mining_process_id
- * @property string $name
+ * @property int|null $fleet_id
+ * @property int|null $functional_status_id
+ * @property int|null $machinery_type_id
+ * @property int|null $location_id
+ * @property string $tag
+ * @property string $unique_tag
+ * @property string|null $brand
+ * @property string|null $model
+ * @property string|null $start_operation
+ * @property int|null $lifespan_years
+ * @property string|null $supplier
+ * @property float|null $cost
+ * @property string|null $sap_code
  * @property string|null $description
+ * @property string|null $photo_base_url
+ * @property string|null $photo_path
  * @property string $created_at
  * @property string $updated_at
+ * @property string|null $inspection_type
+ * @property string|null $family
  *
- * @property Fleet[] $fleets
- * @property MiningGroup $miningGroup
- * @property MiningProcess $miningProcess
+ * @property Component[] $components
+ * @property Fleet $fleet
+ * @property FunctionalStatus $functionalStatus
+ * @property Location $location
+ * @property MachineryDocument[] $machineryDocuments
+ * @property MachineryType $machineryType
  */
 class Area extends \yii\db\ActiveRecord
 {
@@ -26,7 +43,7 @@ class Area extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%area}}';
+        return '{{%machinery}}';
     }
 
     /**
@@ -35,13 +52,16 @@ class Area extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'mining_process_id'], 'integer'],
-            [['name'], 'required'],
-            [['description'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
-            [['mining_process_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningProcess::class, 'targetAttribute' => ['mining_process_id' => 'id']],
+            [['fleet_id', 'functional_status_id', 'machinery_type_id', 'location_id', 'lifespan_years'], 'integer'],
+            [['tag', 'unique_tag'], 'required'],
+            [['start_operation', 'created_at', 'updated_at'], 'safe'],
+            [['cost'], 'number'],
+            [['description', 'inspection_type', 'family'], 'string'],
+            [['tag', 'unique_tag', 'brand', 'model', 'supplier', 'sap_code', 'photo_base_url', 'photo_path'], 'string', 'max' => 255],
+            [['fleet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Fleet::class, 'targetAttribute' => ['fleet_id' => 'id']],
+            [['functional_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => FunctionalStatus::class, 'targetAttribute' => ['functional_status_id' => 'id']],
+            [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
+            [['machinery_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => MachineryType::class, 'targetAttribute' => ['machinery_type_id' => 'id']],
         ];
     }
 
@@ -52,43 +72,87 @@ class Area extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
-            'mining_process_id' => Yii::t('app', 'Mining Process ID'),
-            'name' => Yii::t('app', 'Name'),
+            'fleet_id' => Yii::t('app', 'Fleet ID'),
+            'functional_status_id' => Yii::t('app', 'Functional Status ID'),
+            'machinery_type_id' => Yii::t('app', 'Machinery Type ID'),
+            'location_id' => Yii::t('app', 'Location ID'),
+            'tag' => Yii::t('app', 'Tag'),
+            'unique_tag' => Yii::t('app', 'Unique Tag'),
+            'brand' => Yii::t('app', 'Brand'),
+            'model' => Yii::t('app', 'Model'),
+            'start_operation' => Yii::t('app', 'Start Operation'),
+            'lifespan_years' => Yii::t('app', 'Lifespan Years'),
+            'supplier' => Yii::t('app', 'Supplier'),
+            'cost' => Yii::t('app', 'Cost'),
+            'sap_code' => Yii::t('app', 'Sap Code'),
             'description' => Yii::t('app', 'Description'),
+            'photo_base_url' => Yii::t('app', 'Photo Base Url'),
+            'photo_path' => Yii::t('app', 'Photo Path'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
+            'inspection_type' => Yii::t('app', 'Inspection Type'),
+            'family' => Yii::t('app', 'Family'),
         ];
     }
 
     /**
-     * Gets query for [[Fleets]].
+     * Gets query for [[Components]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\ComponentQuery
+     */
+    public function getComponents()
+    {
+        return $this->hasMany(Component::class, ['machinery_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Fleet]].
      *
      * @return \yii\db\ActiveQuery|\common\models\query\FleetQuery
      */
-    public function getFleets()
+    public function getFleet()
     {
-        return $this->hasMany(Fleet::class, ['area_id' => 'id']);
+        return $this->hasOne(Fleet::class, ['id' => 'fleet_id']);
     }
 
     /**
-     * Gets query for [[MiningGroup]].
+     * Gets query for [[FunctionalStatus]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\FunctionalStatusQuery
      */
-    public function getMiningGroup()
+    public function getFunctionalStatus()
     {
-        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
+        return $this->hasOne(FunctionalStatus::class, ['id' => 'functional_status_id']);
     }
 
     /**
-     * Gets query for [[MiningProcess]].
+     * Gets query for [[Location]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningProcessQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\LocationQuery
      */
-    public function getMiningProcess()
+    public function getLocation()
     {
-        return $this->hasOne(MiningProcess::class, ['id' => 'mining_process_id']);
+        return $this->hasOne(Location::class, ['id' => 'location_id']);
+    }
+
+    /**
+     * Gets query for [[MachineryDocuments]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MachineryDocumentQuery
+     */
+    public function getMachineryDocuments()
+    {
+        return $this->hasMany(MachineryDocument::class, ['machinery_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[MachineryType]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MachineryTypeQuery
+     */
+    public function getMachineryType()
+    {
+        return $this->hasOne(MachineryType::class, ['id' => 'machinery_type_id']);
     }
 
     /**

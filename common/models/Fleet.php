@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "{{%fleet}}".
  *
  * @property int $id
- * @property int|null $mining_group_id
  * @property int|null $area_id
  * @property int|null $location_id
  * @property string $name
@@ -19,7 +18,6 @@ use Yii;
  * @property Area $area
  * @property Location $location
  * @property Machinery[] $machineries
- * @property MiningGroup $miningGroup
  */
 class Fleet extends \yii\db\ActiveRecord
 {
@@ -37,14 +35,13 @@ class Fleet extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'area_id', 'location_id'], 'integer'],
+            [['area_id', 'location_id'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::class, 'targetAttribute' => ['area_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];
     }
 
@@ -55,7 +52,6 @@ class Fleet extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'area_id' => Yii::t('app', 'Area ID'),
             'location_id' => Yii::t('app', 'Location ID'),
             'name' => Yii::t('app', 'Name'),
@@ -93,16 +89,6 @@ class Fleet extends \yii\db\ActiveRecord
     public function getMachineries()
     {
         return $this->hasMany(Machinery::class, ['fleet_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[MiningGroup]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
-     */
-    public function getMiningGroup()
-    {
-        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
     }
 
     /**

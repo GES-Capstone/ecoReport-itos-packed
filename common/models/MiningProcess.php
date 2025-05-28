@@ -8,14 +8,15 @@ use Yii;
  * This is the model class for table "{{%mining_process}}".
  *
  * @property int $id
- * @property int $mining_group_id
  * @property int $company_id
+ * @property int|null $location_id
  * @property string $name
+ * @property string|null $description
  * @property string $created_at
- * @property string $updated_at
  *
+ * @property Area[] $areas
  * @property Company $company
- * @property MiningGroup $miningGroup
+ * @property Location $location
  */
 class MiningProcess extends \yii\db\ActiveRecord
 {
@@ -33,12 +34,12 @@ class MiningProcess extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'company_id', 'name'], 'required'],
-            [['mining_group_id', 'company_id'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
+            [['company_id', 'name'], 'required'],
+            [['company_id', 'location_id'], 'integer'],
+            [['created_at'], 'safe'],
+            [['name', 'description'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
+            [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
         ];
     }
 
@@ -49,12 +50,22 @@ class MiningProcess extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'company_id' => Yii::t('app', 'Company ID'),
+            'location_id' => Yii::t('app', 'Location ID'),
             'name' => Yii::t('app', 'Name'),
+            'description' => Yii::t('app', 'Description'),
             'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\AreaQuery
+     */
+    public function getAreas()
+    {
+        return $this->hasMany(Area::class, ['mining_process_id' => 'id']);
     }
 
     /**
@@ -68,13 +79,13 @@ class MiningProcess extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[MiningGroup]].
+     * Gets query for [[Location]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\LocationQuery
      */
-    public function getMiningGroup()
+    public function getLocation()
     {
-        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
+        return $this->hasOne(Location::class, ['id' => 'location_id']);
     }
 
     /**

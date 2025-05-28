@@ -7,74 +7,46 @@ use yii\db\Migration;
  */
 class m140703_000004_create_mining_process_table extends Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function safeUp()
+     public function safeUp()
     {
         $this->createTable('{{%mining_process}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id' => $this->integer()->notNull(),
             'company_id' => $this->integer()->notNull(),
+            'location_id' => $this->integer()->Null(),
             'name' => $this->string(255)->notNull(),
+            'description' => $this->string(255),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
 
-       
-        $this->addForeignKey(
-            'fk-mining_process-mining_group_id',
-            '{{%mining_process}}',
-            'mining_group_id',
-            '{{%mining_group}}',
-            'id',
-            'CASCADE',
-            'RESTRICT'
-        );
+        $this->createIndex('idx-mining_process-company_id', '{{%mining_process}}', 'company_id');
+        $this->createIndex('idx-mining_process-location_id', '{{%mining_process}}', 'location_id');
+
         $this->addForeignKey(
             'fk-mining_process-company_id',
             '{{%mining_process}}',
             'company_id',
             '{{%company}}',
             'id',
-            'CASCADE',
-            'RESTRICT'
+            'CASCADE'
         );
-      
-        $this->createIndex(
-            'idx-mining_process-mining_group_id',
+
+        $this->addForeignKey(
+            'fk-mining_process-location_id',
             '{{%mining_process}}',
-            'mining_group_id'
-        );
-        $this->createIndex(
-            'idx-mining_process-company_id',
-            '{{%mining_process}}',
-            'company_id'
+            'location_id',
+            '{{%location}}',
+            'id',
+            'CASCADE'
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function safeDown()
     {
-        $this->dropForeignKey(
-            'fk-mining_process-mining_group_id',
-            '{{%mining_process}}'
-        );
-        $this->dropForeignKey(
-            'fk-mining_process-company_id',
-            '{{%mining_process}}'
-        );
-        $this->dropIndex(
-            'idx-mining_process-company_id',
-            '{{%mining_process}}'
-        );
+        $this->dropForeignKey('fk-mining_process-location_id', '{{%mining_process}}');
+        $this->dropForeignKey('fk-mining_process-company_id', '{{%mining_process}}');
 
-        $this->dropIndex(
-            'idx-mining_process-mining_group_id',
-            '{{%mining_process}}'
-        );
+        $this->dropIndex('idx-mining_process-location_id', '{{%mining_process}}');
+        $this->dropIndex('idx-mining_process-company_id', '{{%mining_process}}');
 
         $this->dropTable('{{%mining_process}}');
     }
