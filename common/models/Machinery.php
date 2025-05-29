@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "{{%machinery}}".
  *
  * @property int $id
- * @property int|null $mining_group_id
  * @property int|null $fleet_id
  * @property int|null $functional_status_id
  * @property int|null $machinery_type_id
@@ -36,7 +35,6 @@ use Yii;
  * @property Location $location
  * @property MachineryDocument[] $machineryDocuments
  * @property MachineryType $machineryType
- * @property MiningGroup $miningGroup
  */
 class Machinery extends \yii\db\ActiveRecord
 {
@@ -54,7 +52,7 @@ class Machinery extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mining_group_id', 'fleet_id', 'functional_status_id', 'machinery_type_id', 'location_id', 'lifespan_years'], 'integer'],
+            [['fleet_id', 'functional_status_id', 'machinery_type_id', 'location_id', 'lifespan_years'], 'integer'],
             [['tag', 'unique_tag'], 'required'],
             [['start_operation', 'created_at', 'updated_at'], 'safe'],
             [['cost'], 'number'],
@@ -64,7 +62,6 @@ class Machinery extends \yii\db\ActiveRecord
             [['functional_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => FunctionalStatus::class, 'targetAttribute' => ['functional_status_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
             [['machinery_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => MachineryType::class, 'targetAttribute' => ['machinery_type_id' => 'id']],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];
     }
 
@@ -75,7 +72,6 @@ class Machinery extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'fleet_id' => Yii::t('app', 'Fleet ID'),
             'functional_status_id' => Yii::t('app', 'Functional Status ID'),
             'machinery_type_id' => Yii::t('app', 'Machinery Type ID'),
@@ -157,16 +153,6 @@ class Machinery extends \yii\db\ActiveRecord
     public function getMachineryType()
     {
         return $this->hasOne(MachineryType::class, ['id' => 'machinery_type_id']);
-    }
-
-    /**
-     * Gets query for [[MiningGroup]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
-     */
-    public function getMiningGroup()
-    {
-        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
     }
 
     /**
