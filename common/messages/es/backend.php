@@ -321,4 +321,5 @@ return [
     'Fleet Details' => 'Detalles de la Flota',
     'Company saved successfully.' => 'Compañía guardada con éxito.',
     'Error saving the company.' => 'Error al guardar la compañía.',
+    'Select a company to edit or create a new one' => 'Selecciona una compañía para editar o crear una nueva',
 ];

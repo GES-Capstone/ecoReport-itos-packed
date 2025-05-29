@@ -6,7 +6,7 @@ use yii\helpers\ArrayHelper;
 
 <div class="container mt-5">
     <p class="text-center fw-bold display-4 my-4">
-        <?= Yii::t('backend', 'Select a mining process to edit or create a new one') ?>
+        <?= Yii::t('backend', 'Select a company to edit or create a new one') ?>
     </p>
 
     <div class="d-flex flex-column flex-md-row gap-4">
