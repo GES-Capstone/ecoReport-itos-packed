@@ -11,78 +11,119 @@ use Yii;
  * @property int $mining_group_id
  * @property int $company_id
  * @property int $mining_process_id
- * @property int $location_id
+ * @property int|null $location_id
  * @property string $name
  * @property string|null $description
- * @property float|null $latitude
- * @property float|null $longitude
- * @property string|null $created_at
+ * @property string $created_at
  *
- * @property Location $location
  * @property Company $company
+ * @property Fleet[] $fleets
+ * @property Location $location
  * @property MiningGroup $miningGroup
  * @property MiningProcess $miningProcess
  */
 class Area extends \yii\db\ActiveRecord
 {
+    /**
+     * {@inheritdoc}
+     */
     public static function tableName()
     {
-        return '{{%machinery}}';
+        return 'area';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['mining_process_id', 'location_id'], 'integer'],
-            [['mining_process_id', 'name'], 'required'],
-            [['name', 'description'], 'string', 'max' => 255],
+            [['mining_group_id', 'company_id', 'mining_process_id', 'name'], 'required'],
+            [['mining_group_id', 'company_id', 'mining_process_id', 'location_id'], 'integer'],
             [['created_at'], 'safe'],
             [['name'], 'validateUniqueNameInProcess'],
-            [['mining_process_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningProcess::class, 'targetAttribute' => ['mining_process_id' => 'id']],
+            [['name', 'description'], 'string', 'max' => 255],
+            [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
+            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
+            [['mining_process_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningProcess::class, 'targetAttribute' => ['mining_process_id' => 'id']],
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
             'id' => Yii::t('backend', 'ID'),
-            'mining_process_id' => Yii::t('backend', 'Mining Process'),
-            'location_id' => Yii::t('backend', 'Location'),
-            'name' => Yii::t('backend', 'Area Name'),
+            'mining_group_id' => Yii::t('backend', 'Mining Group ID'),
+            'company_id' => Yii::t('backend', 'Company ID'),
+            'mining_process_id' => Yii::t('backend', 'Mining Process ID'),
+            'location_id' => Yii::t('backend', 'Location ID'),
+            'name' => Yii::t('backend', 'Name'),
             'description' => Yii::t('backend', 'Description'),
             'created_at' => Yii::t('backend', 'Created At'),
         ];
     }
 
+    /**
+     * Gets query for [[Company]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\CompanyQuery
+     */
+    public function getCompany()
+    {
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
+    }
+
+    /**
+     * Gets query for [[Fleets]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\FleetQuery
+     */
+    public function getFleets()
+    {
+        return $this->hasMany(Fleet::class, ['area_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Location]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\LocationQuery
+     */
     public function getLocation()
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
     }
 
+    /**
+     * Gets query for [[MiningGroup]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
+     */
+    public function getMiningGroup()
+    {
+        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
+    }
+
+    /**
+     * Gets query for [[MiningProcess]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MiningProcessQuery
+     */
     public function getMiningProcess()
     {
-        return $this->hasOne(Location::class, ['id' => 'location_id']);
+        return $this->hasOne(MiningProcess::class, ['id' => 'mining_process_id']);
     }
 
     /**
-     * Gets query for [[MachineryDocuments]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MachineryDocumentQuery
+     * {@inheritdoc}
+     * @return \common\models\query\AreaQuery the active query used by this AR class.
      */
-    public function getMachineryDocuments()
+    public static function find()
     {
-        return $this->hasMany(MachineryDocument::class, ['machinery_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[MachineryType]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MachineryTypeQuery
-     */
-    public function getMachineryType()
-    {
-        return $this->hasOne(MachineryType::class, ['id' => 'machinery_type_id']);
+        return new \common\models\query\AreaQuery(get_called_class());
     }
 
     public function validateUniqueNameInProcess($attribute, $params)

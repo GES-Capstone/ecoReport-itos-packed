@@ -36,8 +36,6 @@ class m140703_122006_create_machinery_type_table extends Migration
             'id',
             'SET NULL'
         );
-
-       
     }
 
     /**
