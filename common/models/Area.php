@@ -27,7 +27,7 @@ class Area extends \yii\db\ActiveRecord
 {
     public static function tableName()
     {
-        return '{{%area}}';
+        return '{{%machinery}}';
     }
 
     public function rules()
@@ -62,7 +62,27 @@ class Area extends \yii\db\ActiveRecord
 
     public function getMiningProcess()
     {
-        return $this->hasOne(MiningProcess::class, ['id' => 'mining_process_id']);
+        return $this->hasOne(Location::class, ['id' => 'location_id']);
+    }
+
+    /**
+     * Gets query for [[MachineryDocuments]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MachineryDocumentQuery
+     */
+    public function getMachineryDocuments()
+    {
+        return $this->hasMany(MachineryDocument::class, ['machinery_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[MachineryType]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\MachineryTypeQuery
+     */
+    public function getMachineryType()
+    {
+        return $this->hasOne(MachineryType::class, ['id' => 'machinery_type_id']);
     }
 
     public function validateUniqueNameInProcess($attribute, $params)

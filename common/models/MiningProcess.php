@@ -38,12 +38,12 @@ class MiningProcess extends \yii\db\ActiveRecord
         return [
             [['mining_group_id', 'company_id', 'name'], 'required'],
             [['mining_group_id', 'company_id', 'location_id'], 'integer'],
-            [['created_at'], 'safe'],
             [['name'], 'validateUniqueNameInCompany'],
+            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
+            [['created_at'], 'safe'],
             [['name', 'description'], 'string', 'max' => 255],
             [['company_id'], 'exist', 'skipOnError' => true, 'targetClass' => Company::class, 'targetAttribute' => ['company_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];
     }
 
@@ -54,7 +54,6 @@ class MiningProcess extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
             'company_id' => Yii::t('app', 'Company ID'),
             'location_id' => Yii::t('app', 'Location ID'),
             'name' => Yii::t('app', 'Name'),
@@ -82,15 +81,6 @@ class MiningProcess extends \yii\db\ActiveRecord
             }
         }
     }
-    /**
-     * Gets query for [[Areas]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\AreaQuery
-     */
-    public function getAreas()
-    {
-        return $this->hasMany(Area::class, ['mining_process_id' => 'id']);
-    }
 
     /**
      * Gets query for [[Company]].
@@ -113,6 +103,24 @@ class MiningProcess extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     * @return \common\models\query\MiningProcessQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new \common\models\query\MiningProcessQuery(get_called_class());
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\AreaQuery
+     */
+    public function getAreas()
+    {
+        return $this->hasMany(Area::class, ['mining_process_id' => 'id']);
+    }
+    /**
      * Gets query for [[MiningGroup]].
      *
      * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
@@ -120,14 +128,5 @@ class MiningProcess extends \yii\db\ActiveRecord
     public function getMiningGroup()
     {
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\MiningProcessQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\MiningProcessQuery(get_called_class());
     }
 }

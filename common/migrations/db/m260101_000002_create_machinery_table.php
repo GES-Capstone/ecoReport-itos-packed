@@ -11,8 +11,8 @@ class m260101_000002_create_machinery_table extends Migration
     {
         $this->createTable('{{%machinery}}', [
             'id' => $this->primaryKey(),
-            'mining_group_id' => $this->integer(),
             'fleet_id' => $this->integer(),
+            'mining_group_id' => $this->integer(),
             'functional_status_id' => $this->integer(),
             'machinery_type_id' => $this->integer(),
             'location_id' => $this->integer(),
@@ -34,21 +34,28 @@ class m260101_000002_create_machinery_table extends Migration
             'family' => "ENUM('SEMI','MOBILE','FIXED') DEFAULT 'FIXED'"
         ]);
 
-        // Añadir claves foráneas solo para las columnas existentes
-        $this->addForeignKey(
-            'fk-machinery-mining_group_id',
-            '{{%machinery}}',
-            'mining_group_id',
-            '{{%mining_group}}',
-            'id',
-            'CASCADE'
-        );
+        // Agregar índices
+        $this->createIndex('idx-machinery-tag', '{{%machinery}}', 'tag');
+        $this->createIndex('idx-machinery-unique_tag', '{{%machinery}}', 'unique_tag', true); // índice único
+        $this->createIndex('idx-machinery-sap_code', '{{%machinery}}', 'sap_code');
+        $this->createIndex('idx-machinery-brand', '{{%machinery}}', 'brand');
+        $this->createIndex('idx-machinery-model', '{{%machinery}}', 'model');
 
+        // Agregar Foreign Keys
         $this->addForeignKey(
             'fk-machinery-fleet_id',
             '{{%machinery}}',
             'fleet_id',
             '{{%fleet}}',
+            'id',
+            'SET NULL'
+        );
+
+        $this->addForeignKey(
+            'fk-machinery-mining_group_id',
+            '{{%machinery}}',
+            'mining_group_id',
+            '{{%mining_group}}',
             'id',
             'SET NULL'
         );
@@ -70,6 +77,7 @@ class m260101_000002_create_machinery_table extends Migration
             'id',
             'SET NULL'
         );
+
         $this->addForeignKey(
             'fk-machinery-machinery_type_id',
             '{{%machinery}}',
@@ -82,12 +90,19 @@ class m260101_000002_create_machinery_table extends Migration
 
     public function safeDown()
     {
-        // Eliminar claves foráneas
-        $this->dropForeignKey('fk-machinery-mining_group_id', '{{%machinery}}');
+        // Eliminar Foreign Keys
         $this->dropForeignKey('fk-machinery-fleet_id', '{{%machinery}}');
+        $this->dropForeignKey('fk-machinery-mining_group_id', '{{%machinery}}');
         $this->dropForeignKey('fk-machinery-functional_status_id', '{{%machinery}}');
         $this->dropForeignKey('fk-machinery-location_id', '{{%machinery}}');
         $this->dropForeignKey('fk-machinery-machinery_type_id', '{{%machinery}}');
+
+        // Eliminar índices
+        $this->dropIndex('idx-machinery-tag', '{{%machinery}}');
+        $this->dropIndex('idx-machinery-unique_tag', '{{%machinery}}');
+        $this->dropIndex('idx-machinery-sap_code', '{{%machinery}}');
+        $this->dropIndex('idx-machinery-brand', '{{%machinery}}');
+        $this->dropIndex('idx-machinery-model', '{{%machinery}}');
 
         // Eliminar tabla
         $this->dropTable('{{%machinery}}');
