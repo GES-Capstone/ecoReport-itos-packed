@@ -5,31 +5,31 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%component}}`.
  */
-class m200101_000003_create_component_table extends Migration
+class m270101_000003_create_component_table extends Migration
 {
     public function safeUp()
     {
         $this->createTable('{{%component}}', [
             'id' => $this->primaryKey(),
-            
+
             // Relación con machinery
             'machinery_id' => $this->integer()->notNull(),
             'location_id' => $this->integer()->null(),
-            
+
             'name' => $this->string()->notNull(),
             'tag' => $this->string(),
             'model' => $this->string(),
-            
+
             // Vida útil
             'useful_life_years' => $this->double(),
             'useful_life_hours' => $this->integer(),
-            
+
             'supplier' => $this->string(),
             'cost' => $this->decimal(10, 2),
-            
+
             // Fecha de inicio de operaciones
             'started_operations' => $this->date(),
-            
+
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);

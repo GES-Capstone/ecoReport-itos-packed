@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%component_document}}`.
  */
-class m200101_000006_create_component_document_table extends Migration
+class m270102_000006_create_component_document_table extends Migration
 {
     public function safeUp()
     {
@@ -33,7 +33,7 @@ class m200101_000006_create_component_document_table extends Migration
             'id',
             'CASCADE'
         );
-        
+
         // Índice para búsquedas por tipo
         $this->createIndex(
             'idx-component_document-type',
@@ -54,10 +54,10 @@ class m200101_000006_create_component_document_table extends Migration
         // Eliminar índices
         $this->dropIndex('idx-component_document-component_type', '{{%component_document}}');
         $this->dropIndex('idx-component_document-type', '{{%component_document}}');
-        
+
         // Eliminar clave foránea
         $this->dropForeignKey('fk-component_document-component_id', '{{%component_document}}');
-        
+
         // Eliminar tabla
         $this->dropTable('{{%component_document}}');
     }

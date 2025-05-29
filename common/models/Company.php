@@ -64,6 +64,7 @@ class Company extends \yii\db\ActiveRecord
         return [
             [['mining_group_id', 'location_id'], 'integer'],
             [['name'], 'required'],
+            [['name'], 'validateUniqueNameInGroup'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'commercial_address', 'operational_address', 'logo_path', 'logo_base_url'], 'string', 'max' => 255],
@@ -81,34 +82,20 @@ class Company extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
-            'location_id' => Yii::t('app', 'Location ID'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'commercial_address' => Yii::t('app', 'Commercial Address'),
-            'operational_address' => Yii::t('app', 'Operational Address'),
-            'phone' => Yii::t('app', 'Phone'),
-            'email' => Yii::t('app', 'Email'),
-            'logo_path' => Yii::t('app', 'Logo Path'),
-            'logo_base_url' => Yii::t('app', 'Logo Base Url'),
-            'picture' => Yii::t('common', 'Picture'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-
+            'id' => Yii::t('backend', 'ID'),
+            'mining_group_id' => Yii::t('backend', 'Mining Group ID'),
+            'location_id' => Yii::t('backend', 'Location ID'),
+            'name' => Yii::t('backend', 'Name'),
+            'description' => Yii::t('backend', 'Description'),
+            'commercial_address' => Yii::t('backend', 'Commercial Address'),
+            'operational_address' => Yii::t('backend', 'Operational Address'),
+            'phone' => Yii::t('backend', 'Phone'),
+            'email' => Yii::t('backend', 'Email'),
+            'logo_path' => Yii::t('backend', 'Logo Path'),
+            'logo_base_url' => Yii::t('backend', 'Logo Base Url'),
+            'picture' => Yii::t('backend', 'Picture'),
         ];
     }
-
-    /**
-     * Gets query for [[Areas]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\AreaQuery
-     */
-    public function getAreas()
-    {
-        return $this->hasMany(Area::class, ['company_id' => 'id']);
-    }
-
     /**
      * Gets query for [[Location]].
      *
@@ -158,5 +145,19 @@ class Company extends \yii\db\ActiveRecord
         return $this->logo_path
             ? Yii::getAlias($this->logo_base_url . '/' . $this->logo_path)
             : $default;
+    }
+
+    public function validateUniqueNameInGroup($attribute, $params)
+    {
+        $query = Company::find()
+            ->where(['name' => $this->name, 'mining_group_id' => $this->mining_group_id]);
+
+        if (!$this->isNewRecord) {
+            $query->andWhere(['<>', 'id', $this->id]);
+        }
+
+        if ($query->exists()) {
+            $this->addError($attribute, Yii::t('backend', 'There is already a company with this name in the mining group.'));
+        }
     }
 }

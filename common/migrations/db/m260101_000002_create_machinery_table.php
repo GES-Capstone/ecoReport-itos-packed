@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%machinery}}`.
  */
-class m200101_000002_create_machinery_table extends Migration
+class m260101_000002_create_machinery_table extends Migration
 {
     public function safeUp()
     {

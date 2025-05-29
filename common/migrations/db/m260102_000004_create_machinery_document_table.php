@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%machinery_document}}`.
  */
-class m200101_000004_create_machinery_document_table extends Migration
+class m260102_000004_create_machinery_document_table extends Migration
 {
     public function safeUp()
     {
@@ -33,7 +33,7 @@ class m200101_000004_create_machinery_document_table extends Migration
             'id',
             'CASCADE'
         );
-        
+
         // Opcionalmente, índice para búsquedas por tipo
         $this->createIndex(
             'idx-machinery_document-type',
@@ -46,10 +46,10 @@ class m200101_000004_create_machinery_document_table extends Migration
     {
         // Eliminar clave foránea
         $this->dropForeignKey('fk-machinery_document-machinery_id', '{{%machinery_document}}');
-        
+
         // Eliminar índice
         $this->dropIndex('idx-machinery_document-type', '{{%machinery_document}}');
-        
+
         // Eliminar tabla
         $this->dropTable('{{%machinery_document}}');
     }

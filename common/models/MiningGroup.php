@@ -83,20 +83,21 @@ class MiningGroup extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'location_id' => 'Location ID',
-            'name' => 'Nombre del Grupo Minero',
-            'ges_name' => 'Nombre  GES del Grupo Minero',
-            'description' => 'Description',
-            'commercial_address' => 'Commercial Address',
-            'operational_address' => 'Operational Address',
-            'phone' => 'Phone',
-            'email' => 'Email',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'picture' => Yii::t('common', 'Picture'),
+            'id' => Yii::t('backend', 'ID'),
+            'location_id' => Yii::t('backend', 'Location ID'),
+            'name' => Yii::t('backend', 'Mining Group Name'),
+            'ges_name' => Yii::t('backend', 'Mining Group Name'),
+            'description' => Yii::t('backend', 'Description'),
+            'commercial_address' => Yii::t('backend', 'Commercial Address'),
+            'operational_address' => Yii::t('backend', 'Operational Address'),
+            'phone' => Yii::t('backend', 'Phone'),
+            'email' => Yii::t('backend', 'Email'),
+            'created_at' => Yii::t('backend', 'Created At'),
+            'updated_at' => Yii::t('backend', 'Updated At'),
+            'picture' => Yii::t('backend', 'Picture'),
         ];
     }
+
 
     /**
      * Gets query for [[Companies]].

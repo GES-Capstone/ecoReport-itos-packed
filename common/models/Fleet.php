@@ -5,112 +5,80 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%fleet}}".
+ * This is the model class for table "fleet".
  *
  * @property int $id
- * @property int|null $mining_group_id
- * @property int|null $area_id
+ * @property int $mining_group_id
+ * @property int $company_id
+ * @property int $mining_process_id
+ * @property int $area_id
  * @property int|null $location_id
  * @property string $name
  * @property string|null $description
  * @property string $created_at
- * @property string $updated_at
  *
- * @property Area $area
- * @property Location $location
- * @property Machinery[] $machineries
  * @property MiningGroup $miningGroup
+ * @property Company $company
+ * @property MiningProcess $miningProcess
+ * @property Area $area
+ * @property Location|null $location
  */
 class Fleet extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return '{{%fleet}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['mining_group_id', 'area_id', 'location_id'], 'integer'],
-            [['name'], 'required'],
-            [['description'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
+            [['area_id', 'name'], 'required'],
+            [['area_id', 'location_id'], 'integer'],
+            [['name', 'description'], 'string', 'max' => 255],
+            [['created_at'], 'safe'],
+            [['name'], 'validateUniqueNameInArea'],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::class, 'targetAttribute' => ['area_id' => 'id']],
             [['location_id'], 'exist', 'skipOnError' => true, 'targetClass' => Location::class, 'targetAttribute' => ['location_id' => 'id']],
-            [['mining_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => MiningGroup::class, 'targetAttribute' => ['mining_group_id' => 'id']],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'mining_group_id' => Yii::t('app', 'Mining Group ID'),
-            'area_id' => Yii::t('app', 'Area ID'),
-            'location_id' => Yii::t('app', 'Location ID'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'id' => Yii::t('backend', 'ID'),
+            'area_id' => Yii::t('backend', 'Area'),
+            'location_id' => Yii::t('backend', 'Location'),
+            'name' => Yii::t('backend', 'Fleet Name'),
+            'description' => Yii::t('backend', 'Description'),
+            'created_at' => Yii::t('backend', 'Created At'),
         ];
     }
 
-    /**
-     * Gets query for [[Area]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\AreaQuery
-     */
+    public function validateUniqueNameInArea($attribute, $params)
+    {
+        if (!$this->hasErrors()) {
+            $query = self::find()
+                ->where(['area_id' => $this->area_id, 'name' => $this->name]);
+
+            if (!$this->isNewRecord) {
+                $query->andWhere(['<>', 'id', $this->id]);
+            }
+
+            if ($query->exists()) {
+                $this->addError($attribute, Yii::t('backend', 'There is already a fleet with this name in the selected area.'));
+            }
+        }
+    }
+
     public function getArea()
     {
         return $this->hasOne(Area::class, ['id' => 'area_id']);
     }
 
-    /**
-     * Gets query for [[Location]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\LocationQuery
-     */
     public function getLocation()
     {
         return $this->hasOne(Location::class, ['id' => 'location_id']);
-    }
-
-    /**
-     * Gets query for [[Machineries]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MachineryQuery
-     */
-    public function getMachineries()
-    {
-        return $this->hasMany(Machinery::class, ['fleet_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[MiningGroup]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\MiningGroupQuery
-     */
-    public function getMiningGroup()
-    {
-        return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\FleetQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\FleetQuery(get_called_class());
     }
 }

@@ -1,90 +1,117 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-
+use yii\bootstrap5\ActiveForm;
+use yii\helpers\ArrayHelper;
 ?>
-<?php $form = ActiveForm::begin([
-    'id' => 'company-form',
-    'options' => ['enctype' => 'multipart/form-data']
-]); ?>
 
-<div class="container-profile">
-    <p class="text-center fw-bold display-4 my-4">Carga de Datos Compañía</p>
-    <div class="d-flex flex-wrap justify-content-center" style="gap: 40px; width: 90%;">
-        <?php if (!$modelCompany->isNewRecord): ?>
-            <?= Html::activeHiddenInput($modelCompany, 'id') ?>
-        <?php endif; ?>
-        <!-- Formulario -->
-        <div class="col-md-7">
-            
-            <?= $form->field($modelCompany, 'name')->textInput(['maxlength' => true, 'style' => 'font-size: 18px;']) ?>
-            <?= $form->field($modelCompany, 'description')->textarea(['rows' => 3, 'style' => 'font-size: 16px;']) ?>
-            <?= $form->field($modelCompany, 'commercial_address')->textInput(['maxlength' => true, 'style' => 'font-size: 16px;']) ?>
-            <?= $form->field($modelCompany, 'operational_address')->textInput(['maxlength' => true, 'style' => 'font-size: 16px;']) ?>
-            <?= $form->field($modelCompany, 'phone')->textInput(['maxlength' => true, 'style' => 'font-size: 16px;']) ?>
-            <?= $form->field($modelCompany, 'email')->textInput(['type' => 'email', 'style' => 'font-size: 16px;']) ?>
-            <?= $form->field($modelLocation, 'location_url')->textInput([
-                'placeholder' => 'Ejemplo: -12.0464,-77.0428',
-                'style' => 'font-size: 16px;',
-            ]) ?>
+<div class="container mt-5">
+    <p class="text-center fw-bold display-4 my-4">
+        <?= Yii::t('backend', 'Select a company to edit or create a new one') ?>
+    </p>
 
-        </div>
+    <div class="d-flex flex-column flex-md-row gap-4">
+        <div class="card flex-fill shadow-sm">
+            <div class="card-body">
+                <div class="mb-4 text-center">
+                    <?= Html::beginForm(['initial-configuration/step2'], 'get') ?>
+                    <?= Html::dropDownList(
+                        'company_id',
+                        Yii::$app->request->get('company_id'),
+                        ArrayHelper::map($companies, 'id', 'name'),
+                        [
+                            'prompt' => Yii::t('backend', 'Select a company...'),
+                            'class' => 'form-select w-75 d-inline-block',
+                            'id' => 'select-company',
+                        ]
+                    ) ?>
+                    <?= Html::submitButton(Yii::t('backend', 'Edit'), ['class' => 'btn btn-primary ms-2']) ?>
+                    <?= Html::a(Yii::t('backend', 'Create New'), ['initial-configuration/step2'], ['class' => 'btn btn-success ms-2']) ?>
+                    <?= Html::endForm() ?>
+                </div>
 
+                <?php if ($modelCompany): ?>
+                    <?php $form = ActiveForm::begin([
+                        'id' => 'mining-process-form',
+                        'options' => ['enctype' => 'multipart/form-data']
+                    ]); ?>
 
-        <div class="col-md-4 mt-4">
-            <div class="d-flex align-items-start" style="gap: 20px;">
-                <?= $form->field($modelCompany, 'picture')->widget(\trntv\filekit\widget\Upload::class, [
-                    'url' => ['picture'],
-                ]) ?>
-                
-                <?= Html::img($modelCompany->getLogo('/img/anonymous.png'), [
-                    'id' => 'preview-image',
-                    'class' => 'img-thumbnail mt-5',
-                    'style' => 'width: 120px; height: 120px; object-fit: cover; cursor: zoom-in;',
-                    'alt' => 'Avatar'
-                ]) ?>
+                    <?= $form->field($modelCompany, 'name')->textInput([
+                        'maxlength' => 255,
+                        'id' => 'input-process-name',
+                        'placeholder' => Yii::t('backend', 'Enter process name'),
+                    ]) ?>
+
+                    <?= $form->field($modelCompany, 'description')->textarea([
+                        'rows' => 4,
+                        'placeholder' => Yii::t('backend', 'Enter a brief description of the process'),
+                    ]) ?>
+
+                    <?= $form->field($modelLocation, 'location_url')->textInput([
+                        'placeholder' => Yii::t('backend', 'Example: -12.0464,-77.0428'),
+                    ]) ?>
+
+                    <div class="text-center mt-4">
+                        <?= Html::a(Yii::t('backend', 'Back'), ['initial-configuration/step1'], ['class' => 'btn btn-secondary px-4']) ?>
+                        <?= Html::submitButton(Yii::t('backend', 'Save'), ['class' => 'btn btn-success px-4']) ?>
+
+                        <?php if ($config->step >= 3): ?>
+                            <?= Html::a(Yii::t('backend', 'Next'), ['initial-configuration/step3'], ['class' => 'btn btn-primary px-4']) ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php ActiveForm::end(); ?>
+                <?php endif; ?>
             </div>
+        </div>
 
+        <div class="card flex-fill shadow-sm">
+            <div class="card-body">
+                <div class="text-center mb-3 fw-bold h4"><?= Yii::t('backend', 'Current Hierarchy') ?></div>
+
+                <div class="d-flex flex-column align-items-center">
+                    <div class="card text-white bg-primary mb-3" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= Yii::t('backend', 'Company') ?></h5>
+                            <p class="card-text fs-5" id="company-name">
+                                <?= $modelCompany->name ? Html::encode($modelCompany->name) : Yii::t('backend', 'N/A') ?>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="text-center mt-4">
-            <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-</div>
-
-<!-- Modal para ver imagen en grande -->
-<div id="image-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.85); z-index:1050; align-items:center; justify-content:center;">
-    <span id="close-modal" style="position:absolute; top:20px; right:30px; font-size:30px; color:white; cursor:pointer;">&times;</span>
-    <img id="modal-image" src="" style="max-height:90%; max-width:90%; border-radius:10px; box-shadow:0 0 30px rgba(255,255,255,0.2);">
 </div>
 
 <?php
-$this->registerJs(<<<JS
-    const preview = document.getElementById('preview-image');
-    const modal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-image');
-    const closeBtn = document.getElementById('close-modal');
+$companyData = [];
+foreach ($companies as $company) {
+    $companyData[$company->id] = $company->name;
+}
+$companyJson = json_encode($companyData);
+$js = <<<JS
+    const companyMap = $companyJson;
 
-    if (preview) {
-        preview.addEventListener('click', function () {
-            modal.style.display = 'flex';
-            modalImg.src = this.src;
-        });
-    }
+    $('#select-company').on('change', function() {
+        const selectedId = $(this).val();
+        const selectedName = companyMap[selectedId] || 'N/A';
+        $('#company-name').text(selectedName);
 
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function () {
-            modal.style.display = 'none';
-        });
-    }
+        // Limpia el input del nombre para no confundir
+        $('#input-process-name').val('');
+    });
 
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
+    $('#input-process-name').on('input', function() {
+        const val = $(this).val().trim();
+        if (val.length > 0) {
+            $('#company-name').text(val);
+        } else {
+            const selectedId = $('#select-company').val();
+            $('#company-name').text(companyMap[selectedId] || 'N/A');
         }
     });
-JS);
-?>
+JS;
 
+$this->registerJs($js);
+?>
