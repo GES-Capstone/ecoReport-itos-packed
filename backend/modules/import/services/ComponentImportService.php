@@ -1,5 +1,7 @@
 <?php
+
 namespace backend\modules\import\services;
+
 use Yii;
 use backend\modules\import\services\ImportServiceInterface;
 use common\models\User;
@@ -12,19 +14,23 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ComponentImportService implements ImportServiceInterface
 {
-    public function processFile($filePath, $userId)
+    public function processFile($filePath, $userId, $miningGroupId)
     {
-        $miningGroup = $this->getMiningGroup($userId);
-        if (!$miningGroup) {
-            throw new \Exception('User not associated to mining group');
+        if (Yii::$app->user->can('super-administrator') && $miningGroupId !== null) {
+            $miningGroup = $this->getMiningGroup($miningGroupId);
+        } else {
+            $miningGroup = $this->getMiningGroupByUser($userId);
+            if (!$miningGroup) {
+                throw new \Exception('User not associated to mining group');
+            }
         }
-        
+
         $stats = [
             "components_created" => 0,  // Corregido: removido espacio extra
             'components_updated' => 0,  // Agregado: faltaba inicialización
             'errors' => [],
         ];
-        
+
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheet = $spreadsheet->getActiveSheet();
@@ -53,7 +59,7 @@ class ComponentImportService implements ImportServiceInterface
                     $componentCost,
                     $miningGroup->id
                 );
-                
+
                 if ($result['success']) {
                     if ($result['isNew']) {
                         $stats['components_created']++;
@@ -64,10 +70,9 @@ class ComponentImportService implements ImportServiceInterface
                     $stats['errors'][] = "Fila $row: " . $result['error'];
                 }
             }
-            
+
             // Movido fuera del bucle
             return $stats;
-            
         } catch (\Exception $e) {
             throw new \Exception('Error procesando archivo: ' . $e->getMessage());
         }
@@ -127,17 +132,17 @@ class ComponentImportService implements ImportServiceInterface
         try {
             $createResult = $this->createComponent(
                 $component,
-                $machinery, 
-                $componentName, 
-                $componentTag, 
-                $model, 
-                $startedOperations, 
-                $usefulLifeYear, 
-                $usefulLifeHours, 
-                $supplier, 
-                $componentCost, 
+                $machinery,
+                $componentName,
+                $componentTag,
+                $model,
+                $startedOperations,
+                $usefulLifeYear,
+                $usefulLifeHours,
+                $supplier,
+                $componentCost,
             );
-            
+
             if ($createResult) {
                 $result['success'] = true;
             } else {
@@ -178,10 +183,10 @@ class ComponentImportService implements ImportServiceInterface
     {
         // Corregida la sintaxis del findOne
         $machinery = Machinery::findOne([
-            'unique_tag' => $machineryTag, 
+            'unique_tag' => $machineryTag,
             'mining_group_id' => $miningGroupId
         ]);
-        
+
         return $machinery;
     }
 
@@ -304,9 +309,20 @@ class ComponentImportService implements ImportServiceInterface
     }
 
 
-private function getMiningGroup($userId) 
-{
-    $user = User::find()->where(['id' => $userId])->one();
-    return $user ? $user->miningGroup : null;
-}
+    private function getMiningGroupByUser($userId)
+    {
+        $user = User::findOne($userId);
+        if (!$user) {
+            return null;
+        }
+        return $user->getMiningGroup()->one();
+    }
+    private function getMiningGroup($miningGroupId)
+    {
+        $miningGroup = MiningGroup::findOne($miningGroupId);
+        if (!$miningGroup) {
+            throw new \Exception('Mining group not found');
+        }
+        return $miningGroup;
+    }
 }

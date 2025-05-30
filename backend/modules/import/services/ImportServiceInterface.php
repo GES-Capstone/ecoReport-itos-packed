@@ -9,7 +9,7 @@ interface ImportServiceInterface
     /**
      * Procesa un archivo Excel
      */
-    public function processFile($filePath, $userId);
+    public function processFile($filePath, $userId,$miningGroupId);
 
     public function generateTemplate($path);
 }

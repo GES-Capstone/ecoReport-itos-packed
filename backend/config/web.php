@@ -110,6 +110,13 @@ $config = [
                 'actions' => ['index', 'process'],
             ],
             [
+                'controllers' => ['import/import-companies'],
+                'allow' => true,
+                'roles' => ['@'],
+                'actions' => ['index', 'process', 'template'],
+            ],
+
+            [
                 'allow' => true,
                 'roles' => ['administrator'],
             ],

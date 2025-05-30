@@ -5,6 +5,7 @@ namespace backend\modules\import\services;
 use common\models\Company;
 use common\models\Location;
 use common\models\User;
+use common\models\MiningGroup;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -13,11 +14,15 @@ use Yii;
 class CompanyImportService implements ImportServiceInterface
 {
 
-    public function processFile($filePath, $userId): array
+    public function processFile($filePath, $userId,$miningGroupId): array
     {
-        $miningGroup = $this->getMiningGroup($userId);
-        if (!$miningGroup) {
-            throw new \Exception('User not associated to mining group');
+        if (Yii::$app->user->can('super-administrator') && $miningGroupId !== null) {
+            $miningGroup = $this->getMiningGroup($miningGroupId);
+        } else {
+            $miningGroup = $this->getMiningGroupByUser($userId);
+            if (!$miningGroup) {
+                throw new \Exception('User not associated to mining group');
+            }
         }
 
         $stats = [
@@ -150,13 +155,21 @@ class CompanyImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function getMiningGroup($userId)
+   private function getMiningGroupByUser($userId)
     {
         $user = User::findOne($userId);
         if (!$user) {
             return null;
         }
-        return $user->getMiningGroup()->One();
+        return $user->getMiningGroup()->one();
+    }
+    private function getMiningGroup($miningGroupId)
+    {
+        $miningGroup = MiningGroup::findOne($miningGroupId);
+        if (!$miningGroup) {
+            throw new \Exception('Mining group not found');
+        }
+        return $miningGroup;
     }
 
     public function generateTemplate($path): bool

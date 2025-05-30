@@ -22,12 +22,17 @@ class MachineryImportService implements ImportServiceInterface
     /**
      * @throws \Exception
      */
-    public function processFile($filePath, $userId)
+    public function processFile($filePath, $userId, $miningGroupId)
     {
-        $miningGroup = $this->getMiningGroup($userId);
-        if (!$miningGroup) {
-            throw new \Exception('User not associated to mining group');
+        if (Yii::$app->user->can('super-administrator') && $miningGroupId !== null) {
+            $miningGroup = $this->getMiningGroup($miningGroupId);
+        } else {
+            $miningGroup = $this->getMiningGroupByUser($userId);
+            if (!$miningGroup) {
+                throw new \Exception('User not associated to mining group');
+            }
         }
+
         $stats = [
             'machinery_created' => 0,
             'mining_process_created' => 0,
@@ -204,7 +209,7 @@ class MachineryImportService implements ImportServiceInterface
             $result['miningProcess']['isNew'] = $miningProcessResult['isNew'];
             $miningProcess = $miningProcessResult['miningProcess'];
 
-            $areaResult = $this->findArea($areaData, $miningProcess->id, $miningGroupId);
+            $areaResult = $this->findArea($areaData, $miningProcess->id, $miningGroupId, $company->id);
             if (!$areaResult['success']) {
                 throw new \Exception($areaResult['error']);
             }
@@ -220,7 +225,7 @@ class MachineryImportService implements ImportServiceInterface
             $result['machineryType']['isNew'] = $machineryTypeResult['isNew'];
 
             // Encontrar o crear flota
-            $fleetResult = $this->findFleet($fleetData, $area->id, $miningGroupId);
+            $fleetResult = $this->findFleet($fleetData, $area->id, $miningGroupId,$company->id);
             if (!$fleetResult['success']) {
                 throw new \Exception($fleetResult['error']);
             }
@@ -383,13 +388,21 @@ class MachineryImportService implements ImportServiceInterface
     }
 
 
-    private function getMiningGroup($userId)
+    private function getMiningGroupByUser($userId)
     {
         $user = User::findOne($userId);
         if (!$user) {
             return null;
         }
         return $user->getMiningGroup()->one();
+    }
+    private function getMiningGroup($miningGroupId)
+    {
+        $miningGroup = MiningGroup::findOne($miningGroupId);
+        if (!$miningGroup) {
+            throw new \Exception('Mining group not found');
+        }
+        return $miningGroup;
     }
 
     private function findCompany($companyName, $miningGroupId)
@@ -428,7 +441,7 @@ class MachineryImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function findArea($areaName, $miningProcessId, $miningGroupId)
+    private function findArea($areaName, $miningProcessId, $miningGroupId,$companyId)
     {
         $result = [
             'success' => false,
@@ -449,6 +462,7 @@ class MachineryImportService implements ImportServiceInterface
                 $area->name = $areaName;
                 $area->mining_process_id = $miningProcessId;
                 $area->mining_group_id = $miningGroupId;
+                $area->company_id = $companyId;
 
                 if (!$area->save()) {
                     throw new \Exception("Error guardando área: " . implode(", ", $area->getErrorSummary(true)));
@@ -498,7 +512,7 @@ class MachineryImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function findFleet($fleetName, $areaId, $miningGroupId)
+    private function findFleet($fleetName, $areaId, $miningGroupId,$companyId)
     {
         $result = [
             'success' => false,
@@ -520,6 +534,7 @@ class MachineryImportService implements ImportServiceInterface
                 $fleet->name = $fleetName;
                 $fleet->area_id = $areaId;
                 $fleet->mining_group_id = $miningGroupId;
+                $fleet->company_id = $companyId;
 
                 if (!$fleet->save()) {
                     throw new \Exception("Error guardando flota: " . implode(", ", $fleet->getErrorSummary(true)));

@@ -1,4 +1,5 @@
 <?php
+
 namespace backend\modules\import\controllers;
 
 use backend\modules\import\models\ExcelUploadForm;
@@ -10,24 +11,15 @@ use yii\web\UploadedFile;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class ImportDataController extends Controller
+class ImportCompaniesController extends Controller
 {
-    public function actionIndex($type = 'machinery', $miningGroupId = null)
+    public function actionIndex($miningGroupId = null)
     {
-        $validTypes = ['machinery', 'component'];
-        if (!in_array($type, $validTypes)) {
-            $type = 'machinery';
-        }
-
         $model = new ExcelUploadForm();
-        $model->type = $type;
+        $model->type = 'company';
 
         if (Yii::$app->request->isPost) {
             $model->excelFile = UploadedFile::getInstance($model, 'excelFile');
-
-            if (isset(Yii::$app->request->post('ExcelUploadForm')['type'])) {
-                $model->type = Yii::$app->request->post('ExcelUploadForm')['type'];
-            }
 
             if ($model->upload()) {
                 return $this->redirect(['process', 'key' => $model->getUploadKey(), 'miningGroupId' => $miningGroupId]);
@@ -36,8 +28,8 @@ class ImportDataController extends Controller
 
         return $this->render('index', [
             'model' => $model,
-            'type' => $type,
-            'templates' => $this->getTemplateUrls(),
+            'templateUrl' => $this->getCompanyTemplateUrl(),    
+            'miningGroupId' => $miningGroupId,
         ]);
     }
 
@@ -48,22 +40,17 @@ class ImportDataController extends Controller
 
         if (!$fileData) {
             Yii::$app->session->setFlash('error', Yii::t('app', 'Invalid or expired file'));
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'miningGroupId' => $miningGroupId]);
         }
 
         try {
-            if (!isset($fileData['type'])) {
-                throw new \Exception(Yii::t('app', 'Import type not specified'));
-            }
-            $type = $fileData['type'];
-            
-            // Validar que solo sean tipos permitidos
-            $validTypes = ['machinery', 'component'];
-            if (!in_array($type, $validTypes)) {
-                throw new \Exception(Yii::t('app', 'Invalid import type: {type}', ['type' => $type]));
+            // Validar que sea tipo company
+            if (!isset($fileData['type']) || $fileData['type'] !== 'company') {
+                throw new \Exception(Yii::t('app', 'Invalid file type for company import'));
             }
             
-            $importService = ImportServiceFactory::create($type);
+            // Reutilizar servicio existente
+            $importService = ImportServiceFactory::create('company');
 
             $stats = $importService->processFile($fileData['path'], Yii::$app->user->id, $miningGroupId);
 
@@ -72,7 +59,8 @@ class ImportDataController extends Controller
             return $this->render('result', [
                 'stats' => $stats,
                 'fileName' => $fileData['original_name'],
-                'type' => $type,
+                'type' => 'company',
+                'miningGroupId' => $miningGroupId,
             ]);
 
         } catch (\Exception $e) {
@@ -81,20 +69,16 @@ class ImportDataController extends Controller
 
             $fileService->cleanupFile($key);
 
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'miningGroupId' => $miningGroupId]);
         }
     }
 
-    public function actionTemplate($type)
+    public function actionTemplate()
     {
-        $validTypes = ['machinery', 'component'];
-        if (!in_array($type, $validTypes)) {
-            $type = 'machinery';
-        }
+        // Reutilizar servicio existente
+        $importService = ImportServiceFactory::create('company');
 
-        $importService = ImportServiceFactory::create($type);
-
-        $filename = $type . '_template.xlsx';
+        $filename = 'company_template.xlsx';
         $templatePath = Yii::getAlias('@backend/web/templates/' . $filename);
 
         $dir = dirname($templatePath);
@@ -109,11 +93,31 @@ class ImportDataController extends Controller
         return Yii::$app->response->sendFile($templatePath, $filename);
     }
 
-    private function getTemplateUrls()
+    private function getCompanyTemplateUrl()
+    {
+        return Yii::$app->urlManager->createUrl(['import/import-companies/template']);
+    }
+
+    public function behaviors()
     {
         return [
-            'machinery' => Yii::$app->urlManager->createUrl(['import/import-data/template', 'type' => 'machinery']),
-            'component' => Yii::$app->urlManager->createUrl(['import/import-data/template', 'type' => 'component']),
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // Solo usuarios autenticados
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'index' => ['GET', 'POST'],
+                    'process' => ['GET'],
+                    'template' => ['GET'],
+                ],
+            ],
         ];
     }
 }
