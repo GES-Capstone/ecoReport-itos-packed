@@ -41,8 +41,8 @@ class m150725_192740_seed_data extends Migration
         ]);
         $this->insert('{{%initial_configuration}}', [
             'id' => 1,
-            'step' => 0,
-            'status' => 'not started',
+            'step' => 1,
+            'status' => 'in progress',
             'mining_group_id' => 1,
         ]);
         $this->insert('{{%initial_configuration}}', [
@@ -51,9 +51,30 @@ class m150725_192740_seed_data extends Migration
             'status' => 'not started',
             'mining_group_id' => 2,
         ]);
+        $this->insert('{{%company}}', [
+            'id' => 1,
+            'mining_group_id' => 1,
+            'name' => 'GES Mining',
+            'description' => 'GES Mining is a leading mining company specializing in the extraction of precious metals and minerals.',
+            'commercial_address' => '1234 Main St, Suite 100, Cityville, ST 12345',
+            'operational_address' => '5678 Industrial Rd, Cityville, ST 12345',
+            'phone' => '+1 (555) 123-4567',
+            'email' => 'ges@company.cl',
+        ]);
+        $this->insert('{{%company}}', [
+            'id' => 2,
+            'mining_group_id' => 2,
+            'name' => 'Alpha Mining',
+            'description' => 'Alpha Mining is a global leader in the mining industry, dedicated to sustainable practices and innovative technologies.',
+            'commercial_address' => '2500 Mineral Peak Blvd, Suite 1200',
+            'operational_address' => '4500 Quarry Access Road',
+            'phone' => '+1 (555) 987-6543',
+            'email' => 'alpha@company.cl',
+        ]);
         $this->insert('{{%user}}', [
             'id' => 1,
             'mining_group_id' => 1,
+            'company_id' => 1,
             'username' => 'ges',
             'email' => 'ges@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('ges'),
@@ -86,6 +107,7 @@ class m150725_192740_seed_data extends Migration
         $this->insert('{{%user}}', [
             'id' => 3,
             'mining_group_id' => 2,
+            'company_id' => 2,
             'username' => 'manager',
             'email' => 'manager@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('manager'),
@@ -102,6 +124,7 @@ class m150725_192740_seed_data extends Migration
         $this->insert('{{%user}}', [
             'id' => 4,
             'mining_group_id' => 2,
+            'company_id' => 2,
             'username' => 'reviewer',
             'email' => 'user1@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('reviewer'),
@@ -117,8 +140,9 @@ class m150725_192740_seed_data extends Migration
         ]);
         $this->insert('{{%user}}', [
             'id' => 5,
-            'username' => 'inspector',
             'mining_group_id' => 2,
+            'company_id' => 2,
+            'username' => 'inspector',
             'email' => 'user2@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('inspector'),
             'password_encrypted' => Yii::$app->security->encryptByKey(
@@ -134,6 +158,7 @@ class m150725_192740_seed_data extends Migration
         $this->insert('{{%user}}', [
             'id' => 6,
             'mining_group_id' => 2,
+            'company_id' => 2,
             'username' => 'user',
             'email' => 'user3@example.com',
             'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('user'),

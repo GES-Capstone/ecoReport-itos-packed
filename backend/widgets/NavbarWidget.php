@@ -78,7 +78,18 @@ class NavbarWidget extends Widget
                 'label' => FAS::icon('home') . Html::tag('span', Yii::t('backend', 'Home'), ['class' => 'ms-1 d-none d-sm-inline']),
                 'url' => ['/home'],
                 'options' => ['class' => 'nav-item']
-            ]
+            ],
+            [
+                'label' => FAS::icon('users') . Html::tag('span', Yii::t('backend', 'Users'), ['class' => 'ms-1 d-none d-sm-inline']),
+                'url' => ['/users/edit'],
+                'options' => ['class' => 'nav-item']
+            ],
+            [
+                'label' => FAS::icon('building') . Html::tag('span', Yii::t('backend', 'Companies'), ['class' => 'ms-1 d-none d-sm-inline']),
+                'url' => ['/company/index'],
+                'options' => ['class' => 'nav-item']
+            ],
+
         ], [
             'class' => 'navbar-nav me-auto',
             'itemOptions' => ['class' => 'nav-item'],

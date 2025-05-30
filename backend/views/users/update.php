@@ -127,7 +127,25 @@ $this->registerJsFile('@web/js/user/user-edit.js', ['depends' => \backend\assets
             <?= $form->field($modelProfile, 'profession')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Profession')]) ?>
             <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Username')]) ?>
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('backend', 'Email')]) ?>
-            <?= $form->field($model, 'status')->dropDownList([2 => Yii::t('backend', 'Active'), 1 => Yii::t('backend', 'Inactive'), 3 => Yii::t('backend', 'Deleted')], ['prompt' => Yii::t('backend', 'Select the Status')]) ?>
+            <?php
+            if (
+                ! $user->isSuperAdministrator
+                && (
+                    Yii::$app->user->can('super-administrator')
+                    || ! $user->isAdministrator
+                )
+            ):
+            ?>
+                <?= $form->field($model, 'status')
+                    ->dropDownList(
+                        [
+                            2    => Yii::t('backend', 'Active'),
+                            1 => Yii::t('backend', 'Inactive'),
+                            3    => Yii::t('backend', 'Deleted'),
+                        ],
+                        ['prompt' => Yii::t('backend', 'Select the Status')]
+                    ) ?>
+            <?php endif; ?>
             <div class="text-center mt-3">
                 <?= Html::submitButton(Yii::t('backend', 'Save Changes'), ['class' => 'btn btn-success mb-3']) ?>
             </div>

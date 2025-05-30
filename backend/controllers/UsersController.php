@@ -10,6 +10,7 @@ use backend\models\UserForm;
 use backend\models\UserCreateForm;
 use yii\web\NotFoundHttpException;
 use backend\models\GroupMiningCreateForm;
+use common\models\Company;
 use trntv\filekit\actions\UploadAction;
 use common\models\MiningGroup;
 use common\models\InitialConfiguration;
@@ -204,11 +205,14 @@ class UsersController extends Controller
         }
 
         $group_user_mining = Yii::$app->request->get('group_user_mining');
+        $company_filter = Yii::$app->request->get('companies');
         $role_filter = Yii::$app->request->get('role_filter');
         $status_filter = Yii::$app->request->get('status_filter', User::STATUS_ACTIVE); // Por defecto muestra activos
 
-        $query = User::find();
-        $isAdmin = Yii::$app->user->can('administrator');
+        $query      = User::find();
+        $isAdmin    = Yii::$app->user->can('administrator');
+        $isSuper    = Yii::$app->user->can('super-administrator');
+        $userGroupId = Yii::$app->user->identity->mining_group_id;
 
         if (!$isAdmin) {
             $userGroupId = Yii::$app->user->identity->mining_group_id;
@@ -223,6 +227,58 @@ class UsersController extends Controller
             }
         }
 
+        if ($company_filter !== null && $company_filter !== '') {
+            // “no company” special case
+            if ($company_filter === 'no_company') {
+                if ($isSuper) {
+                    $groupIdsNoCompany = User::find()
+                        ->select('mining_group_id')
+                        ->where(['company_id' => null])
+                        ->distinct()
+                        ->column();
+
+                    $query->joinWith('authAssignments aa', false)
+                        ->andWhere([
+                            'or',
+                            ['company_id' => null],
+                            [
+                                'and',
+                                ['aa.item_name'     => User::ROLE_ADMINISTRATOR],
+                                ['in', 'mining_group_id', $groupIdsNoCompany],
+                            ],
+                        ]);
+                } else {
+                    $query->andWhere([
+                        'company_id'      => null,
+                        'mining_group_id' => $userGroupId,
+                    ]);
+                }
+            } else {
+                if ($isSuper) {
+                    $groupIds = User::find()
+                        ->select('mining_group_id')
+                        ->where(['company_id' => $company_filter])
+                        ->distinct()
+                        ->column();
+                    $query->joinWith('authAssignments aa', false)
+                        ->andWhere([
+                            'or',
+                            ['company_id' => $company_filter],
+                            [
+                                'and',
+                                ['aa.item_name'     => User::ROLE_ADMINISTRATOR],
+                                ['in', 'mining_group_id', $groupIds],
+                            ],
+                        ]);
+                } else {
+                    $query->andWhere([
+                        'company_id'      => $company_filter,
+                        'mining_group_id' => $userGroupId,
+                    ]);
+                }
+            }
+        }
+
         if ($role_filter) {
             $query->joinWith('authAssignments as auth_assignment')
                 ->andWhere(['auth_assignment.item_name' => $role_filter]);
@@ -230,10 +286,9 @@ class UsersController extends Controller
 
         $query->andWhere(['status' => $status_filter]);
 
-        if (Yii::$app->user->can('super-administrator')) {
+        if ($isSuper) {
             $users = $query->all();
-        } else if (Yii::$app->user->can('administrator')) {
-            $userGroupId = Yii::$app->user->identity->mining_group_id;
+        } else if ($isAdmin) {
             $users = $query->andWhere(['mining_group_id' => $userGroupId])->all();
         } else {
             $users = [$query->andWhere(['id' => Yii::$app->user->id])->one()];
@@ -242,6 +297,21 @@ class UsersController extends Controller
         $groups = MiningGroup::find()->all();
         $groupOptions = \yii\helpers\ArrayHelper::map($groups, 'id', 'name');
         $groupOptions = ['no_group' => Yii::t('backend', 'Without a Group')] + $groupOptions;
+
+        $companyQuery = Company::find();
+
+        if ($isAdmin && ! $isSuper) {
+            $companyQuery->innerJoin(
+                User::tableName(),
+                User::tableName() . '.company_id = ' . Company::tableName() . '.id'
+            )
+                ->andWhere([
+                    User::tableName() . '.mining_group_id' => $userGroupId
+                ]);
+        }
+
+        $companies = $companyQuery->all();
+        $companyOptions = ['no_company' => Yii::t('backend', 'Without a Company'),] + \yii\helpers\ArrayHelper::map($companies, 'id', 'name');
 
         $auth = Yii::$app->authManager;
         $rolesList = \yii\helpers\ArrayHelper::map($auth->getRoles(), 'name', 'name');
@@ -255,6 +325,7 @@ class UsersController extends Controller
         return $this->render('edit', [
             'users' => $users,
             'groupOptions' => $groupOptions,
+            'companyOptions' => $companyOptions,
             'rolesList' => $rolesList,
             'isAdmin' => $isAdmin,
             'statusOptions' => $statusOptions,
@@ -412,6 +483,7 @@ class UsersController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'user' => $user,
             'gm' => $gm,
             'modelProfile' => $modelProfile,
             'roles' => $this->getRolesWithDescriptions(),

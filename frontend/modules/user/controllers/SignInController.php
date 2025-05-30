@@ -55,14 +55,27 @@ class SignInController extends \yii\web\Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'signup', 'login', 'login-by-pass', 'request-password-reset', 'reset-password', 'oauth', 'activation', 'resend-email'
+                            'signup',
+                            'login',
+                            'login-by-pass',
+                            'request-password-reset',
+                            'reset-password',
+                            'oauth',
+                            'activation',
+                            'resend-email'
                         ],
                         'allow' => true,
                         'roles' => ['?']
                     ],
                     [
                         'actions' => [
-                            'signup', 'login', 'request-password-reset', 'reset-password', 'oauth', 'activation', 'resend-email'
+                            'signup',
+                            'login',
+                            'request-password-reset',
+                            'reset-password',
+                            'oauth',
+                            'activation',
+                            'resend-email'
                         ],
                         'allow' => false,
                         'roles' => ['@'],
@@ -295,7 +308,7 @@ class SignInController extends \yii\web\Controller
             $user->username = ArrayHelper::getValue($attributes, 'login');
             // check default location of email, if not found as in google plus dig inside the array of emails
             $email = ArrayHelper::getValue($attributes, 'email');
-            if($email === null){
+            if ($email === null) {
                 $email = ArrayHelper::getValue($attributes, ['emails', 0, 'value']);
             }
             $user->email = $email;
@@ -328,7 +341,6 @@ class SignInController extends \yii\web\Controller
                         ]
                     );
                 }
-
             } else {
                 // We already have a user with this email. Do what you want in such case
                 if ($user->email && User::find()->where(['email' => $user->email])->count()) {
@@ -350,7 +362,6 @@ class SignInController extends \yii\web\Controller
                         ]
                     );
                 }
-
             };
         }
         if (Yii::$app->user->login($user, 3600 * 24 * 30)) {

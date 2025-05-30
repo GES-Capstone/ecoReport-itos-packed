@@ -29,9 +29,11 @@ use yii\web\IdentityInterface;
  * @property integer $logged_at
  * @property string $password write-only password
  * @property integer $mining_group_id
+ * @property integer $company_id
  *
  * @property \common\models\UserProfile $userProfile
  * @property \common\models\MiningGroup $miningGroup
+ * @property \common\models\Company $company
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -181,7 +183,16 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'default', 'value' => self::STATUS_NOT_ACTIVE],
             ['status', 'in', 'range' => array_keys(self::statuses())],
             [['username'], 'filter', 'filter' => '\yii\helpers\Html::encode'],
-            [['mining_group_id'], 'integer']
+            [['mining_group_id'], 'integer'],
+            ['company_id', 'integer'],
+            [
+                'company_id',
+                'exist',
+                'skipOnError'     => true,
+                'skipOnEmpty'     => true,
+                'targetClass'     => Company::class,
+                'targetAttribute' => ['company_id' => 'id'],
+            ],
         ];
     }
 
@@ -212,6 +223,7 @@ class User extends ActiveRecord implements IdentityInterface
             'updated_at' => Yii::t('common', 'Updated at'),
             'logged_at' => Yii::t('common', 'Last login'),
             'mining_group_id' => Yii::t('common', 'Mining Group'),
+            'company_id' => Yii::t('common', 'Company'),
         ];
     }
 
@@ -229,6 +241,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function getMiningGroup()
     {
         return $this->hasOne(MiningGroup::class, ['id' => 'mining_group_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompany()
+    {
+        return $this->hasOne(Company::class, ['id' => 'company_id']);
     }
 
 
@@ -266,10 +286,8 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        /* 1) keep the normal hash */
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
 
-        /* 2) store a reversible encrypted copy */
         $key = Yii::$app->params['passwordEncryptionKey'];
         $this->password_encrypted = Yii::$app->security->encryptByKey($password, $key);
     }
@@ -355,5 +373,23 @@ class User extends ActiveRecord implements IdentityInterface
     public function getAuthAssignments()
     {
         return $this->hasMany(AuthAssignment::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAdministrator(): bool
+    {
+        return (bool) Yii::$app->authManager
+            ->getAssignment(self::ROLE_ADMINISTRATOR, $this->getId());
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsSuperAdministrator(): bool
+    {
+        return (bool) Yii::$app->authManager
+            ->getAssignment(self::ROLE_SUPER_ADMINISTRATOR, $this->getId());
     }
 }

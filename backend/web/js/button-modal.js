@@ -1,62 +1,55 @@
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete modal handling
-    const deleteModal = document.getElementById('deleteModal');
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    const confirmDelete = document.getElementById('confirmDelete');
-    
-    let deleteUserId = null;
-    
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            deleteUserId = this.getAttribute('data-id');
-        });
+  const deleteButtons   = document.querySelectorAll('.delete-user-btn, .delete-company-btn');
+  const confirmDeleteEl = document.getElementById('confirm-delete-btn');
+  let deleteUrl = null;
+
+  deleteButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      deleteUrl = this.getAttribute('data-url');
     });
-    
-    confirmDelete.addEventListener('click', function() {
-        if (deleteUserId) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `${window.location.origin}/users/delete?id=${deleteUserId}`;
-            
-            // Add CSRF token
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_csrf';
-            csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
-            
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
-    });
-});
+  });
 
-const restoreModal = document.getElementById('restoreModal');
-const restoreButtons = document.querySelectorAll('.restore-btn');
-const confirmRestore = document.getElementById('confirmRestore');
+  confirmDeleteEl.addEventListener('click', function() {
+    if (deleteUrl) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = deleteUrl;
 
-let restoreUserId = null;
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = '_csrf';
+      csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+      form.appendChild(csrfInput);
 
-restoreButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        restoreUserId = this.getAttribute('data-id');
-    });
-});
-
-confirmRestore.addEventListener('click', function() {
-    if (restoreUserId) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `${window.location.origin}/users/restore?id=${restoreUserId}`;
-        
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = '_csrf';
-        csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
-        
-        form.appendChild(csrfInput);
-        document.body.appendChild(form);
-        form.submit();
+      document.body.appendChild(form);
+      form.submit();
     }
+  });
+
+  const restoreButtons   = document.querySelectorAll('.restore-user-btn');
+  const confirmRestoreEl = document.getElementById('confirm-restore-btn');
+  let restoreUrl = null;
+
+  restoreButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      restoreUrl = this.getAttribute('data-url');
+    });
+  });
+
+  confirmRestoreEl.addEventListener('click', function() {
+    if (restoreUrl) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = restoreUrl;
+
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = '_csrf';
+      csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+      form.appendChild(csrfInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  });
 });

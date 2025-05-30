@@ -13,6 +13,7 @@ class m140703_123000_user extends Migration
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
             'mining_group_id' => $this->integer()->null(),
+            'company_id' => $this->integer()->null(),
             'username' => $this->string(32),
             'auth_key' => $this->string(32)->notNull(),
             'access_token' => $this->string(40)->notNull(),

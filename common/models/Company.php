@@ -17,7 +17,7 @@ use trntv\filekit\behaviors\UploadBehavior;
  * @property string|null $operational_address
  * @property string|null $phone
  * @property string|null $email
- *  * @property string $picture
+ * @property string $picture
  * @property string|null $logo_path Path to logo image
  * @property string|null $logo_base_url Base URL for logo image
  * @property string $created_at
@@ -31,7 +31,7 @@ use trntv\filekit\behaviors\UploadBehavior;
  */
 class Company extends \yii\db\ActiveRecord
 {
-
+    /** @var \yii\web\UploadedFile|string|null */
     public $picture;
     /**
      * {@inheritdoc}
@@ -140,6 +140,7 @@ class Company extends \yii\db\ActiveRecord
     {
         return new \common\models\query\CompanyQuery(get_called_class());
     }
+
     public function getLogo($default = null)
     {
         return $this->logo_path
