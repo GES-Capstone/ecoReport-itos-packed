@@ -46,6 +46,7 @@ class ComponentImportService implements ImportServiceInterface
                 $usefulLifeHours = trim($sheet->getCell('G' . $row)->getValue() ?? '');
                 $supplier = trim($sheet->getCell('H' . $row)->getValue() ?? '');
                 $componentCost = trim($sheet->getCell('I' . $row)->getValue() ?? '');
+                $locationData = trim($sheet->getCell('J' . $row)->getValue() ?? '');
 
                 $result = $this->processRow(
                     $machineryTag,
@@ -57,7 +58,8 @@ class ComponentImportService implements ImportServiceInterface
                     $usefulLifeHours,
                     $supplier,
                     $componentCost,
-                    $miningGroup->id
+                    $miningGroup->id,
+                    $locationData
                 );
 
                 if ($result['success']) {
@@ -88,7 +90,8 @@ class ComponentImportService implements ImportServiceInterface
         $usefulLifeHours,
         $supplier,
         $componentCost,
-        $miningGroupId
+        $miningGroupId,
+        $locationData
     ) {
         $result = [
             'success' => false,

@@ -56,13 +56,13 @@ class MachineryImportService implements ImportServiceInterface
                 $fleetData = trim($sheet->getCell('E' . $row)->getValue() ?? '');
                 $machineryType = trim($sheet->getCell('F' . $row)->getValue() ?? '');
                 $tag = trim($sheet->getCell('G' . $row)->getValue() ?? '');
-                $brand = trim($sheet->getCell('H' . $row)->getValue() ?? '');
-                $model = trim($sheet->getCell('I' . $row)->getValue() ?? '');
-                $startedOperations = trim($sheet->getCell('J' . $row)->getValue() ?? '');
-                $usefulLife = trim($sheet->getCell('K' . $row)->getValue() ?? '');
-                $supplier = trim($sheet->getCell('L' . $row)->getValue() ?? '');
-                $machineryCost = trim($sheet->getCell('M' . $row)->getValue() ?? '');
-                $location = trim($sheet->getCell('N' . $row)->getValue() ?? '');
+                $brand = trim($sheet->getCell('I' . $row)->getValue() ?? '');
+                $model = trim($sheet->getCell('J' . $row)->getValue() ?? '');
+                $startedOperations = trim($sheet->getCell('K' . $row)->getValue() ?? '');
+                $usefulLife = trim($sheet->getCell('L' . $row)->getValue() ?? '');
+                $supplier = trim($sheet->getCell('M' . $row)->getValue() ?? '');
+                $machineryCost = trim($sheet->getCell('N' . $row)->getValue() ?? '');
+                $location = trim($sheet->getCell('O' . $row)->getValue() ?? '');
 
                 $result = $this->processRow(
                     $row,
@@ -80,7 +80,7 @@ class MachineryImportService implements ImportServiceInterface
                     $miningGroup->id,
                     $location,
                     $miningProcess,
-                    $tag,
+                    $tag
                 );
 
                 // Actualizar estadísticas según el resultado
@@ -225,7 +225,7 @@ class MachineryImportService implements ImportServiceInterface
             $result['machineryType']['isNew'] = $machineryTypeResult['isNew'];
 
             // Encontrar o crear flota
-            $fleetResult = $this->findFleet($fleetData, $area->id, $miningGroupId,$company->id);
+            $fleetResult = $this->findFleet($fleetData, $area->id, $miningGroupId, $company->id);
             if (!$fleetResult['success']) {
                 throw new \Exception($fleetResult['error']);
             }
@@ -237,7 +237,7 @@ class MachineryImportService implements ImportServiceInterface
 
             // Crear nueva maquinaria (cada fila es una unidad física diferente)
             $processLocation = $this->generateLocation($location);
-            $machineryUniqueTag = $this->generateUniqueTag($tag, $area->name, $fleet->name, $miningProcess->name, $company->name);
+            $uniqueTag = $this->generateUniqueTag($tag, $machineryType->name, $fleet->name, $area->name, $machineryFamily, $miningProcess->name, $company->name);
             $machineryResult = $this->processMachinery(
                 $miningGroupId,
                 $fleet->id,
@@ -251,7 +251,7 @@ class MachineryImportService implements ImportServiceInterface
                 $machineryCost,
                 $processLocation,
                 $tag,
-                $machineryUniqueTag
+                $uniqueTag
             );
 
             if (!$machineryResult['success']) {
@@ -285,7 +285,7 @@ class MachineryImportService implements ImportServiceInterface
         $machineryCost,
         $processLocation,
         $tag,
-        $machineryUniqueTag
+        $uniqueTag
     ) {
         $result = [
             'success' => false,
@@ -294,7 +294,11 @@ class MachineryImportService implements ImportServiceInterface
             'isNew' => true,
         ];
 
-
+        $machineryExist = Machinery::find()->where(['unique_tag' => $uniqueTag])->exists();
+        if ($machineryExist) {
+            $result['error'] = "Maquinaria con Unique Tag '$uniqueTag' ya existe";
+            return $result;
+        }
         try {
             // Siempre crear una nueva maquinaria
             $machinery = new Machinery();
@@ -304,7 +308,7 @@ class MachineryImportService implements ImportServiceInterface
             $machinery->family = $machineryFamily;
             $machinery->location_id = $processLocation->id;
             $machinery->tag = $tag;
-            $machinery->unique_tag = $machineryUniqueTag;
+            $machinery->unique_tag = $uniqueTag;
 
             // Asignar campos opcionales solo si tienen valor
             if (!empty($brand)) {
@@ -367,7 +371,6 @@ class MachineryImportService implements ImportServiceInterface
 
         // Si es numérico, tratar como número de serie de Excel
         if (is_numeric($date)) {
-            // La fecha base de Excel es 30/12/1899 para sistemas Windows
             $unixTimestamp = ($date - 25569) * 86400;
             $phpDate = date('Y-m-d', $unixTimestamp);
 
@@ -441,7 +444,7 @@ class MachineryImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function findArea($areaName, $miningProcessId, $miningGroupId,$companyId)
+    private function findArea($areaName, $miningProcessId, $miningGroupId, $companyId)
     {
         $result = [
             'success' => false,
@@ -512,7 +515,7 @@ class MachineryImportService implements ImportServiceInterface
         return $result;
     }
 
-    private function findFleet($fleetName, $areaId, $miningGroupId,$companyId)
+    private function findFleet($fleetName, $areaId, $miningGroupId, $companyId)
     {
         $result = [
             'success' => false,
@@ -593,15 +596,34 @@ class MachineryImportService implements ImportServiceInterface
         }
         return $result;
     }
-    private function generateUniqueTag($tag, $areaName, $fleetName, $miningProcessName, $companyName)
+    private function generateUniqueTag($tag, $machineryType, $fleet, $area, $machineryFamily, $miningProcess, $company)
     {
-        $areaName = str_replace(' ', '_', $areaName);
-        $fleetName = str_replace(' ', '_', $fleetName);
-        $miningProcessName = str_replace(' ', '_', $miningProcessName);
-        $companyName = str_replace(' ', '_', $companyName);
 
-        $uniqueTag = $tag . "-" . $areaName . "-" . $fleetName . "-" . $miningProcessName . "-" . $companyName;
-        return $uniqueTag;
+        $values = [$tag, $machineryType, $fleet, $area, $machineryFamily, $miningProcess, $company];
+
+        $nonEmptyCount = 0;
+        foreach ($values as $value) {
+            if (!empty(trim($value))) {
+                $nonEmptyCount++;
+            }
+        }
+
+        // Si todos los valores están vacíos, devolver cadena vacía
+        if ($nonEmptyCount === 0) {
+            return "";
+        }
+
+        // Concatenar valores con "-" y reemplazar espacios con "_"
+        $result = $tag . "-" .
+            $machineryType . "-" .
+            $fleet . "-" .
+            $area . "-" .
+            $machineryFamily . "-" .
+            $miningProcess . "-" .
+            $company;
+
+       
+        return str_replace(" ", "_", $result);
     }
 
     public function generateTemplate($path)
@@ -609,6 +631,7 @@ class MachineryImportService implements ImportServiceInterface
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Headers
         $sheet->setCellValue('A1', 'Compañía*');
         $sheet->setCellValue('B1', 'Proceso Minero*');
         $sheet->setCellValue('C1', 'Familia Equipos* (SEMI/MOVIL/FIJO)');
@@ -616,15 +639,17 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('E1', 'Planta/Flota*');
         $sheet->setCellValue('F1', 'Tipo de Equipo*');
         $sheet->setCellValue('G1', 'Tag/Código*');
-        $sheet->setCellValue('H1', 'Marca');
-        $sheet->setCellValue('I1', 'Modelo');
-        $sheet->setCellValue('J1', 'Inicio Operaciones (DD-MM-YYYY)');
-        $sheet->setCellValue('K1', 'Vida Útil Equipo (años)');
-        $sheet->setCellValue('L1', 'Proveedor');
-        $sheet->setCellValue('M1', 'Costo Maquinaria MUSD');
-        $sheet->setCellValue('N1', 'Ubicación (lat,lng)');
+        $sheet->setCellValue('H1', 'Unique Tag (Auto-generado)');
+        $sheet->setCellValue('I1', 'Marca');
+        $sheet->setCellValue('J1', 'Modelo');
+        $sheet->setCellValue('K1', 'Inicio Operaciones (DD-MM-YYYY)');
+        $sheet->setCellValue('L1', 'Vida Útil Equipo (años)');
+        $sheet->setCellValue('M1', 'Proveedor');
+        $sheet->setCellValue('N1', 'Costo Maquinaria MUSD');
+        $sheet->setCellValue('O1', 'Ubicación (lat,lng)');
 
-        $sheet->getStyle('A1:N1')->applyFromArray([
+        // Estilo para headers
+        $sheet->getStyle('A1:O1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'color' => ['rgb' => '000000'],
@@ -635,8 +660,16 @@ class MachineryImportService implements ImportServiceInterface
             ],
         ]);
 
+        // Estilo especial para la columna Unique Tag (auto-generado)
+        $sheet->getStyle('H1')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '66B2FF'], // Azul más intenso para indicar que es auto-generado
+            ],
+        ]);
+
         // Auto-ajustar anchos de columna
-        foreach (range('A', 'N') as $col) {
+        foreach (range('A', 'O') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -648,21 +681,70 @@ class MachineryImportService implements ImportServiceInterface
         $sheet->setCellValue('E2', 'CAEX-KMTSU');
         $sheet->setCellValue('F2', 'CAEX');
         $sheet->setCellValue('G2', 'CAEX-001');
-        $sheet->setCellValue('H2', 'Komatsu');
-        $sheet->setCellValue('I2', '830E-AC');
-        $sheet->setCellValue('J2', '01-02-2014');
-        $sheet->setCellValue('K2', '10');
-        $sheet->setCellValue('L2', 'Komatsu');
-        $sheet->setCellValue('M2', '800000');
-        $sheet->setCellValue('N2', '-29.9574,-71.3089');
+
+        // Fórmula para generar Unique Tag automáticamente
+        // Concatena: Tag + TipoEquipo + Planta + Area + ProcesoMinero + Compania
+        $sheet->setCellValue('H2', '=CONCATENATE(G2,"-",F2,"-",E2,"-",D2,"-",B2,"-",A2)');
+
+        $sheet->setCellValue('I2', 'Komatsu');
+        $sheet->setCellValue('J2', '830E-AC');
+        $sheet->setCellValue('K2', '01-02-2014');
+        $sheet->setCellValue('L2', '10');
+        $sheet->setCellValue('M2', 'Komatsu');
+        $sheet->setCellValue('N2', '800000');
+        $sheet->setCellValue('O2', '-29.9574,-71.3089');
 
         // Dar formato a los datos de ejemplo
-        $sheet->getStyle('A2:N2')->applyFromArray([
+        $sheet->getStyle('A2:O2')->applyFromArray([
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'EEEEEE'], // Gris claro para la fila de ejemplo
             ],
         ]);
+
+        // Estilo especial para la celda del Unique Tag generado
+        $sheet->getStyle('H2')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E6F3FF'], // Azul muy claro para indicar que es calculado
+            ],
+            'font' => [
+                'italic' => true,
+            ],
+        ]);
+
+        // Crear fórmulas para las siguientes 98 filas (total 100 filas de datos)
+        // Esto hace que sea dinámico - cuando se llenen las celdas, el Unique Tag se generará automáticamente
+        for ($row = 3; $row <= 100; $row++) {
+            $sheet->setCellValue("H{$row}", "=IF(AND(G{$row}<>\"\",F{$row}<>\"\",E{$row}<>\"\",D{$row}<>\"\",B{$row}<>\"\",A{$row}<>\"\"),CONCATENATE(G{$row},\"-\",F{$row},\"-\",E{$row},\"-\",D{$row},\"-\",B{$row},\"-\",A{$row}),\"\")");
+        }
+
+        // Aplicar estilo a toda la columna H para indicar que es auto-generada
+        $sheet->getStyle('H3:H100')->applyFromArray([
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F0F8FF'], // Azul muy claro
+            ],
+            'font' => [
+                'italic' => true,
+            ],
+        ]);
+
+        // Proteger la columna del Unique Tag para evitar edición manual
+        $sheet->getStyle('H:H')->getProtection()->setLocked(true);
+
+        // Agregar una nota explicativa en una celda separada
+        $sheet->setCellValue('A102', 'NOTA: El campo "Unique Tag" se genera automáticamente. No editar manualmente.');
+        $sheet->getStyle('A102')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FF6600'],
+                'size' => 10,
+            ],
+        ]);
+
+        // Fusionar celdas para la nota
+        $sheet->mergeCells('A102:O102');
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save($path);
